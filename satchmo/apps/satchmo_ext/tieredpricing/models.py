@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.contrib.auth.models import Group, User
 from django.db import models
@@ -36,6 +38,8 @@ class PricingTierManager(models.Manager):
 
         return current
 
+
+@python_2_unicode_compatible
 class PricingTier(models.Model):
     """A specific pricing tier, such as "trade customers"
     """
@@ -48,8 +52,9 @@ class PricingTier(models.Model):
 
     objects = PricingTierManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
+
 
 class TieredPriceManager(models.Manager):
 
@@ -120,7 +125,7 @@ def tiered_price_listener(signal, adjustment=None, **kwargs):
     Requires threaded_multihost.ThreadLocalMiddleware to be installed so
     that it can determine the current user."""
 
-    if kwargs.has_key('discountable'):
+    if 'discountable' in kwargs:
         discountable = kwargs['discountable']
     else:
         discountable = adjustment.product.is_discountable

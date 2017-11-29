@@ -190,7 +190,7 @@ class Processor(object):
             else:
                 tc_key = "Default"
                 
-            if rates.has_key(tc_key):
+            if tc_key in rates:
                 rate = rates[tc_key]
             else:
                 rate = self.get_rate(tc, get_object=True)

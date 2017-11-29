@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
+
 from datetime import datetime
 from decimal import Decimal
 from django.contrib.sites.models import Site
@@ -12,12 +15,14 @@ from satchmo_store.contact.models import Contact
 from satchmo_store.shop.models import Order
 import logging
 
+
 GIFTCODE_KEY = 'GIFTCODE'
 log = logging.getLogger('giftcertificate.models')
 SATCHMO_PRODUCT = True
 
 def get_product_types():
     return ("GiftcertificateProduct",)
+
 
 class GiftCertificateManager(models.Manager):
 
@@ -29,6 +34,8 @@ class GiftCertificateManager(models.Manager):
             return GiftCertificate.objects.get(code__exact=code.value, valid__exact=True, site=site)
         raise GiftCertificate.DoesNotExist()
 
+
+@python_2_unicode_compatible
 class GiftCertificate(models.Model):
     """A Gift Cert which holds value."""
     site = models.ForeignKey(Site, null=True, blank=True, verbose_name=_('Site'))
@@ -90,7 +97,7 @@ class GiftCertificate(models.Model):
             self.site = Site.objects.get_current()
         super(GiftCertificate, self).save(**kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         sb = moneyfmt(self.start_balance)
         b = moneyfmt(self.balance)
         return u"Gift Cert: %s/%s" % (sb, b)
@@ -99,6 +106,8 @@ class GiftCertificate(models.Model):
         verbose_name = _("Gift Certificate")
         verbose_name_plural = _("Gift Certificates")
 
+
+@python_2_unicode_compatible
 class GiftCertificateUsage(models.Model):
     """Any usage of a Gift Cert is logged with one of these objects."""
     usage_date = models.DateField(_("Date of usage"), null=True, blank=True)
@@ -110,7 +119,7 @@ class GiftCertificateUsage(models.Model):
         blank=True, null=True, related_name='giftcertificates_used')
     giftcertificate = models.ForeignKey(GiftCertificate, related_name='usages')
 
-    def __unicode__(self):
+    def __str__(self):
         return u"GiftCertificateUsage: %s" % self.balance_used
 
     def save(self, **kwargs):
@@ -119,6 +128,7 @@ class GiftCertificateUsage(models.Model):
         super(GiftCertificateUsage, self).save(**kwargs)
 
 
+@python_2_unicode_compatible
 class GiftCertificateProduct(models.Model):
     """
     The product model for a Gift Certificate
@@ -127,7 +137,7 @@ class GiftCertificateProduct(models.Model):
     is_shippable = False
     discountable = False
 
-    def __unicode__(self):
+    def __str__(self):
         return u"GiftCertificateProduct: %s" % self.product.name
 
     def _get_subtype(self):

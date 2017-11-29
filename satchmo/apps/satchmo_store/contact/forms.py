@@ -310,7 +310,7 @@ class ContactInfoForm(ProxyContactForm):
         return data
 
     def save(self, **kwargs):
-        if not kwargs.has_key('contact'):
+        if not 'contact' in kwargs:
             kwargs['contact'] = None
         return self.save_info(**kwargs)
 

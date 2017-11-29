@@ -5,7 +5,8 @@ Associates products to each other for upselling purposes.
 # TODO:
 # - Rename Upsell object to what it actually is, a CrossSell
 # - Implement an Upsell which would *replace* the item.  Like a "supersize" concept.
-
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from datetime import date
 from decimal import Decimal, getcontext
 from django.conf import settings
@@ -28,8 +29,9 @@ UPSELL_CHOICES=(
     ('FORM', _('Form with 0 quantity')),
 )
 
+
+@python_2_unicode_compatible
 class Upsell(models.Model, CachedObjectMixin):
-    
     target = models.ManyToManyField(Product, verbose_name=_('Target Product'), 
         related_name="upselltargets",
         help_text = _("The products for which you want to show this goal product as an Upsell."))
@@ -54,7 +56,7 @@ class Upsell(models.Model, CachedObjectMixin):
         try:
             trans = self.cache_get(trans=language_code)
 
-        except keyedcache.NotCachedError, e:
+        except keyedcache.NotCachedError as e:
             trans = self._find_translation(language_code)
 
         if trans:
@@ -110,8 +112,8 @@ class Upsell(models.Model, CachedObjectMixin):
         """Returns true if this style ends with TRUE"""
         return self.style.endswith('TRUE')
         
-    def __unicode__(self):
-        return u"Upsell for %s" % self.goal
+    def __str__(self):
+        return "Upsell for %s" % self.goal
         
     def save(self, **kwargs):
         self.create_date = datetime.date.today()

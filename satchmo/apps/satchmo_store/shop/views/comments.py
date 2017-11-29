@@ -22,9 +22,9 @@ def post_rating(request, url='/ratings/posted/', maxcomments=1):
     per product.
     """
     if request.method != "POST":
-        raise Http404, _("One or more of the required fields wasn't submitted")
+        raise Http404(_("One or more of the required fields wasn't submitted"))
         
-    if request.POST.has_key('url'):
+    if 'url' in request.POST:
         url = request.POST['url']
         
     response = post_comment(request)
@@ -33,14 +33,14 @@ def post_rating(request, url='/ratings/posted/', maxcomments=1):
         try:
             target = request.POST['target']
         except KeyError:
-            raise Http404, _("One or more of the required fields wasn't submitted")
+            raise Http404(_("One or more of the required fields wasn't submitted"))
             
         content_type_id, object_id = target.split(':')
         
         try:
             ct = ContentType.objects.get(pk=content_type_id)
         except ContentType.DoesNotExist:
-            raise Http404, _("Bad ContentType: %s" % content_type_id)
+            raise Http404(_("Bad ContentType: %s" % content_type_id))
         
         comments = Comment.objects.filter(object_id__exact=object_id,
             content_type__app_label__exact=ct.app_label,

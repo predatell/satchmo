@@ -1,5 +1,6 @@
 """Product queries using ratings."""
 from django.conf import settings
+import six
 if 'django_comments' in settings.INSTALLED_APPS:
     from django_comments.models import Comment
 else:
@@ -25,7 +26,7 @@ def highest_rated(count=0, site=None):
         pks = [pk for pk in pks.split(',')]
         log.debug('retrieved highest rated products from cache')
         
-    except NotCachedError, nce:
+    except NotCachedError as nce:
         # here were are going to do just one lookup for all product comments
 
         comments = Comment.objects.filter(content_type__app_label__exact='product',
@@ -57,7 +58,7 @@ def highest_rated(count=0, site=None):
         cache_set(nce.key, value=pkstring)
     
     if pks:
-        pks = [pk for pk in pks if isinstance(pk, (int, long))]
+        pks = [pk for pk in pks if isinstance(pk, six.integer_types)]
         productdict = Product.objects.in_bulk(pks)
         products = []
         for pk in pks:

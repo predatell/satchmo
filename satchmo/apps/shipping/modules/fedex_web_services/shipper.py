@@ -192,27 +192,27 @@ class Shipper(BaseShipper):
 
         # If you'd like to see some documentation on the ship service WSDL, un-comment
         # this line. (Spammy).
-        #print rate_request.client
+        #print(rate_request.client)
 
         # Un-comment this to see your complete, ready-to-send request as it stands
         # before it is actually sent. This is useful for seeing what values you can
         # change.
-        # print rate_request.RequestedShipment
+        # print(rate_request.RequestedShipment)
         # Fires off the request, sets the 'response' attribute on the object.
         try:
             rate_request.send_request()
-        except FedexBaseServiceException, e:
+        except FedexBaseServiceException as e:
             # Expected Fedex exceptions with good messages are:
             # FedexFailure (for temporary server error), FedexError (for wrong request), SchemaValidationError
             log.info('******************* Error in shipping: %s' % str(e))
-        except Exception, e:
+        except Exception as e:
             # Unexpected exceptions mostly need a traceback but also continue.
             log.info('******************* Error in shipping:\n%s', traceback.format_exc(limit=15))
 
         # This will show the reply to your rate_request being sent. You can access the
         # attributes through the response attribute on the request object. This is
         # good to un-comment to see the variables returned by the FedEx reply.
-        # print rate_request.response
+        # print(rate_request.response)
         
         if rate_request.response:
             if rate_request.response.HighestSeverity in ['SUCCESS', 'WARNING', 'NOTE']:

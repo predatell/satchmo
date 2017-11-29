@@ -69,9 +69,9 @@ def filter_admin_app_list(parser, token):
     """
     tokens = token.contents.split()
     if len(tokens) < 4:
-        raise template.TemplateSyntaxError, "'%s' tag requires two arguments" % tokens[0]
+        raise template.TemplateSyntaxError("'%s' tag requires two arguments" % tokens[0])
     if tokens[2] != 'as':
-        raise template.TemplateSyntaxError, "Second argument to '%s' tag must be 'as'" % tokens[0]
+        raise template.TemplateSyntaxError("Second argument to '%s' tag must be 'as'" % tokens[0])
     return FilterAdminApplistNode(tokens[1], tokens[3])
 
 register.tag('filter_admin_app_list', filter_admin_app_list)

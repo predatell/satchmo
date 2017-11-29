@@ -10,7 +10,7 @@ import fnmatch
 import logging
 import os
 import shutil
-import urlparse
+from six.moves import urllib
 
 try:
     import Image
@@ -52,7 +52,7 @@ def _get_thumbnail_path(path, width=None, height=None):
         th_name += '_h%d' % height
     th_name += ext
 
-    return urlparse.urljoin(basedir, th_name)
+    return urllib.parse.urljoin(basedir, th_name)
 
 def _get_path_from_url(url, root=settings.MEDIA_ROOT, url_root=settings.MEDIA_URL):
     """ make filesystem path from url """
@@ -71,7 +71,7 @@ def _get_url_from_path(path, root=settings.MEDIA_ROOT, url_root=settings.MEDIA_U
     if path.startswith(root):
         path = path[len(root):] # strip media root
 
-    return urlparse.urljoin(root, path.replace('\\', '/'))
+    return urllib.parse.urljoin(root, path.replace('\\', '/'))
 
 def _has_thumbnail(photo_url, width=None, height=None, root=settings.MEDIA_ROOT, url_root=settings.MEDIA_URL):
     # one of width/height is required
@@ -126,10 +126,10 @@ def make_thumbnail(photo_url, width=None, height=None, root=settings.MEDIA_ROOT,
         img = Image.open(photo_path).copy()
         img.thumbnail(size, Image.ANTIALIAS)
         img.save(th_path, quality=config_value('THUMBNAIL', 'IMAGE_QUALITY'))
-    except Exception, err:
+    except Exception as err:
         # this goes to webserver error log
         import sys
-        print >>sys.stderr, '[MAKE THUMBNAIL] error %s for file %r' % (err, photo_url)
+        print('[MAKE THUMBNAIL] error %s for file %r' % (err, photo_url), file=sys.stderr)
         return photo_url
 
     return th_url
@@ -216,10 +216,10 @@ def get_image_size(photo_url, root=settings.MEDIA_ROOT, url_root=settings.MEDIA_
     if size is None:
         try:
             size = Image.open(path).size
-        except Exception, err:
+        except Exception as err:
             # this goes to webserver error log
             import sys
-            print >>sys.stderr, '[GET IMAGE SIZE] error %s for file %r' % (err, photo_url)
+            print('[GET IMAGE SIZE] error %s for file %r' % (err, photo_url), file=sys.stderr)
             return None, None
 
         if size is not None:

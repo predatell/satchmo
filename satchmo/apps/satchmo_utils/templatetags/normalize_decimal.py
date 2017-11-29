@@ -62,7 +62,7 @@ def normalize_decimal(value, args=""):
     try:
         return mark_safe(str(round_decimal(val=value, **kwargs)))
 
-    except RoundedDecimalError, e:
+    except RoundedDecimalError as e:
         log.error("normalize_decimal error val=%s, id-%s, msg=%s", (e.val, e.id, e.msg))
         return value
 

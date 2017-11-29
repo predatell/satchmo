@@ -212,7 +212,7 @@ def get_price(request, product_slug):
 
     prod_slug = product.slug
 
-    if request.method == "POST" and request.POST.has_key('quantity'):
+    if request.method == "POST" and 'quantity' in request.POST:
         try:
             quantity = round_decimal(request.POST['quantity'], places=2, roundfactor=.25)
         except RoundedDecimalError:
@@ -256,7 +256,7 @@ def get_price_detail(request, product_slug):
 
         prod_slug = product.slug
 
-        if reqdata.has_key('quantity'):
+        if 'quantity' in reqdata:
             try:
                 quantity = round_decimal(reqdata['quantity'], places=2, roundfactor=.25)
             except RoundedDecimalError:

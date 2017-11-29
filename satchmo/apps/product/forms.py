@@ -227,7 +227,7 @@ class ProductExportForm(forms.Form):
 
         try:
             raw = serializers.serialize(format, objects, indent=False)
-        except Exception, e:
+        except Exception as e:
             raise CommandError("Unable to serialize database: %s" % e)
 
         if include_images:
@@ -239,7 +239,7 @@ class ProductExportForm(forms.Form):
 
             zinfo = zf.getinfo(str(export_file))
             # Caution, highly magic number, chmods the file to 644
-            zinfo.external_attr = 2175008768L
+            zinfo.external_attr = 2175008768
 
             image_dir = config_value('PRODUCT', 'IMAGE_DIR')
             config = "PRODUCT.IMAGE_DIR=%s\nEXPORT_FILE=%s" % (image_dir, export_file)
@@ -247,7 +247,7 @@ class ProductExportForm(forms.Form):
 
             zinfo = zf.getinfo('VARS')
             # Caution, highly magic number, chmods the file to 644
-            zinfo.external_attr = 2175008768L
+            zinfo.external_attr = 2175008768
 
             for image in images:
                 f = image.path
@@ -375,7 +375,7 @@ class ProductImportForm(forms.Form):
                 results.append(_('Added %(count)i objects from %(filename)s') % {'count': ct, 'filename': filename})
                 transaction.commit()
                 #label_found = True
-            except Exception, e:
+            except Exception as e:
                 #fixture.close()
                 errors.append(_("Problem installing fixture '%(filename)s': %(error_msg)s\n") % {'filename': filename, 'error_msg': str(e)})
                 errors.append("Raw: %s" % raw)

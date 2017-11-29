@@ -51,7 +51,7 @@ def wishlist_add(request):
     log.debug('FORM: %s', request.POST)
     formdata = request.POST.copy()
     productslug = None
-    if formdata.has_key('productname'):
+    if 'productname' in formdata:
         productslug = formdata['productname']
     try:
         product, details = product_from_post(productslug, formdata)
@@ -113,7 +113,7 @@ def wishlist_move_to_cart(request):
         cart = Cart.objects.from_request(request, create=True)
         try:
             cart.add_item(wish.product, number_added=1, details=wish.details)
-        except CartAddProhibited, cap:
+        except CartAddProhibited as cap:
             msg = _("Wishlist product '%(product)s' could't be added to the cart. %(details)s") % {
                 'product' : wish.product.translated_name(), 
                 'details' : cap.message

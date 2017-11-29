@@ -21,7 +21,7 @@ def upload_dir(instance, filename):
         raw = config_value('PRODUCT', 'IMAGE_DIR')
     except SettingNotSet:
         pass
-    except ImportError, e:
+    except ImportError:
         log.warn("Error getting upload_dir, OK if you are in SyncDB.")
 
     updir = normalize_dir(raw)

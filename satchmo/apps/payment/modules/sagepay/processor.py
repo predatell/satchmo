@@ -13,8 +13,7 @@ from payment.modules.base import BasePaymentProcessor, ProcessorResult
 from satchmo_utils.numbers import trunc_decimal
 from django.utils.http import urlencode
 import forms
-import urllib2
-
+from six.moves import urllib
 PROTOCOL = "2.22"
 
 SAGEPAY_DEFAULT_URLS = {
@@ -102,7 +101,7 @@ class PaymentProcessor(BasePaymentProcessor):
             addr = [data.bill_street1, data.bill_street2, data.bill_city, data.bill_state]
             self.packet['BillingAddress'] = ', '.join(addr)
             self.packet['BillingPostCode'] = data.bill_postal_code
-        except Exception, e:
+        except Exception as e:
             self.log.error('preparing data, got error: %s\nData: %s', e, data)
             self.valid = False
             return
@@ -154,13 +153,13 @@ class PaymentProcessor(BasePaymentProcessor):
 
             else:
                 self.log_extra("About to post to server: %s?%s", self.url, self.postString)
-                conn = urllib2.Request(self.url, data=self.postString)
+                conn = urllib.request.Request(self.url, data=self.postString)
                 try:
-                    f = urllib2.urlopen(conn)
+                    f = urllib.request.urlopen(conn)
                     result = f.read()
                     self.log_extra('Process: url=%s\nPacket=%s\nResult=%s', self.url, self.packet, result)
 
-                except urllib2.URLError, ue:
+                except urllib.error.URLError as ue:
                     self.log.error("error opening %s\n%s", self.url, ue)
                     return ProcessorResult(self.key, False, 'Could not talk to Sage Pay gateway')
 
@@ -170,7 +169,7 @@ class PaymentProcessor(BasePaymentProcessor):
                     success = (status == 'OK')
                     detail = self.response['StatusDetail']
 
-                except KeyError, e:
+                except KeyError as e:
                     self.log.info('Error submitting payment: %s', e)
                     payment = self.record_failure(order=order, amount=amount,
                         transaction_id="", reason_code="error",
