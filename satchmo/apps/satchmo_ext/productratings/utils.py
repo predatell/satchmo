@@ -1,4 +1,5 @@
 from django.conf import settings
+from six.moves import reduce
 try:
     from django.contrib.comments.models import Comment
 except ImportError:

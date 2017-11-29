@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.generic import DetailView, FormView
+import six
 
 from livesettings.functions import config_value
 from product.models import Product, OptionManager
@@ -75,7 +76,7 @@ def _set_quantity(request, force_delete=False):
         try:
             roundfactor = config_value('SHOP', 'CART_ROUNDING')
             qty = round_decimal(request.POST.get('quantity', 0), places=cartplaces, roundfactor=roundfactor, normalize=True)
-        except RoundedDecimalError, P:
+        except RoundedDecimalError as P:
             return (False, cart, None, _("Bad quantity."))
 
         if qty < Decimal('0'):
@@ -173,7 +174,7 @@ def add(request, id=0, redirect_to='satchmo_cart'):
     cartplaces = config_value('SHOP', 'CART_PRECISION')
     roundfactor = config_value('SHOP', 'CART_ROUNDING')
 
-    if formdata.has_key('productname'):
+    if 'productname' in formdata:
         productslug = formdata['productname']
     try:
         product, details = product_from_post(productslug, formdata)
@@ -216,7 +217,7 @@ def add(request, id=0, redirect_to='satchmo_cart'):
     try:
         added_item = cart.add_item(product, number_added=quantity, details=details)
 
-    except CartAddProhibited, cap:
+    except CartAddProhibited as cap:
         return _product_error(request, product, cap.message)
 
     # got to here with no error, now send a signal so that listeners can also operate on this form.
@@ -229,9 +230,9 @@ def add(request, id=0, redirect_to='satchmo_cart'):
             'name': product.translated_name(),
             'item_id': added_item.id,
             'item_qty': str(round_decimal(quantity, 2)),
-            'item_price': unicode(moneyfmt(added_item.line_total)) or "0.00",
+            'item_price': six.text_type(moneyfmt(added_item.line_total)) or "0.00",
             'cart_count': str(round_decimal(cart.numItems, 2)),
-            'cart_total': unicode(moneyfmt(cart.total)),
+            'cart_total': six.text_type(moneyfmt(cart.total)),
             # Legacy result, for now
             'results': _("Success"),
         }
@@ -245,7 +246,7 @@ def add(request, id=0, redirect_to='satchmo_cart'):
         
 def add_ajax(request, id=0, **kwargs):
     # Allow for legacy apps to still use this url
-    if not request.META.has_key('HTTP_X_REQUESTED_WITH'):
+    if not 'HTTP_X_REQUESTED_WITH' in request.META:
         request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
     log.warning('satchmo_cart_add_ajax is deprecated, use satchmo_cart_add')
     return add(request, id)
@@ -329,7 +330,7 @@ def remove(request):
             return _json_response({'errors': errors, 'results': _("Error")}, True)
         else:
             return _json_response({
-                'cart_total': unicode(moneyfmt(cart.total)),
+                'cart_total': six.text_type(moneyfmt(cart.total)),
                 'cart_count': str(cart.numItems),
                 'item_id': cartitem.id,
                 'results': success, # Legacy
@@ -345,7 +346,7 @@ def remove(request):
 def remove_ajax(request, template="shop/json.html"):
     """Remove an item from the cart. Returning JSON formatted results."""
     # Allow for legacy apps to still use this url
-    if not request.META.has_key('HTTP_X_REQUESTED_WITH'):
+    if not 'HTTP_X_REQUESTED_WITH' in request.META:
         request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
 
     log.warning('satchmo_cart_remove_ajax is deprecated, use satchmo_cart_remove')
@@ -371,8 +372,8 @@ def set_quantity(request):
             return _json_response({
                 'item_id': cartitem.id,
                 'item_qty': str(cartitem.quantity) or "0",
-                'item_price': unicode(moneyfmt(cartitem.line_total)) or "0.00",
-                'cart_total': unicode(moneyfmt(cart.total)) or "0.00",
+                'item_price': six.text_type(moneyfmt(cartitem.line_total)) or "0.00",
+                'cart_total': six.text_type(moneyfmt(cart.total)) or "0.00",
                 'cart_count': str(cart.numItems) or '0',
             })
 
@@ -387,7 +388,7 @@ def set_quantity_ajax(request, template="shop/json.html"):
     """Set the quantity for a cart item, returning results formatted for handling by script.
     Kept for legacy apps.
     """
-    if not request.META.has_key('HTTP_X_REQUESTED_WITH'):
+    if not 'HTTP_X_REQUESTED_WITH' in request.META:
         request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
 
     return set_quantity(request)
@@ -439,8 +440,8 @@ def product_from_post(productslug, formdata):
                 price_change = result.price_change
             else:
                 price_change = zero
-            data = { 'name': unicode(result.option_group),
-                      'value': unicode(result.translated_name()),
+            data = { 'name': six.text_type(result.option_group),
+                      'value': six.text_type(result.translated_name()),
                       'sort_order': result.sort_order,
                       'price_change': price_change
             }

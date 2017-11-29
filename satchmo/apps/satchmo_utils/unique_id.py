@@ -5,8 +5,9 @@ If that doesn't work, we add random numbers to the name
 """
 
 from django.contrib.auth.models import User
-from django.utils.encoding import smart_unicode
-from htmlentitydefs import name2codepoint
+from django.utils.encoding import smart_text 
+import six
+from six.moves.html_entities import name2codepoint
 from satchmo_utils import random_string
 import re
 import unicodedata
@@ -40,36 +41,36 @@ def _id_generator(first_name, last_name, email):
 def generate_id(first_name='', last_name='', email=''):
     valid_id = False
     gen = _id_generator(first_name, last_name, email)
-    test_name = gen.next()
+    test_name = next(gen)
     while valid_id is False:
         try:
             User.objects.get(username=test_name)
         except User.DoesNotExist:
             valid_id = True
         else:
-            test_name = gen.next()
+            test_name = next(gen)
     return test_name
 
 # From http://www.djangosnippets.org/snippets/369/
 def slugify(s, entities=True, decimal=True, hexadecimal=True,
    instance=None, slug_field='slug', filter_dict=None):
-    s = smart_unicode(s)
+    s = smart_text(s)
 
     #character entity reference
     if entities:
-        s = re.sub('&(%s);' % '|'.join(name2codepoint), lambda m: unichr(name2codepoint[m.group(1)]), s)
+        s = re.sub('&(%s);' % '|'.join(name2codepoint), lambda m: six.unichr(name2codepoint[m.group(1)]), s)
 
     #decimal character reference
     if decimal:
         try:
-            s = re.sub('&#(\d+);', lambda m: unichr(int(m.group(1))), s)
+            s = re.sub('&#(\d+);', lambda m: six.unichr(int(m.group(1))), s)
         except:
             pass
 
     #hexadecimal character reference
     if hexadecimal:
         try:
-            s = re.sub('&#x([\da-fA-F]+);', lambda m: unichr(int(m.group(1), 16)), s)
+            s = re.sub('&#x([\da-fA-F]+);', lambda m: six.unichr(int(m.group(1), 16)), s)
         except:
             pass
 

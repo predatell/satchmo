@@ -1,6 +1,8 @@
 """
 ProductShipping  models
-""" 
+"""
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -85,6 +87,7 @@ class Shipper(BaseShipper):
         return True
 
 
+@python_2_unicode_compatible
 class Carrier(models.Model):
     key = models.SlugField(_('Key'))
     ordering = models.IntegerField(_('Ordering'), default=0)
@@ -183,11 +186,12 @@ class Carrier(models.Model):
             log.debug("No %s shipping price found for %s", self, product.slug)
             raise ProductShippingPriceException('No price available')
             
-    def __unicode__(self):
-        return u"Carrier: %s [%s]" % (self.name, self.method)
+    def __str__(self):
+        return "Carrier: %s [%s]" % (self.name, self.method)
         
     class Meta:
         ordering = ('ordering',)
+        
         
 class CarrierTranslation(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='translations')
@@ -200,13 +204,15 @@ class CarrierTranslation(models.Model):
     class Meta:
         ordering=('languagecode','name')
 
+
+@python_2_unicode_compatible
 class ProductShippingPrice(models.Model):
     product = models.ForeignKey(Product, related_name="shipping_price")
     carrier = models.ForeignKey('Carrier', related_name='tiers')
     price = models.DecimalField(_("Shipping Price"), max_digits=10, decimal_places=2, )
     
-    def __unicode__(self):
-        return u"ProductShippingPrice: %s" % (self.price)
+    def __str__(self):
+        return "ProductShippingPrice: %s" % (self.price)
     
     class Meta:
         ordering = ('carrier','price')

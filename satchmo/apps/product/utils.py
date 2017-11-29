@@ -12,8 +12,6 @@ from satchmo_utils.numbers import round_decimal
 import datetime
 import logging
 import types
-import string
-
 log = logging.getLogger('product.utils')
 
 
@@ -79,7 +77,7 @@ def productvariation_details(product, include_tax, user, create=False):
             log.warning('You must run satchmo_rebuild_pricing and add it to a cron-job to run every day, or else the product details will not work for product detail pages.')
     for detl in variations:
         key = detl.key
-        if details.has_key(key):
+        if key in details:
             detail = details[key]
             qty = detl.quantity
         else:
@@ -184,7 +182,7 @@ def serialize_options(product, selected_options=()):
 
         for options in all_options:
             for option in options:
-                if not opts.has_key(option):
+                if not option in opts:
                     k, v = split_option_unique_id(option)
                     vals[v] = False
                     groups[k] = False
@@ -192,13 +190,13 @@ def serialize_options(product, selected_options=()):
 
         for option in Option.objects.filter(option_group__id__in = groups.keys(), value__in = vals.keys()):
             uid = option.unique_id
-            if opts.has_key(uid):
+            if uid in opts:
                 opts[uid] = option
 
         # now we have all the objects in our "opts" dictionary, so build the serialization dict
 
         for option in opts.values():
-            if not serialized.has_key(option.option_group_id):
+            if not option.option_group_id in serialized:
                 serialized[option.option_group.id] = {
                     'name': option.option_group.translated_name(),
                     'description': option.option_group.translated_description(),
@@ -260,8 +258,8 @@ def validation_yesno(value, obj=None):
     Validates that yes or no is entered.
     Converts the yes or no to capitalized version
     """
-    if string.upper(value) in ["YES","NO"]:
-        return True, string.capitalize(value)
+    if value.upper() in ["YES","NO"]:
+        return True, value.capitalize()
     else:
         return False, value
 
@@ -316,7 +314,7 @@ def optionids_from_post(configurableproduct, POST):
     from the passed `ConfigurableProduct`"""
     chosen_options = []
     for opt_grp in configurableproduct.option_group.all():
-        if POST.has_key(str(opt_grp.id)):
+        if str(opt_grp.id) in POST:
             chosen_options.append('%s-%s' % (opt_grp.id, POST[str(opt_grp.id)]))
     return sorted_tuple(chosen_options)
     

@@ -17,6 +17,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import smart_str
+import six
 try: 
     from importlib import import_module
 except ImportError:
@@ -201,7 +202,7 @@ class WKHTMLDocument(DocumentBase, FileTemplateMixin, FileRenderMixin):
             prefix='satchmo-wkhtml'
         )
         try:
-            if isinstance(data, unicode):
+            if isinstance(data, six.text_type):
                 data = data.encode("utf-8")
             with open(input_file, 'wb') as input:
                 input.write(data)

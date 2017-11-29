@@ -2,6 +2,7 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 from product import active_product_types
 from product.models import Product
 from satchmo_utils.urlhelper import reverse_admin_url
@@ -31,7 +32,7 @@ def edit_subtypes(product):
                            _('Add %(subtype)s') % {'subtype': subtype} +
                            '</a></li>')
     output += '</ul>'
-    return output
+    return mark_safe(output)
 
 register.simple_tag(edit_subtypes)
 

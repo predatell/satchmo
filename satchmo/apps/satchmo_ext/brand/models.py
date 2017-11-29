@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
@@ -22,6 +24,8 @@ class BrandManager(models.Manager):
         site = Site.objects.get_current()
         return self.get(slug=slug, site=site)
 
+
+@python_2_unicode_compatible
 class Brand(models.Model, TranslatedObjectMixin):
     """A product brand"""
     site = models.ForeignKey(Site)
@@ -59,8 +63,8 @@ class Brand(models.Model, TranslatedObjectMixin):
     def has_products(self):
         return self.active_products().count() > 0
             
-    def __unicode__(self):
-        return u"%s" % self.slug
+    def __str__(self):
+        return "%s" % self.slug
             
     class Meta:
         ordering=('ordering', 'slug')
@@ -99,11 +103,14 @@ class BrandTranslation(models.Model):
         verbose_name = _('Brand Translation')
         verbose_name_plural = _('Brand Translations')  
 
+
 class BrandCategoryManager(models.Manager):
     def by_slug(self, brandname, slug):
         brand = Brand.objects.by_slug(brandname)
         return brand.categories.get(slug=slug)
 
+
+@python_2_unicode_compatible
 class BrandCategory(models.Model, TranslatedObjectMixin):
     """A category within a brand"""
     slug = models.SlugField(_("Slug"),
@@ -136,7 +143,7 @@ class BrandCategory(models.Model, TranslatedObjectMixin):
     def has_products(self):
         return self.active_products().count > 0
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s: %s" % (self.brand.slug, self.slug)
 
     class Meta:

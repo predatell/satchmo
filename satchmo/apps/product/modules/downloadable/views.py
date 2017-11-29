@@ -6,12 +6,11 @@ from django.utils.translation import ugettext_lazy as _
 from product.modules.downloadable.models import DownloadLink
 from satchmo_store.shop.signals import sendfile_url_for_file
 import mimetypes
+from six.moves.urllib.parse import urljoin
 
 import os
 import os.path
 import re
-from urlparse import urljoin
-
 SHA1_RE = re.compile('^[a-f0-9]{40}$')
 
 def _validate_key(download_key):

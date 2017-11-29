@@ -1,3 +1,4 @@
+from __future__ import print_function
 from decimal import Decimal
 from distutils.version import LooseVersion
 from django.core.management.base import BaseCommand
@@ -8,6 +9,8 @@ import imp
 import logging
 import os
 import re
+import six
+from six.moves import reduce
 import sys
 import types
 
@@ -107,7 +110,7 @@ class Command(BaseCommand):
         try:
             from livesettings.models import Setting
             Setting.objects.all().count()
-        except Exception, e:
+        except Exception as e:
             error_out("Can not use livesettings: %s" % e)
         else:
             # The function urlresolvers.reverse has its own way of error reporting to screen and we have no access
@@ -116,7 +119,7 @@ class Command(BaseCommand):
                 url = urlresolvers.reverse('satchmo_search')
                 # Catch SystemExit, because if an error occurs, `urlresolvers` usually calls sys.exit() and other error
                 # messages would be lost.
-            except (Exception, SystemExit), e:
+            except (Exception, SystemExit) as e:
                 error_out("Unable to resolve urls. Received error - %s" % formaterror(e))
         try:
             from l10n.l10n_settings import get_l10n_default_currency_symbol
@@ -180,13 +183,13 @@ class Command(BaseCommand):
             for error in errors:
                 print_out(error)
             if logged_more:
-                print >>sys.stderr, "Error details are in 'satchmo.log'"
+                print("Error details are in 'satchmo.log'", file=sys.stderr)
 
 
 def print_out(msg):
     "Print immediately to screen and to the log."
     log.info(msg)
-    print >>sys.stderr, msg
+    print(msg, file=sys.stderr)
 
 
 def error_out(msg):
@@ -273,7 +276,7 @@ def check_install(project_name, appname, min_version=None, hg_hash=None):
     except ImportError:
         log.exception('Can not import "%s"' % appname)
         logged_more = True
-    except Exception, e:
+    except Exception as e:
         log.exception('Error while importing "%s": %s' % (appname, str(e)))
         logged_more = True
 

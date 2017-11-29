@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -13,6 +15,8 @@ SATCHMO_PRODUCT=True
 def get_product_types():
     return ('CustomProduct',)
 
+
+@python_2_unicode_compatible
 class CustomProduct(models.Model):
     """
     Product which must be custom-made or ordered.
@@ -95,8 +99,8 @@ class CustomProduct(models.Model):
     def _get_subtype(self):
         return 'CustomProduct'
 
-    def __unicode__(self):
-        return u"CustomProduct: %s" % self.product.name
+    def __str__(self):
+        return "CustomProduct: %s" % self.product.name
 
     def get_valid_options(self):
         """
@@ -115,6 +119,7 @@ class CustomProduct(models.Model):
         verbose_name_plural = _('Custom Products')
 
 
+@python_2_unicode_compatible
 class CustomTextField(models.Model):
     """
     A text field to be filled in by a customer.
@@ -138,13 +143,15 @@ class CustomTextField(models.Model):
     def translated_name(self, language_code=None):
         return lookup_translation(self, 'name', language_code)
 
-    def __unicode__(self):
-        return u"CustomText: %s" % self.name
+    def __str__(self):
+        return "CustomText: %s" % self.name
 
     class Meta:
         ordering = ('sort_order',)
         unique_together = ('slug', 'products')
 
+
+@python_2_unicode_compatible
 class CustomTextFieldTranslation(models.Model):
     """A specific language translation for a `CustomTextField`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -161,5 +168,5 @@ class CustomTextFieldTranslation(models.Model):
         ordering = ('customtextfield', 'name','languagecode')
         unique_together = ('customtextfield', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"CustomTextFieldTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.customtextfield, self.name)
+    def __str__(self):
+        return "CustomTextFieldTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.customtextfield, self.name)

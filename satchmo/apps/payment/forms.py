@@ -289,13 +289,13 @@ class PaymentContactInfoForm(PaymentMethodForm, ContactInfoForm):
             required_fields = self.payment_required_fields.get(paymentmethod, [])
             msg = _('Selected payment method requires this field to be filled')
             for fld in required_fields:
-                if not (self.cleaned_data.has_key(fld) and self.cleaned_data[fld]):
+                if not (fld in self.cleaned_data and self.cleaned_data[fld]):
                     self._errors[fld] = forms.util.ErrorList([msg])
                 elif fld == 'state':
                     self.enforce_state = True
                     try:
                         self._check_state(self.cleaned_data['state'], self.cleaned_data['country'])
-                    except forms.ValidationError, e:
+                    except forms.ValidationError as e:
                         self._errors[fld] = e.messages
             super(PaymentContactInfoForm, self).clean()
             return self.cleaned_data
@@ -352,7 +352,7 @@ class SimplePayShipForm(forms.Form):
         except Contact.DoesNotExist:
             self.tempContact = None
 
-        if kwargs.has_key('default_view_tax'):
+        if 'default_view_tax' in kwargs:
             default_view_tax = kwargs['default_view_tax']
         else:
             default_view_tax = config_value_safe('TAX', 'TAX_SHIPPING', False)
@@ -422,7 +422,7 @@ class SimplePayShipForm(forms.Form):
         if self.order and self.tempContact and self.tempCart:
             order = self.order
             if order.is_shippable and len(self.shipping_dict) == 1:
-                update_shipping(order, self.shipping_dict.keys()[0], self.tempContact, self.tempCart)
+                update_shipping(order, list(self.shipping_dict.keys())[0], self.tempContact, self.tempCart)
             order.recalculate_total(save=False)
             needed = not order.paid_in_full
             if not needed:

@@ -15,10 +15,10 @@ from satchmo_store.shop.models import Order, OrderPayment
 from satchmo_store.contact.models import Contact
 from satchmo_utils.dynamic import lookup_url, lookup_template
 from satchmo_utils.views import bad_or_missing
+from six.moves import urllib
 from sys import exc_info
 from traceback import format_exception
 import logging
-import urllib2
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -194,9 +194,9 @@ def confirm_ipn_data(query_string, PP_URL):
 
     params = 'cmd=_notify-validate&' + query_string
 
-    req = urllib2.Request(PP_URL)
+    req = urllib.request.Request(PP_URL)
     req.add_header("Content-type", "application/x-www-form-urlencoded")
-    fo = urllib2.urlopen(req, params)
+    fo = urllib.request.urlopen(req, params)
 
     ret = fo.read()
     if ret == "VERIFIED":

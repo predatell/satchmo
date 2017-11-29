@@ -4,6 +4,8 @@ import django
 import logging
 import os
 import random
+from six.moves import range
+from six.moves import reduce
 import sys
 import types
 import warnings
@@ -154,7 +156,7 @@ _LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 def random_string(length, variable=False, charset=_LETTERS):
     if variable:
         length = random.randrange(1, length+1)
-    return ''.join([random.choice(charset) for x in xrange(length)])
+    return ''.join([random.choice(charset) for x in range(length)])
 
 def request_is_secure(request):
     if request.is_secure():

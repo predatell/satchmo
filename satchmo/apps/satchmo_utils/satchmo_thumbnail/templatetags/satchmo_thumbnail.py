@@ -8,6 +8,7 @@ from django.conf import settings
 from django.template import TemplateSyntaxError
 from satchmo_utils.satchmo_thumbnail.utils import make_thumbnail, get_image_size
 from django.utils.safestring import mark_safe
+import six
 register = template.Library()
 ##################################################
 ## FILTERS ##
@@ -20,16 +21,16 @@ def js_thumbnail_array(details, args=''):
     """
     ret = ''
 
-    for k,v in details.iteritems():
+    for k,v in six.iteritems(details):
         try:
-            for kv,vv in v.iteritems():
+            for kv,vv in six.iteritems(v):
                 if type(vv) is dict:
                     # never get an ADDITIONAL_IMAGES field here
                     pass
                 else:
                     if kv == u'ADDITIONAL_IMAGES':
                         ret = ret + 'satchmo.thumbnails["' + vv[0] + '"] = "' + thumbnail(settings.MEDIA_URL + vv[0], args) + '";\n'
-        except Exception, e:
+        except Exception as e:
             pass
 
     return mark_safe(ret)
@@ -87,11 +88,11 @@ or if only a width is requested (to be compatibile with admin interface)::
             try:
                 val = int(val) # convert all ints
             except ValueError:
-                raise template.TemplateSyntaxError, "thumbnail filter: argument %r is invalid integer (%r)" % (kw, val)
+                raise template.TemplateSyntaxError("thumbnail filter: argument %r is invalid integer (%r)" % (kw, val))
             kwargs[kw] = val
     
     if ('width' not in kwargs) and ('height' not in kwargs):
-        raise template.TemplateSyntaxError, "thumbnail filter requires arguments (width and/or height)"
+        raise template.TemplateSyntaxError("thumbnail filter requires arguments (width and/or height)")
     
     ret = make_thumbnail(url, **kwargs)
     if ret is None:

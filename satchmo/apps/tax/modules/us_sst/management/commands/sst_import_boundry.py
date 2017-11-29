@@ -3,6 +3,7 @@ import os
 from datetime import date
 
 # We don't actually need it, but otherwise livesettings chokes.
+from six.moves import range
 import tax.config
 
 from tax.modules.us_sst.models import TaxRate, TaxBoundry
@@ -16,7 +17,7 @@ def ash_split(arg, qty):
     """
     l = arg.split(',')
     if len(l) < qty:
-        l.extend([None for x in xrange(qty-len(l))])
+        l.extend([None for x in range(qty-len(l))])
     return l
 
 CSV_MAP = (
@@ -96,7 +97,7 @@ class Command(BaseCommand):
         if not os.path.isfile(file):
             raise RuntimeError("File: %s is not a normal file or doesn't exist." % file)
         file = open(file)
-        print "Processing: ",
+        print("Processing: ", end=" ")
         for line in file:
             line = line.strip()
             #Z,20080701,99991231,,,,,,,,,,,,,,,00073,,00073,,EXTRA
@@ -169,7 +170,7 @@ class Command(BaseCommand):
                     raise
 
             if total % 100 == 0:
-                print "%s," % total,
+                print("%s," % total, end=" "),
 
             # Now, handle mapping boundries to rates.
             #extra = SER,state_providing,state_taxed,County,Place,Class,Long,Lat, (ST/VD,Special Code,Special Type,) x 20

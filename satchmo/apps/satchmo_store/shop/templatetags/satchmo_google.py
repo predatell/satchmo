@@ -45,7 +45,7 @@ def google_adwords_sale(context):
     try:
         request = context['request']
     except KeyError:
-        print >> sys.stderr, "Template satchmo.show.templatetags.google.google_adwords_sale couldn't get the request from the context.  Are you missing the request context_processor?"
+        print("Template satchmo.show.templatetags.google.google_adwords_sale couldn't get the request from the context.  Are you missing the request context_processor?", file=sys.stderr)
         return ""
 
     secure = request.is_secure()
@@ -71,7 +71,7 @@ def google_adwords_signup(context):
     try:
         request = context['request']
     except KeyError:
-        print >> sys.stderr, "Template satchmo.show.templatetags.google.google_adwords_sale couldn't get the request from the context.  Are you missing the request context_processor?"
+        print("Template satchmo.show.templatetags.google.google_adwords_sale couldn't get the request from the context.  Are you missing the request context_processor?", file=sys.stderr)
         return ""
 
     secure = request.is_secure()

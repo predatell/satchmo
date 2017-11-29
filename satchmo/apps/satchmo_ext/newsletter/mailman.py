@@ -73,8 +73,7 @@ def mailman_add(contact, listname=None, send_welcome_msg=None, admin_notify=None
         - `admin_notify`: True of False, defaulting to the list default
     """
     mm, listname = _get_maillist(listname)
-    print >> sys.stderr, 'mailman adding %s to %s' % (contact.email, listname)
-
+    print('mailman adding %s to %s' % (contact.email, listname), file=sys.stderr)
     if send_welcome_msg is None:
         send_welcome_msg = mm.send_welcome_msg
 
@@ -84,28 +83,23 @@ def mailman_add(contact, listname=None, send_welcome_msg=None, admin_notify=None
     userdesc.digest = False
 
     if mm.isMember(contact.email):
-        print >> sys.stderr, _('Already Subscribed: %s' % contact.email)
-
+        print(_('Already Subscribed: %s' % contact.email), file=sys.stderr)
     else:
         try:
             try:
                 mm.Lock()
                 mm.ApprovedAddMember(userdesc, send_welcome_msg, admin_notify)
                 mm.Save()
-                print >> sys.stderr, _('Subscribed: %(email)s') % { 'email' : contact.email }
-
+                print(_('Subscribed: %(email)s') % { 'email' : contact.email }, file=sys.stderr)
             except Errors.MMAlreadyAMember:
-                print >> sys.stderr, _('Already a member: %(email)s') % { 'email' : contact.email }
-
+                print(_('Already a member: %(email)s') % { 'email' : contact.email }, file=sys.stderr)
             except Errors.MMBadEmailError:
                 if userdesc.address == '':
-                    print >> sys.stderr, _('Bad/Invalid email address: blank line')
+                    print(_('Bad/Invalid email address: blank line'), file=sys.stderr)
                 else:
-                    print >> sys.stderr, _('Bad/Invalid email address: %(email)s') % { 'email' : contact.email }
-
+                    print(_('Bad/Invalid email address: %(email)s') % { 'email' : contact.email }, file=sys.stderr)
             except Errors.MMHostileAddress:
-                print >> sys.stderr, _('Hostile address (illegal characters): %(email)s') % { 'email' : contact.email }
-
+                print(_('Hostile address (illegal characters): %(email)s') % { 'email' : contact.email }, file=sys.stderr)
         finally:
             mm.Unlock()
 
@@ -121,8 +115,7 @@ def mailman_remove(contact, listname=None, userack=None, admin_notify=None):
 
 
     mm, listname = _get_maillist(listname)
-    print >> sys.stderr, 'mailman removing %s from %s' % (contact.email, listname)
-
+    print('mailman removing %s from %s' % (contact.email, listname), file=sys.stderr)
     if mm.isMember(contact.email):
         try:
             mm.Lock()
@@ -143,5 +136,5 @@ def _get_maillist(listname):
         return MailList.MailList(listname, lock=0), listname
 
     except Errors.MMUnknownListError:
-        print >> sys.stderr, "Can't find the MailMan newsletter: %s" % listname
+        print("Can't find the MailMan newsletter: %s" % listname, file=sys.stderr)
         raise NameError('No such newsletter, "%s"' % listname)

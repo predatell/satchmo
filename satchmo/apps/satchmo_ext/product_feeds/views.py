@@ -24,7 +24,7 @@ def product_feed(request, category=None, template="product_feeds/googlebase_atom
             cat = Category.objects.active().get(slug=category)
             products = cat.active_products()
         except Category.DoesNotExist:
-            raise Http404, _("Bad Category: %s" % category)
+            raise Http404(_("Bad Category: %s" % category))
     else:
         cat = None
         products = Product.objects.active_by_site()

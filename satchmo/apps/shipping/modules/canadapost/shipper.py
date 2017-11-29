@@ -14,8 +14,7 @@ from livesettings.functions import config_get_group, config_value
 from shipping.modules.base import BaseShipper
 import datetime
 import logging
-import urllib2
-
+from six.moves import urllib
 try:
     from xml.etree.ElementTree import fromstring, tostring
 except ImportError:
@@ -104,8 +103,8 @@ class Shipper(BaseShipper):
         '''
           Post the data and return the XML response
         '''
-        conn = urllib2.Request(url=connection, data=request.encode("utf-8"))
-        f = urllib2.urlopen(conn)
+        conn = urllib.request.Request(url=connection, data=request.encode("utf-8"))
+        f = urllib.request.urlopen(conn)
         all_results = f.read()
         self.raw = all_results
         return(fromstring(all_results))
