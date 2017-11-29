@@ -14,6 +14,7 @@ from django.contrib import admin
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
+from six.moves import reduce
 try:
     from functools import update_wrapper
 except ImportError:

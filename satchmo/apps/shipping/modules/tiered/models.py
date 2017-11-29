@@ -1,6 +1,8 @@
 """
 Tiered shipping models
 """ 
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -9,6 +11,7 @@ from shipping.modules.base import BaseShipper
 import datetime
 import logging
 import operator
+from six.moves import reduce
 
 log = logging.getLogger('shipping.Tiered')
 
@@ -87,6 +90,7 @@ class Shipper(BaseShipper):
         return True
 
 
+@python_2_unicode_compatible
 class Carrier(models.Model):
     key = models.SlugField(_('Key'))
     ordering = models.IntegerField(_('Ordering'), default=0)
@@ -194,11 +198,12 @@ class Carrier(models.Model):
             raise TieredPriceException('No price available')
             
             
-    def __unicode__(self):
-        return u"Carrier: %s" % self.name
+    def __str__(self):
+        return "Carrier: %s" % self.name
         
     class Meta:
         ordering = ('ordering',)
+        
         
 class CarrierTranslation(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='translations')
@@ -211,6 +216,8 @@ class CarrierTranslation(models.Model):
     class Meta:
         ordering=('languagecode','name')
 
+
+@python_2_unicode_compatible
 class ShippingTier(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='tiers')
     min_total = models.DecimalField(_("Min Price"), 
@@ -219,8 +226,8 @@ class ShippingTier(models.Model):
     price = models.DecimalField(_("Shipping Price"), max_digits=10, decimal_places=2, )
     expires = models.DateField(_("Expires"), null=True, blank=True)
     
-    def __unicode__(self):
-        return u"ShippingTier: %s @ %s" % (self.price, self.min_total)
+    def __str__(self):
+        return "ShippingTier: %s @ %s" % (self.price, self.min_total)
     
     class Meta:
         ordering = ('carrier','price')

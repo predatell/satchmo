@@ -6,6 +6,7 @@ http://www.trustcommerce.com/tclink.html
 
 from django.utils.translation import ugettext_lazy as _
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
+import six
 import tclink
 
 class PaymentProcessor(BasePaymentProcessor):
@@ -32,7 +33,7 @@ class PaymentProcessor(BasePaymentProcessor):
     def prepare_post(self, data, amount):
         # See tclink developer's guide for additional fields and info
         # convert amount to cents, no decimal point
-        amount = unicode((amount * 100).to_integral())
+        amount = six.text_type((amount * 100).to_integral())
 
         # convert exp date to mmyy from mm/yy or mm/yyyy
         cc = data.credit_card
@@ -71,7 +72,7 @@ class PaymentProcessor(BasePaymentProcessor):
             'operator'	: 'Satchmo'
             }
         for key, value in self.transactionData.items():
-            if isinstance(value, unicode):
+            if isinstance(value, six.text_type):
                 self.transactionData[key] = value.encode('utf7',"ignore")
 
     def capture_payment(self, testing=False, order=None, amount=None):
@@ -100,7 +101,7 @@ class PaymentProcessor(BasePaymentProcessor):
             payment = self.record_payment(order=order, amount=amount,
                 transaction_id="", reason_code=status)
             success = True
-            msg = unicode(result)
+            msg = six.text_type(result)
 
         else:
             if status == 'decline':
@@ -146,7 +147,7 @@ if __name__ == "__main__":
             pass
 
 
-    if not os.environ.has_key("DJANGO_SETTINGS_MODULE"):
+    if not "DJANGO_SETTINGS_MODULE" in os.environ:
         os.environ["DJANGO_SETTINGS_MODULE"]="satchmo_store.settings"
 
     sampleOrder = testOrder()

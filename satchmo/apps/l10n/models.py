@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,7 +47,7 @@ AREAS = (
 )
 
 
-
+@python_2_unicode_compatible
 class Country(models.Model):
     """
     International Organization for Standardization (ISO) 3166-1 Country list
@@ -64,10 +66,11 @@ class Country(models.Model):
         verbose_name_plural = _('Countries')
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.printable_name
 
 
+@python_2_unicode_compatible
 class AdminArea(models.Model):
     """
     Administrative Area level 1 for a country.  For the US, this would be the states
@@ -83,5 +86,5 @@ class AdminArea(models.Model):
         ordering = ('name',)
         unique_together = ('country', 'name')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

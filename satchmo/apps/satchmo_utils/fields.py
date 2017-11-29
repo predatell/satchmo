@@ -1,7 +1,7 @@
 from django import forms
 from django.db.models.fields import DecimalField
 import logging
-from widgets import CurrencyWidget
+from .widgets import CurrencyWidget
 
 log = logging.getLogger('satchmo_utils.fields')
 

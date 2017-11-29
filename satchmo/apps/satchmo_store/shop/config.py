@@ -2,7 +2,7 @@
 
 import os
 import sys
-import urlparse
+from six.moves import urllib
 from decimal import Decimal
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -14,7 +14,7 @@ SHOP_GROUP = ConfigurationGroup('SHOP', _('Satchmo Shop Settings'), ordering=0)
 
 project_root = os.path.dirname(os.path.normpath(sys.modules[os.environ['DJANGO_SETTINGS_MODULE']].__file__))
 # default value `project_root + 'static'` is currently the best common for all Django 1.2 - 1.4
-default_icon_url = urlparse.urlunsplit(
+default_icon_url = urllib.parse.urlunsplit(
     ('file',
      '',
      os.path.join(project_root, 'static', 'images/sample-logo.bmp'),

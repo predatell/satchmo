@@ -327,7 +327,7 @@ if __name__ == "__main__":
         def order_success(self):
             pass
 
-    if not os.environ.has_key("DJANGO_SETTINGS_MODULE"):
+    if not "DJANGO_SETTINGS_MODULE" in os.environ:
         os.environ["DJANGO_SETTINGS_MODULE"] = "satchmo_store.settings"
 
     settings_module = os.environ['DJANGO_SETTINGS_MODULE']

@@ -68,7 +68,7 @@ def make_messages():
 
     for lang in languages:
 
-        print "processing language", lang
+        print("processing language %s" % lang)
         basedir = os.path.join(localedir, lang, 'LC_MESSAGES')
         if not os.path.isdir(basedir):
             os.makedirs(basedir)

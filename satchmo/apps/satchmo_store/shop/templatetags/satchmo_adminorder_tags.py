@@ -2,6 +2,7 @@ from django import template
 from satchmo_store.shop import get_satchmo_setting
 from satchmo_store.shop.models import Order, ORDER_STATUS
 from satchmo_store.shop.utils import is_multihost_enabled
+import six
 
 register = template.Library()
 
@@ -20,7 +21,7 @@ register.inclusion_tag('shop/admin/_customorder_management.html')(customorder_ma
 
 def inprocess_order_list():
     """Returns a formatted list of in-process orders"""
-    inprocess = unicode(ORDER_STATUS[2][0])
+    inprocess = six.text_type(ORDER_STATUS[2][0])
     orders = orders_at_status(inprocess)
 
     return {
@@ -44,7 +45,7 @@ register.inclusion_tag('shop/admin/_orderpayment_list.html')(orderpayment_list)
 
 def pending_order_list():
     """Returns a formatted list of pending orders"""
-    pending = unicode(ORDER_STATUS[1][0])
+    pending = six.text_type(ORDER_STATUS[1][0])
     orders = orders_at_status(pending)
 
     return {

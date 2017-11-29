@@ -1,6 +1,8 @@
 """
 Tiered shipping models
 """
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -9,12 +11,15 @@ from shipping.modules.base import BaseShipper
 import datetime
 import logging
 import operator
+from six.moves import reduce
 
 log = logging.getLogger('shipping.TieredQuantity')
+
 
 class TieredPriceException(Exception):
     def __init__(self, reason):
         self.reason = reason
+
 
 class Shipper(BaseShipper):
 
@@ -81,6 +86,7 @@ class Shipper(BaseShipper):
         return True
 
 
+@python_2_unicode_compatible
 class Carrier(models.Model):
     key = models.SlugField(_('Key'))
     ordering = models.IntegerField(_('Ordering'), default=0)
@@ -185,14 +191,15 @@ class Carrier(models.Model):
             raise TieredPriceException('No price available')
             
             
-    def __unicode__(self):
-        return u"Carrier: %s" % self.name
+    def __str__(self):
+        return "Carrier: %s" % self.name
         
     class Admin:
         ordering = ('key',)
 
     class Meta:
         pass
+        
         
 class CarrierTranslation(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='translations')
@@ -202,6 +209,8 @@ class CarrierTranslation(models.Model):
     method = models.CharField(_('Method'), help_text=_("i.e. US Mail"), max_length=200)
     delivery = models.CharField(_('Delivery Days'), max_length=200)
 
+
+@python_2_unicode_compatible
 class QuantityTier(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='tiers')
     quantity = models.DecimalField(_("Min Quantity"), max_digits=18,  decimal_places=6,
@@ -215,8 +224,8 @@ class QuantityTier(models.Model):
     def calculate_price(self, qty):
         return self.handling + self.price * qty
     
-    def __unicode__(self):
-        return u"QuantityTier: %s @ %s" % (self.price, self.quantity)
+    def __str__(self):
+        return "QuantityTier: %s @ %s" % (self.price, self.quantity)
     
     class Admin:
         ordering = ('min_total', 'expires')

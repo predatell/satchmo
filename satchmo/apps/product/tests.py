@@ -16,6 +16,7 @@ from product.models import (
     Price,
 )
 from product.prices import (
+import six
     get_product_quantity_adjustments,
     PriceAdjustment,
     PriceAdjustmentCalc,

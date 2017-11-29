@@ -2,17 +2,20 @@
 Configuration items for the shop.
 Also contains shopping cart and related classes.
 """
-
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal, ROUND_CEILING
 from django.contrib.sites.models import Site
 from django.conf import settings
 from django.core import urlresolvers
 from django.db import models
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+import six
+from six.moves import reduce
 
 from l10n.models import Country
 from l10n.utils import moneyfmt
@@ -33,6 +36,7 @@ import signals
 
 log = logging.getLogger('satchmo_store.shop.models')
 
+
 class NullConfig(object):
     """Standin for a real config when we don't have one yet."""
 
@@ -51,7 +55,9 @@ class NullConfig(object):
     def __str__(self):
         return "Test Store - no configured store exists!"
 
+
 class ConfigManager(models.Manager):
+    
     def get_current(self, site=None):
         """Convenience method to get the current shop config"""
         if not site:
@@ -61,7 +67,7 @@ class ConfigManager(models.Manager):
 
         try:
             shop_config = keyedcache.cache_get("Config", site)
-        except keyedcache.NotCachedError, nce:
+        except keyedcache.NotCachedError as nce:
             try:
                 shop_config = self.get(site__id__exact=site)
                 keyedcache.cache_set(nce.key, value=shop_config)
@@ -71,6 +77,8 @@ class ConfigManager(models.Manager):
 
         return shop_config
 
+
+@python_2_unicode_compatible
 class Config(models.Model):
     """
     Used to store specific information about a store.  Also used to
@@ -101,6 +109,13 @@ class Config(models.Model):
         related_name="shop_configs")
 
     objects = ConfigManager()
+
+    class Meta:
+        verbose_name = _("Store Configuration")
+        verbose_name_plural = _("Store Configurations")
+
+    def __str__(self):
+        return self.store_name
 
     def _options(self):
         return ConfigurationSettings()
@@ -155,13 +170,6 @@ class Config(models.Model):
         super(Config, self).save(**kwargs)
         keyedcache.cache_set("Config", self.site.id, value=self)
 
-    def __unicode__(self):
-        return self.store_name
-
-    class Meta:
-        verbose_name = _("Store Configuration")
-        verbose_name_plural = _("Store Configurations")
-
 
 class NullCart(object):
     """Standin for a real cart when we don't have one yet.  More convenient than testing for null all the time."""
@@ -193,6 +201,7 @@ class NullCart(object):
     def save(self):
         pass
 
+
 class OrderCart(NullCart):
     """Allows us to fake a cart if we are reloading an order."""
 
@@ -222,6 +231,7 @@ class OrderCart(NullCart):
 
     def __iter__(self):
         return iter(self.cartitem_set.all())
+
 
 class CartManager(models.Manager):
 
@@ -276,6 +286,7 @@ class CartManager(models.Manager):
         return cart
 
 
+@python_2_unicode_compatible
 class Cart(models.Model):
     """
     Store items currently in a cart
@@ -288,6 +299,10 @@ class Cart(models.Model):
     customer = models.ForeignKey(Contact, blank=True, null=True, verbose_name=_('Customer'))
 
     objects = CartManager()
+
+    class Meta:
+        verbose_name = _("Shopping Cart")
+        verbose_name_plural = _("Shopping Carts")
 
     def _get_count(self):
         itemCount = 0
@@ -338,8 +353,8 @@ class Cart(models.Model):
         return self.cartitem_set.count() == 0
     is_empty = property(_is_empty)
 
-    def __unicode__(self):
-        return u"Shopping Cart (%s)" % self.date_time_created
+    def __str__(self):
+        return "Shopping Cart (%s)" % self.date_time_created
 
     def add_item(self, chosen_item, number_added, details=[]):
         alreadyInCart = False
@@ -355,7 +370,7 @@ class Cart(models.Model):
                         try:
                             similarItem.details.get(
                                     name=detail['name'],
-                                    value=unicode(detail['value']),     # typecasting for Postgresql
+                                    value=six.text_type(detail['value']),     # typecasting for Postgresql
                                     price_change=detail['price_change']
                                     )
                         except CartItemDetails.DoesNotExist:
@@ -454,9 +469,6 @@ class Cart(models.Model):
                 items.append((q,p))
         return items
 
-    class Meta:
-        verbose_name = _("Shopping Cart")
-        verbose_name_plural = _("Shopping Carts")
 
 class NullCartItem(object):
     def __init__(self, itemid):
@@ -464,6 +476,8 @@ class NullCartItem(object):
         self.quantity = Decimal('0')
         self.line_total = 0
 
+
+@python_2_unicode_compatible
 class CartItem(models.Model):
     """
     An individual item in the cart
@@ -471,6 +485,15 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('Cart'))
     product = models.ForeignKey(Product, verbose_name=_('Product'))
     quantity = models.DecimalField(_("Quantity"),  max_digits=18,  decimal_places=6)
+
+    class Meta:
+        verbose_name = _("Cart Item")
+        verbose_name_plural = _("Cart Items")
+        ordering = ('id',)
+
+    def __str__(self):
+        money_format = force_text(moneyfmt(self.line_total))
+        return '%s - %s %s' % (self.quantity, self.product.name, money_format)
 
     def _get_line_unitprice(self, include_discount=True):
         # Get the qty discount price as the unit price for the line.
@@ -551,15 +574,6 @@ class CartItem(models.Model):
 
     has_details = property(_has_details)
 
-    def __unicode__(self):
-        money_format = force_unicode(moneyfmt(self.line_total))
-        return u'%s - %s %s' % (self.quantity, self.product.name,
-            money_format)
-
-    class Meta:
-        verbose_name = _("Cart Item")
-        verbose_name_plural = _("Cart Items")
-        ordering = ('id',)
 
 class CartItemDetails(models.Model):
     """
@@ -595,6 +609,7 @@ ORDER_STATUS = (
     ('Complete', _('Complete')),
     ('Cancelled', _('Cancelled')),
 )
+
 
 class OrderManager(models.Manager):
     def from_request(self, request):
@@ -632,6 +647,8 @@ class OrderManager(models.Manager):
             pass
         return False
 
+
+@python_2_unicode_compatible
 class OrderVariable(models.Model):
     order = models.ForeignKey("Order", related_name="variables")
     key = models.SlugField(_('key'), )
@@ -642,13 +659,15 @@ class OrderVariable(models.Model):
         verbose_name = _("Order variable")
         verbose_name_plural = _("Order variables")
 
-    def __unicode__(self):
+    def __str__(self):
         if len(self.value)>10:
             v = self.value[:10] + '...'
         else:
             v = self.value
-        return u"OrderVariable: %s=%s" % (self.key, v)
+        return "OrderVariable: %s=%s" % (self.key, v)
 
+
+@python_2_unicode_compatible
 class Order(models.Model):
     """
     Orders contain a copy of all the information at the time the order was
@@ -699,7 +718,11 @@ class Order(models.Model):
 
     objects = OrderManager()
 
-    def __unicode__(self):
+    class Meta:
+        verbose_name = _("Product Order")
+        verbose_name_plural = _("Product Orders")
+
+    def __str__(self):
         return "Order #%s: %s" % (self.id, self.contact.full_name)
 
     def add_status(self, status=None, notes=""):
@@ -903,7 +926,7 @@ class Order(models.Model):
 
     def invoice(self):
         url = urlresolvers.reverse('satchmo_print_shipping', kwargs={'doc' : 'invoice', 'id' : self.id})
-        return mark_safe(u'<a href="%s">%s</a>' % (url, ugettext('View')))
+        return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
     invoice.allow_tags = True
 
     def _item_discount(self):
@@ -913,7 +936,7 @@ class Order(models.Model):
 
     def packingslip(self):
         url = urlresolvers.reverse('satchmo_print_shipping', kwargs={'doc' : 'packingslip', 'id' : self.id})
-        return mark_safe(u'<a href="%s">%s</a>' % (url, ugettext('View')))
+        return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
     packingslip.allow_tags = True
 
     def recalculate_total(self, save=True):
@@ -1031,7 +1054,7 @@ class Order(models.Model):
 
     def shippinglabel(self):
         url = urlresolvers.reverse('satchmo_print_shipping', None, None, {'doc' : 'shippinglabel', 'id' : self.id})
-        return mark_safe(u'<a href="%s">%s</a>' % (url, ugettext('View')))
+        return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
     shippinglabel.allow_tags = True
 
     def _order_total(self):
@@ -1136,10 +1159,8 @@ class Order(models.Model):
                     valid = valid and validate_method(request, self, orderitem)
         return valid
 
-    class Meta:
-        verbose_name = _("Product Order")
-        verbose_name_plural = _("Product Orders")
 
+@python_2_unicode_compatible
 class OrderItem(models.Model):
     """
     A line item on an order.
@@ -1160,7 +1181,12 @@ class OrderItem(models.Model):
     discount = CurrencyField(_("Line item discount"),
         max_digits=18, decimal_places=10, blank=True, null=True)
 
-    def __unicode__(self):
+    class Meta:
+        verbose_name = _("Order Line Item")
+        verbose_name_plural = _("Order Line Items")
+        ordering = ('id',)
+
+    def __str__(self):
         return self.product.translated_name()
 
     def _get_category(self):
@@ -1224,11 +1250,8 @@ class OrderItem(models.Model):
             self.unit_tax = processor.by_price(taxclass, self.unit_price)
             self.tax = processor.by_orderitem(self)
 
-    class Meta:
-        verbose_name = _("Order Line Item")
-        verbose_name_plural = _("Order Line Items")
-        ordering = ('id',)
 
+@python_2_unicode_compatible
 class OrderItemDetail(models.Model):
     """
     Name, value pair and price delta associated with a specific item in an order
@@ -1240,14 +1263,16 @@ class OrderItemDetail(models.Model):
     sort_order = models.IntegerField(_("Sort Order"),
         help_text=_("The display order for this group."))
 
-    def __unicode__(self):
-        return u"%s - %s,%s" % (self.item, self.name, self.value)
-
     class Meta:
         verbose_name = _("Order Item Detail")
         verbose_name_plural = _("Order Item Details")
         ordering = ('sort_order',)
+        
+    def __str__(self):
+        return "%s - %s,%s" % (self.item, self.name, self.value)
 
+
+@python_2_unicode_compatible
 class OrderStatus(models.Model):
     """
     An order will have multiple statuses as it moves its way through processing.
@@ -1258,7 +1283,13 @@ class OrderStatus(models.Model):
     notes = models.CharField(_("Notes"), max_length=100, blank=True)
     time_stamp = models.DateTimeField(_("Timestamp"))
 
-    def __unicode__(self):
+    class Meta:
+        verbose_name = _("Order Status")
+        verbose_name_plural = _("Order Statuses")
+        ordering = ('time_stamp',)
+        get_latest_by = 'time_stamp'
+        
+    def __str__(self):
         return self.status
 
     def save(self, **kwargs):
@@ -1267,11 +1298,6 @@ class OrderStatus(models.Model):
         super(OrderStatus, self).save(**kwargs)
         self.order.update_status(self.status)
 
-    class Meta:
-        verbose_name = _("Order Status")
-        verbose_name_plural = _("Order Statuses")
-        ordering = ('time_stamp',)
-        get_latest_by = 'time_stamp'
 
 class OrderPaymentBase(models.Model):
     payment = models.CharField(_("Payment Method"), max_length=25, blank=True) # choices=iterchoices_db(payment.config.labelled_gateway_choices),
@@ -1281,6 +1307,9 @@ class OrderPaymentBase(models.Model):
     details = models.CharField(_("Details"), max_length=255, blank=True, null=True)
     reason_code = models.CharField(_('Reason Code'),  max_length=255, blank=True, null=True)
 
+    class Meta:
+        abstract = True
+        
     def _credit_card(self):
         """Return the credit card associated with this payment."""
         try:
@@ -1300,19 +1329,22 @@ class OrderPaymentBase(models.Model):
 
         super(OrderPaymentBase, self).save(**kwargs)
 
-    class Meta:
-        abstract = True
 
+@python_2_unicode_compatible
 class OrderAuthorization(OrderPaymentBase):
     order = models.ForeignKey(Order, related_name="authorizations")
     capture = models.ForeignKey('OrderPayment', related_name="authorizations")
     complete = models.BooleanField(_('Complete'), default=False)
 
-    def __unicode__(self):
+    class Meta:
+        verbose_name = _("Order Payment Authorization")
+        verbose_name_plural = _("Order Payment Authorizations")
+
+    def __str__(self):
         if self.id is not None:
-            return u"Order Authorization #%i" % self.id
+            return "Order Authorization #%i" % self.id
         else:
-            return u"Order Authorization (unsaved)"
+            return "Order Authorization (unsaved)"
 
     def remaining(self):
         payments = [p.amount for p in self.order.payments.all()]
@@ -1337,9 +1369,6 @@ class OrderAuthorization(OrderPaymentBase):
             self.capture = OrderPayment.objects.create_linked(self)
         super(OrderPaymentBase, self).save(**kwargs)
 
-    class Meta:
-        verbose_name = _("Order Payment Authorization")
-        verbose_name_plural = _("Order Payment Authorizations")
 
 class OrderPaymentManager(models.Manager):
     def create_linked(self, other, **kwargs):
@@ -1353,30 +1382,38 @@ class OrderPaymentManager(models.Manager):
         linked.save(**kwargs)
         return linked
 
+
+@python_2_unicode_compatible
 class OrderPayment(OrderPaymentBase):
     order = models.ForeignKey(Order, related_name="payments")
 
     objects = OrderPaymentManager()
 
-    def __unicode__(self):
-        if self.id is not None:
-            return u"Order Payment #%i" % self.id
-        else:
-            return u"Order Payment (unsaved)"
-
     class Meta:
         verbose_name = _("Order Payment")
         verbose_name_plural = _("Order Payments")
 
+    def __str__(self):
+        if self.id is not None:
+            return "Order Payment #%i" % self.id
+        else:
+            return "Order Payment (unsaved)"
+
+
+@python_2_unicode_compatible
 class OrderPendingPayment(OrderPaymentBase):
     order = models.ForeignKey(Order, related_name="pendingpayments")
     capture = models.ForeignKey('OrderPayment', related_name="pendingpayments")
 
-    def __unicode__(self):
+    class Meta:
+        verbose_name = _("Order Pending Payment")
+        verbose_name_plural = _("Order Pending Payments")
+
+    def __str__(self):
         if self.id is not None:
-            return u"Order Pending Payment #%i" % self.id
+            return "Order Pending Payment #%i" % self.id
         else:
-            return u"Order Pending Payment (unsaved)"
+            return "Order Pending Payment (unsaved)"
 
     def save(self, **kwargs):
         # create linked payment
@@ -1387,13 +1424,12 @@ class OrderPendingPayment(OrderPaymentBase):
             self.capture = OrderPayment.objects.create_linked(self, **kwargs)
         super(OrderPaymentBase, self).save(**kwargs)
 
-    class Meta:
-        verbose_name = _("Order Pending Payment")
-        verbose_name_plural = _("Order Pending Payments")
 
 class OrderPaymentFailure(OrderPaymentBase):
     order = models.ForeignKey(Order, null=True, blank=True, related_name='paymentfailures')
 
+
+@python_2_unicode_compatible
 class OrderTaxDetail(models.Model):
     """A tax line item"""
     order = models.ForeignKey(Order, related_name="taxes")
@@ -1402,16 +1438,17 @@ class OrderTaxDetail(models.Model):
     tax = CurrencyField(_("Tax"),
         max_digits=18, decimal_places=10, blank=True, null=True)
 
-    def __unicode__(self):
-        if self.description:
-            return u"Tax: %s %s" % (self.description, self.tax)
-        else:
-            return u"Tax: %s" % self.tax
-
     class Meta:
         verbose_name = _('Order tax detail')
         verbose_name_plural = _('Order tax details')
         ordering = ('id',)
+
+    def __str__(self):
+        if self.description:
+            return "Tax: %s %s" % (self.description, self.tax)
+        else:
+            return "Tax: %s" % self.tax
+
 
 import config
 

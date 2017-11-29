@@ -8,11 +8,10 @@ from product.models import Discount
 from satchmo_store.shop.models import Config
 from satchmo_utils.numbers import trunc_decimal
 from satchmo_utils import add_month
+from six.moves import urllib
 from tax.utils import get_tax_processor
 from xml.dom import minidom
 import random
-import urllib2
-
 class PaymentProcessor(BasePaymentProcessor):
     """
     Authorize.NET payment processing module
@@ -455,11 +454,11 @@ class PaymentProcessor(BasePaymentProcessor):
             self.log_extra('Posting data to: %s\n%s', data['connection'], redacted)
 
         headers = {'Content-type':'text/xml'}
-        conn = urllib2.Request(data['connection'], request, headers)
+        conn = urllib.request.Request(data['connection'], request, headers)
         try:
-            f = urllib2.urlopen(conn)
+            f = urllib.request.urlopen(conn)
             all_results = f.read()
-        except urllib2.URLError, ue:
+        except urllib.error.URLError as ue:
             self.log.error("error opening %s\n%s", data['connection'], ue)
             return (False, 'ERROR', _('Could not talk to Authorize.net gateway'), None)
 
@@ -477,7 +476,7 @@ class PaymentProcessor(BasePaymentProcessor):
             if success:
                 #refID = doc.getElementsByTagName('refId')[0].firstChild.nodeValue
                 subscriptionID = doc.getElementsByTagName('subscriptionId')[0].firstChild.nodeValue
-        except Exception, e:
+        except Exception as e:
             self.log.error("Error %s\nCould not parse response: %s", e, all_results)
             success = False
             reason = "Parse Error"
@@ -517,12 +516,12 @@ class PaymentProcessor(BasePaymentProcessor):
         """
         self.log.info("About to send a request to authorize.net: %(connection)s\n%(logPostString)s", data)
 
-        conn = urllib2.Request(url=data['connection'], data=data['postString'])
+        conn = urllib.request.Request(url=data['connection'], data=data['postString'])
         try:
-            f = urllib2.urlopen(conn)
+            f = urllib.request.urlopen(conn)
             all_results = f.read()
             self.log_extra('Authorize response: %s', all_results)
-        except urllib2.URLError, ue:
+        except urllib.error.URLError as ue:
             self.log.error("error opening %s\n%s", data['connection'], ue)
             return ProcessorResult(self.key, False, _('Could not talk to Authorize.net gateway'))
 
@@ -577,7 +576,7 @@ if __name__ == "__main__":
         def order_success(self):
             pass
 
-    if not os.environ.has_key("DJANGO_SETTINGS_MODULE"):
+    if not "DJANGO_SETTINGS_MODULE" in os.environ:
         os.environ["DJANGO_SETTINGS_MODULE"]="satchmo_store.settings"
 
     settings_module = os.environ['DJANGO_SETTINGS_MODULE']

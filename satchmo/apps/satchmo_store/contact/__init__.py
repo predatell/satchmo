@@ -1,3 +1,3 @@
 CUSTOMER_ID = 'custID'
 
-import listeners
+from .listeners import *

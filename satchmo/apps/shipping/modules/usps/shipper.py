@@ -21,7 +21,7 @@ from l10n.models import Country
 from livesettings.functions import config_get_group, config_value
 from shipping.modules.base import BaseShipper
 import logging
-import urllib2
+from six.moves import urllib
 try:
     from xml.etree.ElementTree import fromstring, tostring
 except ImportError:
@@ -178,8 +178,8 @@ class Shipper(BaseShipper):
 
         data = 'API=%s&XML=%s' % (api, request.encode('utf-8'))
 
-        conn = urllib2.Request(url=connection, data=data)
-        f = urllib2.urlopen(conn)
+        conn = urllib.request.Request(url=connection, data=data)
+        f = urllib.request.urlopen(conn)
         all_results = f.read()
 
         log.error(all_results)
