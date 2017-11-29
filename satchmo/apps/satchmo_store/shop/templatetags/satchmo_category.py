@@ -175,14 +175,12 @@ def categories_for_slugs(parser, token):
         # Splitting by None == splitting by spaces.
         tag_name, arg = token.contents.split(None, 1)
     except ValueError:
-        raise TemplateSyntaxError, "%r tag requires arguments" \
-              % token.contents.split()[0]
+        raise TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
 
     m = re.search(r'"([^ "]+)" as (\w+)', arg)
 
     if not m:
-        raise TemplateSyntaxError, "%r tag had invalid arguments" \
-              % tag_name
+        raise TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
 
     cat_slugs, var = m.groups()
     cats=[]
@@ -307,15 +305,13 @@ def all_products_for_category(parser, token):
         # Splitting by None == splitting by spaces.
         tag_name, arg = token.contents.split(None, 1)
     except ValueError:
-        raise TemplateSyntaxError, "%r tag requires arguments" \
-              % token.contents.split()[0]
+        raise TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
 
     m = re.search(r'(.*?)as (\w+)$', arg)
 
     # First, get the varname - the easiest
     if not m:
-        raise TemplateSyntaxError, "Variable name was not specified for %r tag" \
-              % tag_name
+        raise TemplateSyntaxError("Variable name was not specified for %r tag" % tag_name)
 
     arg, var  = m.groups()
 
@@ -327,8 +323,7 @@ def all_products_for_category(parser, token):
     m = re.search(r'^for (.+?)$', arg.strip())
 
     if not m:
-        raise TemplateSyntaxError, "Invalid arguments for %r tag" \
-              % tag_name
+        raise TemplateSyntaxError("Invalid arguments for %r tag" % tag_name)
 
     arg = m.group(1)
 
@@ -340,8 +335,7 @@ def all_products_for_category(parser, token):
         # We're of the second case.
         return AllProductsForVariableSlugNode(Variable(arg), var)
 
-    raise TemplateSyntaxError, "Invalid arguments for %r tag" \
-          % tag_name
+    raise TemplateSyntaxError("Invalid arguments for %r tag" % tag_name)
 
 @register.filter
 def attribute(category, attr_name):

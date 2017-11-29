@@ -152,7 +152,7 @@ def send_store_mail(subject, context, template='', recipients_list=None,
             raise NoRecipientsException
 
         send_mail(**send_mail_args)
-    except SocketError, e:
+    except SocketError as e:
         if settings.DEBUG:
             log.error('Error sending mail: %s' % e)
             log.warn("""Ignoring email error, since you are running in DEBUG mode.  Email was:

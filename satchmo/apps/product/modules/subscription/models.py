@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -5,12 +7,15 @@ from product.models import Product, get_product_quantity_price, get_product_quan
 from decimal import Decimal
 from satchmo_utils import add_month
 from satchmo_utils.fields import CurrencyField
+import six
 
 SATCHMO_PRODUCT=True
 
 def get_product_types():
     return ('SubscriptionProduct',)
 
+
+@python_2_unicode_compatible
 class SubscriptionProduct(models.Model):
     """
     This type of Product is for recurring billing (memberships, subscriptions, payment terms)
@@ -36,7 +41,7 @@ class SubscriptionProduct(models.Model):
     def _get_subtype(self):
         return 'SubscriptionProduct'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.product.slug
 
     def _get_fullPrice(self):
@@ -115,6 +120,8 @@ class SubscriptionProduct(models.Model):
         verbose_name = _("Subscription Product")
         verbose_name_plural = _("Subscription Products")
 
+
+@python_2_unicode_compatible
 class Trial(models.Model):
     """
     Trial billing terms for subscription products.
@@ -129,8 +136,8 @@ class Trial(models.Model):
     price = CurrencyField(_("Price"), help_text=_("Set to 0 for a free trial.  Leave empty if product does not have a trial."), max_digits=10, decimal_places=2, null=True, )
     expire_length = models.IntegerField(_("Trial Duration"), help_text=_("Length of trial billing cycle.  Leave empty if product does not have a trial."), null=True, blank=True)
 
-    def __unicode__(self):
-        return unicode(self.price)
+    def __str__(self):
+        return six.text_type(self.price)
 
     def _occurrences(self):
         if self.expire_length:

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from satchmo_store.contact.models import Contact
@@ -31,6 +33,8 @@ def get_contact_or_fake(full_name, email):
 
     return contact
 
+
+@python_2_unicode_compatible
 class Subscription(models.Model):
     """A newsletter subscription."""
 
@@ -48,12 +52,12 @@ class Subscription(models.Model):
 
     email_is_subscribed = classmethod(email_is_subscribed)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.subscribed:
             flag="Y"
         else:
             flag="N"
-        return u"[%s] %s" % (flag, self.email)
+        return "[%s] %s" % (flag, self.email)
 
     def __repr__(self):
         return "<Subscription: %s>" % str(self)

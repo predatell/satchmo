@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from satchmo_store.contact.models import Contact, Organization
 import datetime
+import six
 
 class RawItem(models.Model):
     """
@@ -39,7 +40,7 @@ class SupplierOrder(models.Model):
     order_total = models.DecimalField(_("Total"), max_digits=6, decimal_places=2)
     
     def __unicode__(self):
-        return unicode(self.date_created)
+        return six.text_type(self.date_created)
     
     def _status(self):
         return(self.supplierorderstatus_set.latest('date').status)
@@ -65,7 +66,7 @@ class SupplierOrderItem(models.Model):
     line_item_total = models.DecimalField(_("Line Item Total"), max_digits=6,decimal_places=2)
     
     def __unicode__(self):
-        return unicode(self.line_item_total) 
+        return six.text_type(self.line_item_total) 
 
 SUPPLIERORDER_STATUS = (
     (_('Sent in'), _('Sent in')),

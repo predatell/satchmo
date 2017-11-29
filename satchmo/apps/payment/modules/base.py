@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from satchmo_store.shop.models import OrderAuthorization, OrderPayment, OrderPaymentFailure, OrderPendingPayment, OrderStatus
 import logging
+import six
 
 log = logging.getLogger('payment.modules.base')
 
@@ -192,7 +193,7 @@ class PaymentRecorder(object):
 
     def __init__(self, order, config):
         self.order = order
-        self.key = unicode(config.KEY.value)
+        self.key = six.text_type(config.KEY.value)
         self.config = config
         self._amount = None
         self.transaction_id = ""

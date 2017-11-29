@@ -5,8 +5,12 @@ Used with permission.  Thank you David Cramer.
 To install, add the prehandler to the beginning of your middleware list, and the posthandler to the end.  Then, you can use request.COOKIES.get|set|delete anywhere in the code and they'll be automatically added to the response.
 """
 
-from Cookie import SimpleCookie, Morsel
 import copy
+
+import six
+from six.moves.http_cookies import SimpleCookie, Morsel
+
+
  
 class CookiePreHandlerMiddleware(object):
     """
@@ -19,7 +23,7 @@ class CookiePreHandlerMiddleware(object):
     """
     def process_request(self, request):
         cookies = CookieHandler()
-        for k, v in request.COOKIES.iteritems():
+        for k, v in six.iteritems(request.COOKIES):
             cookies[k] = str(v)
         request.COOKIES = cookies
         request._orig_cookies = copy.deepcopy(request.COOKIES)
@@ -32,7 +36,7 @@ class CookiePostHandlerMiddleware(object):
     """
     def process_response(self, request, response):
         if hasattr(request, '_orig_cookies') and request.COOKIES != request._orig_cookies:
-            for k,v in request.COOKIES.iteritems():
+            for k,v in six.iteritems(request.COOKIES):
                 if request._orig_cookies.get(k) != v:
                     dict.__setitem__(response.cookies, k, v)
         return response

@@ -1,6 +1,8 @@
 """
 TieredWeight shipping models
 """
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 import logging
 
 from datetime import date
@@ -110,6 +112,8 @@ class Shipper(BaseShipper):
             return True
 
 
+
+@python_2_unicode_compatible
 class Carrier(models.Model):
     name = models.CharField(_('carrier'), max_length=50)
     ordering = models.IntegerField(_('Ordering'), default=0)
@@ -118,8 +122,8 @@ class Carrier(models.Model):
         related_name='default', null=True, blank=True)
 
 
-    def __unicode__(self):
-        return u'%s' % self.name
+    def __str__(self):
+        return '%s' % self.name
 
 
     class Meta:
@@ -136,6 +140,8 @@ class Carrier(models.Model):
                 return self.default_zone
 
 
+
+@python_2_unicode_compatible
 class Zone(models.Model):
     carrier = models.ForeignKey(Carrier, verbose_name=_('carrier'), related_name='zones')
     name = models.CharField(_('name'), max_length=50)
@@ -143,10 +149,8 @@ class Zone(models.Model):
     handling = models.DecimalField(_('handling'), max_digits=10, decimal_places=2,
         null=True, blank=True)
 
-
-    def __unicode__(self):
-        return u'%s' % self.name
-
+    def __str__(self):
+        return '%s' % self.name
 
     class Meta:
         unique_together = ('carrier', 'name')
@@ -239,6 +243,7 @@ class Zone(models.Model):
             raise TieredWeightException
 
 
+@python_2_unicode_compatible
 class ZoneTranslation(models.Model):
     zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='translations')
     lang_code = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
@@ -246,10 +251,8 @@ class ZoneTranslation(models.Model):
     method = models.CharField(_('method'), help_text=_('i.e. Air, Land, Sea'), max_length=200)
     delivery = models.CharField(_('delivery'), max_length=200)
 
-
-    def __unicode__(self):
-        return u'%s' % self.lang_code
-
+    def __str__(self):
+        return self.lang_code
 
     class Meta:
         ordering = ['lang_code',]
@@ -257,6 +260,7 @@ class ZoneTranslation(models.Model):
         verbose_name_plural = _('zone translations')
 
 
+@python_2_unicode_compatible
 class WeightTier(models.Model):
     zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='tiers')
     min_weight = models.DecimalField(_('min weight'), max_digits=10, decimal_places=2, help_text=_("This tier will be used for weights up to this value. i.e.: this is the MAXIMUM weight this tier will be used for."))
@@ -265,10 +269,8 @@ class WeightTier(models.Model):
     price = models.DecimalField(_('shipping price'), max_digits=10, decimal_places=2)
     expires = models.DateField(_('expires'), null=True, blank=True)
     
-
-    def __unicode__(self):
-        return u'Weight: %s (Total cost: %s)' % (self.min_weight, self.cost)
-
+    def __str__(self):
+        return 'Weight: %s (Total cost: %s)' % (self.min_weight, self.cost)
 
     class Meta:
         unique_together = ('zone', 'min_weight', 'expires')

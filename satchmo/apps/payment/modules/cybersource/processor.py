@@ -2,8 +2,8 @@ from django.template import loader
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 from satchmo_utils.numbers import trunc_decimal
 from django.utils.translation import ugettext_lazy as _
+from six.moves import urllib
 
-import urllib2
 try:
     from xml.etree.ElementTree import fromstring
 except ImportError:
@@ -130,15 +130,15 @@ class PaymentProcessor(BasePaymentProcessor):
             'card' : self.card,
         }
         request = t.render(c)
-        conn = urllib2.Request(url=self.connection, data=request)
+        conn = urllib.request.Request(url=self.connection, data=request)
         try:
-            f = urllib2.urlopen(conn)
-        except urllib2.HTTPError, e:
+            f = urllib.request.urlopen(conn)
+        except urllib.error.HTTPError as e:
             # we probably didn't authenticate properly
             # make sure the 'v' in your account number is lowercase
             return ProcessorResult(self.key, False, 'Problem parsing results')
 
-        f = urllib2.urlopen(conn)
+        f = urllib.request.urlopen(conn)
         all_results = f.read()
         tree = fromstring(all_results)
         parsed_results = tree.getiterator('{urn:schemas-cybersource-com:transaction-data-1.26}reasonCode')
@@ -182,7 +182,7 @@ if __name__ == "__main__":
         def order_success(self):
             pass
 
-    if not os.environ.has_key("DJANGO_SETTINGS_MODULE"):
+    if not "DJANGO_SETTINGS_MODULE" in os.environ:
         os.environ["DJANGO_SETTINGS_MODULE"]="satchmo_store.settings"
 
     settings_module = os.environ['DJANGO_SETTINGS_MODULE']

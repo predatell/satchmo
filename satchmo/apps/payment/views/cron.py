@@ -7,6 +7,7 @@ from livesettings.functions import config_get_group, config_value
 from satchmo_store.shop.models import Order, OrderItem, OrderPayment
 from satchmo_utils.views import bad_or_missing
 import logging
+import six
 
 log = logging.getLogger('payment.views.cron')
 
@@ -79,6 +80,6 @@ def cron_rebill(request=None):
                             item.order.add_status(status='New', notes = ugettext("Subscription Renewal Order successfully submitted"))
                             new_order_item.completed = True
                             new_order_item.save()
-                            orderpayment = OrderPayment(order=item.order, amount=item.order.balance, payment=unicode(payment_module.KEY.value))
+                            orderpayment = OrderPayment(order=item.order, amount=item.order.balance, payment=six.text_type(payment_module.KEY.value))
                             orderpayment.save()
     return HttpResponse()

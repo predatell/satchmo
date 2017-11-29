@@ -1,6 +1,8 @@
 """
 Stores customer, organization, and order information.
 """
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -11,37 +13,43 @@ import logging
 
 log = logging.getLogger('contact.models')
 
+
+@python_2_unicode_compatible
 class ContactRole(models.Model):
     key = models.CharField(_('Key'), max_length=30, unique=True, primary_key=True)
     name = models.CharField(_('Name'), max_length=40)
 
-    def __unicode__(self):
+    def __str__(self):
         return ugettext(self.name)
 
 
+@python_2_unicode_compatible
 class ContactOrganization(models.Model):
     key = models.CharField(_('Key'), max_length=30, unique=True, primary_key=True)
     name = models.CharField(_('Name'), max_length=40)
 
-    def __unicode__(self):
+    def __str__(self):
         return ugettext(self.name)
 
     class Meta:
         verbose_name = _('Contact organization type')
 
 
+@python_2_unicode_compatible
 class ContactOrganizationRole(models.Model):
     key = models.CharField(_('Key'), max_length=30, unique=True, primary_key=True)
     name = models.CharField(_('Name'), max_length=40)
 
-    def __unicode__(self):
+    def __str__(self):
         return ugettext(self.name)
 
+
+@python_2_unicode_compatible
 class ContactInteractionType(models.Model):
     key = models.CharField(_('Key'), max_length=30, unique=True, primary_key=True)
     name = models.CharField(_('Name'), max_length=40)
 
-    def __unicode__(self):
+    def __str__(self):
         return ugettext(self.name)
 
 
@@ -64,6 +72,8 @@ class OrganizationManager(models.Manager):
 
         return org
 
+
+@python_2_unicode_compatible
 class Organization(models.Model):
     """
     An organization can be a company, government or any kind of group.
@@ -76,7 +86,7 @@ class Organization(models.Model):
 
     objects = OrganizationManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, **kwargs):
@@ -88,6 +98,7 @@ class Organization(models.Model):
     class Meta:
         verbose_name = _("Organization")
         verbose_name_plural = _("Organizations")
+
 
 class ContactManager(models.Manager):
 
@@ -136,6 +147,7 @@ class ContactManager(models.Manager):
         return contact
 
 
+@python_2_unicode_compatible
 class Contact(models.Model):
     """
     A customer, supplier or any individual that a store owner might interact
@@ -183,7 +195,7 @@ class Contact(models.Model):
             return None
     primary_phone = property(_primary_phone)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.full_name
 
     def save(self, **kwargs):
@@ -223,6 +235,7 @@ class Contact(models.Model):
         verbose_name = _("Contact")
         verbose_name_plural = _("Contacts")
 
+
 PHONE_CHOICES = (
     ('Work', _('Work')),
     ('Home', _('Home')),
@@ -230,6 +243,7 @@ PHONE_CHOICES = (
     ('Mobile', _('Mobile')),
 )
 
+@python_2_unicode_compatible
 class Interaction(models.Model):
     """
     A type of activity with the customer.  Useful to track emails, phone calls,
@@ -240,13 +254,15 @@ class Interaction(models.Model):
     date_time = models.DateTimeField(_("Date and Time"), )
     description = models.TextField(_("Description"), max_length=200)
 
-    def __unicode__(self):
-        return u'%s - %s' % (self.contact.full_name, self.type)
+    def __str__(self):
+        return '%s - %s' % (self.contact.full_name, self.type)
 
     class Meta:
         verbose_name = _("Interaction")
         verbose_name_plural = _("Interactions")
 
+
+@python_2_unicode_compatible
 class PhoneNumber(models.Model):
     """
     Phone number associated with a contact.
@@ -258,8 +274,8 @@ class PhoneNumber(models.Model):
         )
     primary = models.BooleanField(_("Primary"), default=False)
 
-    def __unicode__(self):
-        return u'%s - %s' % (self.type, self.phone)
+    def __str__(self):
+        return '%s - %s' % (self.type, self.phone)
 
     def save(self, **kwargs):
         """
@@ -281,6 +297,8 @@ class PhoneNumber(models.Model):
         verbose_name = _("Phone Number")
         verbose_name_plural = _("Phone Numbers")
 
+
+@python_2_unicode_compatible
 class AddressBook(models.Model):
     """
     Address information associated with a contact.
@@ -300,8 +318,8 @@ class AddressBook(models.Model):
     is_default_billing = models.BooleanField(_("Default Billing Address"),
         default=False)
 
-    def __unicode__(self):
-       return u'%s - %s' % (self.contact.full_name, self.description)
+    def __str__(self):
+       return '%s - %s' % (self.contact.full_name, self.description)
 
     def save(self, **kwargs):
         """
@@ -331,4 +349,4 @@ class AddressBook(models.Model):
         verbose_name = _("Address Book")
         verbose_name_plural = _("Address Books")
 
-import config
+from .config import *

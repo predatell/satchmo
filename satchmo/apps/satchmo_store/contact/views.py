@@ -370,9 +370,9 @@ def ajax_get_state(request, **kwargs):
     formdata = request.REQUEST.copy()
 
     try:
-        if formdata.has_key("country"):
+        if "country" in formdata:
             country_field = 'country'
-        elif formdata.has_key("ship_country"):
+        elif "ship_country" in formdata:
             country_field = 'ship_country'
         else:
             raise AjaxGetStateException("No country specified")
@@ -387,7 +387,7 @@ def ajax_get_state(request, **kwargs):
         areas = area_choices_for_country(country_obj, ugettext)
 
         return render(request, 'contact/_state_choices.html', { 'areas': areas })
-    except AjaxGetStateException, e:
+    except AjaxGetStateException as e:
         log.error("ajax_get_state aborting: %s" % e.message)
 
     return http.HttpResponseServerError()

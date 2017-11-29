@@ -64,7 +64,7 @@ def _add_upsell(form, cart, i):
                     log.info('Added upsell item: %s qty=%d', product.slug, qty)
                     return (True, product)
 
-                except CartAddProhibited, cap:
+                except CartAddProhibited as cap:
                     vetomsg = cap.veto_messages()
                     msg = _("'%(product)s' couldn't be added to the cart. %(details)s") % {
                         'product' : product.slug,

@@ -1,12 +1,16 @@
+import datetime
+import logging
+import operator
+
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from six.moves import reduce
+
 from satchmo_store import get_version
 from satchmo_store.contact.models import Contact
 from satchmo_store.shop.models import Order, Cart
 from satchmo_store.shop.signals import satchmo_context
 from threaded_multihost import threadlocals
-import datetime
-import logging
-import operator
 from product.models import Product
 
 
@@ -59,9 +63,9 @@ def add_toolbar_context(sender, context={}, **kwargs):
         st['st_total_sold'] = total_sales
         st['st_show_sales'] = show_sales
         st['st_variations'] = variation_items
-        week = datetime.datetime.today()-datetime.timedelta(days=7)
-        day = datetime.datetime.today()-datetime.timedelta(days=1)
-        hours = datetime.datetime.today()-datetime.timedelta(hours=1)
+        week = timezone.now().date()-datetime.timedelta(days=7)
+        day = timezone.now().date()-datetime.timedelta(days=1)
+        hours = timezone.now().date()-datetime.timedelta(hours=1)
         cartweekq = Cart.objects.filter(date_time_created__gte=week)
         cartdayq = Cart.objects.filter(date_time_created__gte=day)
         carthourq = Cart.objects.filter(date_time_created__gte=hours)

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django import forms
 from django.db import models
@@ -10,6 +12,7 @@ from satchmo_utils.unique_id import slugify
 import config # livesettings options
 import datetime
 import logging
+import six
 
 SATCHMO_PRODUCT=True
 
@@ -48,6 +51,8 @@ def get_all_options(obj, ids_only=False):
     results = cross_list(masterlist)
     return results
 
+
+@python_2_unicode_compatible
 class ConfigurableProduct(models.Model):
     """
     Product with selectable options.
@@ -120,7 +125,7 @@ class ConfigurableProduct(models.Model):
                 slug = slugify(u'%s_%s' % (self.product.slug, u'_'.join(optnames)))
 
             while Product.objects.filter(slug=slug).count():
-                slug = u'_'.join((slug, unicode(self.product.id)))
+                slug = u'_'.join((slug, six.text_type(self.product.id)))
 
             variant.slug = slug
 
@@ -261,7 +266,7 @@ class ConfigurableProduct(models.Model):
         verbose_name = _("Configurable Product")
         verbose_name_plural = _("Configurable Products")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.product.slug
 
 
@@ -271,6 +276,8 @@ class ProductVariationManager(models.Manager):
         """Get the list of productvariations which have the `product` as the parent"""
         return ProductVariation.objects.filter(parent=parent)
 
+
+@python_2_unicode_compatible
 class ProductVariation(models.Model):
     """
     This is the real Product that is ordered when a customer orders a

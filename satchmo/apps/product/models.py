@@ -2,7 +2,10 @@
 Base model used for products.  Stores hierarchical categories
 as well as individual product level information which includes
 options.
-"""
+"""from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
+
+from __future__ import print_function
 from decimal import Context, Decimal, ROUND_FLOOR
 from django import forms
 from django.conf import settings
@@ -16,19 +19,21 @@ from django.utils.translation import get_language, ugettext, ugettext_lazy as _
 from l10n.utils import moneyfmt, lookup_translation
 from livesettings.functions import config_value, config_value_safe
 from livesettings.models import SettingNotSet
-from prices import get_product_quantity_price, get_product_quantity_adjustments
+from .prices import get_product_quantity_price, get_product_quantity_adjustments
 from product import active_product_types
 from product.prices import PriceAdjustmentCalc
 from satchmo_utils import get_flat_list
 from satchmo_utils.fields import CurrencyField
 from satchmo_utils.satchmo_thumbnail.field import ImageWithThumbnailField
 from satchmo_utils.unique_id import slugify
-import config   #This import is required to make sure livesettings picks up the config values
+from .config import *   #This import is required to make sure livesettings picks up the config values
 import datetime
 import keyedcache
 import logging
 import operator
-import signals
+from .signals import *
+import six
+from six.moves import reduce
 
 log = logging.getLogger('product.models')
 
@@ -114,6 +119,8 @@ class CategoryManager(models.Manager):
             cats = zip(*fastsort)[2]
         return cats
 
+
+@python_2_unicode_compatible
 class Category(models.Model):
     """
     Basic hierarchical category model for storing products
@@ -148,7 +155,7 @@ class Category(models.Model):
                 img = CategoryImage.objects.filter(category__isnull=True).order_by('sort')[0]
             except IndexError:
                 import sys
-                print >>sys.stderr, 'Warning: default category image not found'
+                print('Warning: default category image not found', file=sys.stderr)
         return img
 
     main_image = property(_get_mainImage)
@@ -230,7 +237,7 @@ class Category(models.Model):
         url_list.append(self.get_absolute_url())
         return zip(name_list, url_list)
 
-    def __unicode__(self):
+    def __str__(self):
         name_list = [cat.name for cat in self._recurse_for_parents(self)]
         name_list.append(self.name)
         return self.get_separator().join(name_list)
@@ -293,6 +300,8 @@ class Category(models.Model):
         verbose_name_plural = _("Categories")
         # unique_together = ('site', 'slug')
 
+
+@python_2_unicode_compatible
 class CategoryTranslation(models.Model):
     """A specific language translation for a `Category`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -310,9 +319,11 @@ class CategoryTranslation(models.Model):
         ordering = ('category', 'name','languagecode')
         unique_together = ('category', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"CategoryTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.category, self.name)
+    def __str__(self):
+        return "CategoryTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.category, self.name)
 
+
+@python_2_unicode_compatible
 class CategoryImage(models.Model):
     """
     A picture of an item.  Can have many pictures associated with an item.
@@ -338,13 +349,13 @@ class CategoryImage(models.Model):
             return 'default'
     _filename = property(_get_filename)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.category:
-            return u"Image of Category %s" % self.category.slug
+            return "Image of Category %s" % self.category.slug
         elif self.caption:
-            return u"Image with caption \"%s\"" % self.caption
+            return "Image with caption \"%s\"" % self.caption
         else:
-            return u"%s" % self.picture
+            return "%s" % self.picture
 
     class Meta:
         ordering = ['sort']
@@ -352,6 +363,8 @@ class CategoryImage(models.Model):
         verbose_name = _("Category Image")
         verbose_name_plural = _("Category Images")
 
+
+@python_2_unicode_compatible
 class CategoryImageTranslation(models.Model):
     """A specific language translation for a `CategoryImage`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -368,8 +381,8 @@ class CategoryImageTranslation(models.Model):
         ordering = ('categoryimage', 'caption','languagecode')
         unique_together = ('categoryimage', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"CategoryImageTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.categoryimage, self.name)
+    def __str__(self):
+        return "CategoryImageTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.categoryimage, self.name)
 
 class OptionGroupManager(models.Manager):
     def get_sortmap(self):
@@ -421,7 +434,7 @@ class DiscountManager(models.Manager):
         site = Site.objects.get_current()
         try:
             sale = keyedcache.cache_get('discount', 'sale', site, today)
-        except keyedcache.NotCachedError, nce:
+        except keyedcache.NotCachedError as nce:
             discs = self.filter(automatic=True,
                 active=True,
                 site=site,
@@ -437,6 +450,8 @@ class DiscountManager(models.Manager):
         else:
             return sale
 
+
+@python_2_unicode_compatible
 class Discount(models.Model):
     """
     Allows for multiple types of discounts including % and dollar off.
@@ -476,7 +491,7 @@ class Discount(models.Model):
         self._calculated = False
         super(Discount, self).__init__(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
     def isValid(self, cart=None, contact=None):
@@ -676,6 +691,7 @@ class Discount(models.Model):
     apply_percentage = classmethod(apply_percentage)
 
 
+@python_2_unicode_compatible
 class OptionGroup(models.Model):
     """
     A set of options that can be applied to an item.
@@ -698,9 +714,9 @@ class OptionGroup(models.Model):
     def translated_name(self, language_code=None):
         return lookup_translation(self, 'name', language_code)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.description:
-            return u"%s - %s" % (self.name, self.description)
+            return "%s - %s" % (self.name, self.description)
         else:
             return self.name
 
@@ -709,6 +725,8 @@ class OptionGroup(models.Model):
         verbose_name = _("Option Group")
         verbose_name_plural = _("Option Groups")
 
+
+@python_2_unicode_compatible
 class OptionGroupTranslation(models.Model):
     """A specific language translation for an `OptionGroup`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -726,8 +744,8 @@ class OptionGroupTranslation(models.Model):
         ordering = ('optiongroup', 'name','languagecode')
         unique_together = ('optiongroup', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"OptionGroupTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.optiongroup, self.name)
+    def __str__(self):
+        return "OptionGroupTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.optiongroup, self.name)
 
 
 class OptionManager(models.Manager):
@@ -736,6 +754,8 @@ class OptionManager(models.Manager):
         group = OptionGroup.objects.get(id=group_id)
         return Option.objects.get(option_group=group_id, value=option_value)
 
+
+@python_2_unicode_compatible
 class Option(models.Model):
     """
     These are the actual items in an OptionGroup.  If the OptionGroup is Size, then an Option
@@ -766,9 +786,11 @@ class Option(models.Model):
     def __repr__(self):
         return "<Option: %s>" % repr(self.name)
 
-    def __unicode__(self):
-        return u'%s: %s' % (self.option_group.name, self.name)
+    def __str__(self):
+        return '%s: %s' % (self.option_group.name, self.name)
 
+
+@python_2_unicode_compatible
 class OptionTranslation(models.Model):
     """A specific language translation for an `Option`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -785,8 +807,9 @@ class OptionTranslation(models.Model):
         ordering = ('option', 'name','languagecode')
         unique_together = ('option', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"OptionTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.option, self.name)
+    def __str__(self):
+        return "OptionTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.option, self.name)
+
 
 class ProductManager(models.Manager):
 
@@ -830,6 +853,7 @@ def get_taxable():
     return config_value('TAX', 'PRODUCTS_TAXABLE_BY_DEFAULT')
     
 
+@python_2_unicode_compatible
 class Product(models.Model):
     """
     Root class for all Products
@@ -894,7 +918,7 @@ class Product(models.Model):
                 img = ProductImage.objects.filter(product__isnull=True).order_by('sort')[0]
             except IndexError:
                 import sys
-                print >>sys.stderr, 'Warning: default product image not found - try syncdb'
+                print('Warning: default product image not found - try syncdb', file=sys.stderr)
 
         return img
 
@@ -1002,7 +1026,7 @@ class Product(models.Model):
 
     has_full_weight = property(_has_full_weight)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_absolute_url(self):
@@ -1186,6 +1210,8 @@ class Product(models.Model):
 
         return context
 
+
+@python_2_unicode_compatible
 class ProductTranslation(models.Model):
     """A specific language translation for a `Product`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -1204,8 +1230,8 @@ class ProductTranslation(models.Model):
         ordering = ('product', 'name','languagecode')
         unique_together = ('product', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"ProductTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.product, self.name)
+    def __str__(self):
+        return "ProductTranslation: [%s] (ver #%i) %s Name: %s" % (self.languagecode, self.version, self.product, self.name)
 
 #class BundledProduct(models.Model):
 #    """
@@ -1364,6 +1390,8 @@ VALIDATIONS = [
 if user_validations:
     VALIDATIONS.extend(user_validations)
 
+
+@python_2_unicode_compatible
 class AttributeOption(models.Model):
     """
     Allows arbitrary name/value pairs to be attached to a product.
@@ -1383,10 +1411,11 @@ class AttributeOption(models.Model):
     class Meta:
         ordering = ('sort_order',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
 
+@python_2_unicode_compatible
 class ProductAttribute(models.Model):
     """
     Allows arbitrary name/value pairs (as strings) to be attached to a product.
@@ -1412,10 +1441,11 @@ class ProductAttribute(models.Model):
         verbose_name_plural = _("Product Attributes")
         ordering = ('option__sort_order',)
 
-
-    def __unicode__(self):
+    def __str__(self):
         return self.option.name
 
+
+@python_2_unicode_compatible
 class CategoryAttribute(models.Model):
     """
     Similar to ProductAttribute, except that this is for categories.
@@ -1438,9 +1468,11 @@ class CategoryAttribute(models.Model):
         verbose_name_plural = _("Category Attributes")
         ordering = ('option__sort_order',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.option.name
 
+
+@python_2_unicode_compatible
 class Price(models.Model):
     """
     A Price!
@@ -1457,8 +1489,8 @@ class Price(models.Model):
     expires = models.DateField(_("Expires"), null=True, blank=True)
     #TODO: add fields here for locale/currency specific pricing
 
-    def __unicode__(self):
-        return unicode(self.price)
+    def __str__(self):
+        return six.text_type(self.price)
 
     def adjustments(self, product=None):
         """Get a list of price adjustments, in the form of a PriceAdjustmentCalc
@@ -1501,6 +1533,8 @@ class Price(models.Model):
         verbose_name_plural = _("Prices")
         unique_together = (("product", "quantity", "expires"),)
 
+
+@python_2_unicode_compatible
 class ProductImage(models.Model):
     """
     A picture of an item.  Can have many pictures associated with an item.
@@ -1530,19 +1564,21 @@ class ProductImage(models.Model):
             return 'default'
     _filename = property(_get_filename)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.product:
-            return u"Image of Product %s" % self.product.slug
+            return "Image of Product %s" % self.product.slug
         elif self.caption:
-            return u"Image with caption \"%s\"" % self.caption
+            return "Image with caption \"%s\"" % self.caption
         else:
-            return u"%s" % self.picture
+            return "%s" % self.picture
 
     class Meta:
         ordering = ['sort']
         verbose_name = _("Product Image")
         verbose_name_plural = _("Product Images")
 
+
+@python_2_unicode_compatible
 class ProductImageTranslation(models.Model):
     """A specific language translation for a `ProductImage`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
@@ -1559,9 +1595,11 @@ class ProductImageTranslation(models.Model):
         ordering = ('productimage', 'caption','languagecode')
         unique_together = ('productimage', 'languagecode', 'version')
 
-    def __unicode__(self):
-        return u"ProductImageTranslation: [%s] (ver #%i) %s" % (self.languagecode, self.version, self.productimage)
+    def __str__(self):
+        return "ProductImageTranslation: [%s] (ver #%i) %s" % (self.languagecode, self.version, self.productimage)
 
+
+@python_2_unicode_compatible
 class TaxClass(models.Model):
     """
     Type of tax that can be applied to a product.  Tax
@@ -1573,7 +1611,7 @@ class TaxClass(models.Model):
     description = models.CharField(_("Description"), max_length=30,
         help_text=_("Description of products that would be taxed."))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from hashlib import sha1 as sha_constructor
 from django.contrib.sites.models import Site
 from django.core import urlresolvers
@@ -28,6 +30,8 @@ def _protected_dir(instance, filename):
     updir = os.path.normpath(normalize_dir(raw))
     return os.path.join(updir, instance.file.field.get_filename(filename))
 
+
+@python_2_unicode_compatible
 class DownloadableProduct(models.Model):
     """
     This type of Product is a file to be downloaded
@@ -46,7 +50,7 @@ class DownloadableProduct(models.Model):
     is_shippable = False
     is_downloadable = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.product.slug
 
     def _get_subtype(self):
@@ -69,6 +73,8 @@ class DownloadableProduct(models.Model):
             del self.product._sub_types
         super(DownloadableProduct, self).save(*args, **kwargs)
 
+
+@python_2_unicode_compatible
 class DownloadLink(models.Model):
     downloadable_product = models.ForeignKey(DownloadableProduct, verbose_name=_('Downloadable product'))
     order = models.ForeignKey(Order, verbose_name=_('Order'))
@@ -110,11 +116,11 @@ class DownloadLink(models.Model):
             self.time_stamp = timezone.now()
         super(DownloadLink, self).save(**kwargs)
 
-    def __unicode__(self):
-        return u"%s - %s" % (self.downloadable_product.product.slug, self.time_stamp)
+    def __str__(self):
+        return "%s - %s" % (self.downloadable_product.product.slug, self.time_stamp)
 
     def _product_name(self):
-        return u"%s" % (self.downloadable_product.product.translated_name())
+        return "%s" % (self.downloadable_product.product.translated_name())
     product_name=property(_product_name)
 
     class Meta:

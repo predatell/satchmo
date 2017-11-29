@@ -1085,7 +1085,7 @@ class SignalTest(TestCase):
             order = make_test_order(self.US, '', include_non_taxed=True)
             self.fail('Should have thrown a CartAddProhibited error')
 
-        except CartAddProhibited, cap:
+        except CartAddProhibited as cap:
             pass
 
         self.assertEqual(len(cart), 0)
