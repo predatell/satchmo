@@ -3,8 +3,6 @@
 # This will effectively place satchmo files but there needs to
 # be extra work before this would work correctly
 
-import ez_setup
-ez_setup.use_setuptools()
 from setuptools import setup, find_packages
 import os, os.path
 import sys
