@@ -217,4 +217,4 @@ class ProductShippingPrice(models.Model):
     class Meta:
         ordering = ('carrier','price')
 
-import config
+from . import config

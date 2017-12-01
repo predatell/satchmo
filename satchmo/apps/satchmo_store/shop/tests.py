@@ -112,7 +112,7 @@ class ShopTest(TestCase):
         Validate account creation process
         """
         shop_config = Config.objects.get_current()
-        subject = u"Welcome to %s" % shop_config.store_name
+        subject = "Welcome to %s" % shop_config.store_name
         response = self.client.get('/accounts/register/')
         self.assertContains(response, "Please Enter Your Account Information", count=1, status_code=200)
         response = self.client.post('/accounts/register/', {'email': 'someone@test.com',

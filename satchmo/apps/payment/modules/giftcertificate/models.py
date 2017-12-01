@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
 
 from datetime import datetime
 from decimal import Decimal
@@ -7,6 +6,8 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
+
 from l10n.utils import moneyfmt
 from payment.modules.giftcertificate.utils import generate_certificate_code
 from payment.utils import get_processor_by_key
@@ -100,7 +101,7 @@ class GiftCertificate(models.Model):
     def __str__(self):
         sb = moneyfmt(self.start_balance)
         b = moneyfmt(self.balance)
-        return u"Gift Cert: %s/%s" % (sb, b)
+        return "Gift Cert: %s/%s" % (sb, b)
 
     class Meta:
         verbose_name = _("Gift Certificate")
@@ -120,7 +121,7 @@ class GiftCertificateUsage(models.Model):
     giftcertificate = models.ForeignKey(GiftCertificate, related_name='usages')
 
     def __str__(self):
-        return u"GiftCertificateUsage: %s" % self.balance_used
+        return "GiftCertificateUsage: %s" % self.balance_used
 
     def save(self, **kwargs):
         if not self.pk:
@@ -138,7 +139,7 @@ class GiftCertificateProduct(models.Model):
     discountable = False
 
     def __str__(self):
-        return u"GiftCertificateProduct: %s" % self.product.name
+        return "GiftCertificateProduct: %s" % self.product.name
 
     def _get_subtype(self):
         return 'GiftCertificateProduct'
@@ -174,5 +175,5 @@ class GiftCertificateProduct(models.Model):
         verbose_name = _("Gift certificate product")
         verbose_name_plural = _("Gift certificate products")
 
-import config
+from . import config
 PAYMENT_PROCESSOR=True

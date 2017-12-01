@@ -22,4 +22,4 @@ class AdminImageWithThumbnailWidget(AdminImageMixin, forms.FileInput):
             output.append('<img src="%s" /><br/>%s<br/> %s ' % \
                 (thumb.url, value.url, _('Change:')))
         output.append(super(AdminImageWithThumbnailWidget, self).render(name, value, attrs))
-        return mark_safe(u''.join(output))
+        return mark_safe(''.join(output))

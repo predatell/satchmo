@@ -1,16 +1,19 @@
-from django.conf import settings
-from django.db.models.fields.files import ImageField
-from livesettings.functions import config_value
-from satchmo_utils.satchmo_thumbnail.text import URLify
-
-#ensure config is loaded
-import satchmo_utils.satchmo_thumbnail.config
+from __future__ import print_function
 
 import fnmatch
 import logging
 import os
 import shutil
 from six.moves import urllib
+
+from django.conf import settings
+from django.db.models.fields.files import ImageField
+
+from livesettings.functions import config_value
+from satchmo_utils.satchmo_thumbnail.text import URLify
+import satchmo_utils.satchmo_thumbnail.config
+
+
 
 try:
     import Image

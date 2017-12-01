@@ -1,3 +1,4 @@
+from __future__ import print_function
 from django.template import Library
 from django.conf import settings
 from satchmo_store.contact.models import Contact

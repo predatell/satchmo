@@ -28,7 +28,7 @@ def js_thumbnail_array(details, args=''):
                     # never get an ADDITIONAL_IMAGES field here
                     pass
                 else:
-                    if kv == u'ADDITIONAL_IMAGES':
+                    if kv == 'ADDITIONAL_IMAGES':
                         ret = ret + 'satchmo.thumbnails["' + vv[0] + '"] = "' + thumbnail(settings.MEDIA_URL + vv[0], args) + '";\n'
         except Exception as e:
             pass

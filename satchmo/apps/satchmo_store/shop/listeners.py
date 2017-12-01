@@ -9,7 +9,7 @@ from satchmo_store.shop.exceptions import OutOfStockError
 from satchmo_store.shop.models import Order
 from satchmo_utils.signals import application_search
 
-import notification
+from .notification import order_success_listener, notify_on_ship_listener
 import logging
 
 log = logging.getLogger('shop.listeners')
@@ -64,12 +64,12 @@ def start_default_listening():
     """Add required default listeners"""
     contact_signals.satchmo_contact_location_changed.connect(recalc_total_on_contact_change, sender=None)
     signals.order_success.connect(decrease_inventory_on_sale)
-    signals.order_success.connect(notification.order_success_listener, sender=None)
+    signals.order_success.connect(order_success_listener, sender=None)
     signals.order_success.connect(discount_used_listener, sender=None)
     signals.satchmo_cart_changed.connect(remove_order_on_cart_update, sender=None)
     application_search.connect(default_product_search_listener, sender=Product)
     signals.satchmo_order_status_changed.connect(capture_on_ship_listener)
-    signals.satchmo_order_status_changed.connect(notification.notify_on_ship_listener)
+    signals.satchmo_order_status_changed.connect(notify_on_ship_listener)
     signals.satchmo_cart_add_verify.connect(veto_out_of_stock)
 
     signals.sending_store_mail.connect(send_html_email)

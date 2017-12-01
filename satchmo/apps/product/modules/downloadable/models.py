@@ -1,21 +1,23 @@
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
+import os
+import random
 from hashlib import sha1 as sha_constructor
+
 from django.contrib.sites.models import Site
 from django.core import urlresolvers
 from django.db import models
 from django.db.models.fields.files import FileField
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+
 from livesettings.functions import config_value
 from product import signals
 from product.models import Product
 import product.modules.downloadable.config
 from satchmo_store.shop.models import Order
 from satchmo_utils import normalize_dir
-import os
-import random
+
 
 SATCHMO_PRODUCT=True
 
@@ -128,6 +130,6 @@ class DownloadLink(models.Model):
         verbose_name_plural = _("Download Links")
 
 
-import config
-import listeners
+from . import config
+from . import listeners
 listeners.start_default_listening()

@@ -2,13 +2,17 @@
 Used to manage raw inventory and supplier relationships.  This is still
 under heavy development.
 """
-
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from satchmo_store.contact.models import Contact, Organization
 import datetime
 import six
 
+from django.utils.encoding import python_2_unicode_compatible
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from satchmo_store.contact.models import Contact, Organization
+
+
+@python_2_unicode_compatible
 class RawItem(models.Model):
     """
     A raw good supplied by a supplier.  For instance, it could be a plain 
@@ -20,13 +24,15 @@ class RawItem(models.Model):
     unit_cost = models.DecimalField(_("Unit Cost"), max_digits=6, decimal_places=2)
     inventory = models.DecimalField(_("Inventory"),  max_digits=18,  decimal_places=6)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.description
     
     class Meta:
         verbose_name = _("Raw Item")
         verbose_name_plural = _("Raw Items")
 
+
+@python_2_unicode_compatible
 class SupplierOrder(models.Model):
     """
     An order the store owner places to a supplier for a raw good.
@@ -39,7 +45,7 @@ class SupplierOrder(models.Model):
     order_notes = models.CharField(_("Notes"), max_length=200, blank=True)
     order_total = models.DecimalField(_("Total"), max_digits=6, decimal_places=2)
     
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.date_created)
     
     def _status(self):
@@ -56,6 +62,8 @@ class SupplierOrder(models.Model):
         verbose_name = _("Supplier Order")
         verbose_name_plural = _("Supplier Orders")
     
+    
+@python_2_unicode_compatible
 class SupplierOrderItem(models.Model):
     """
     Individual line items for an order
@@ -65,8 +73,9 @@ class SupplierOrderItem(models.Model):
     line_item_quantity = models.IntegerField(_("Line Item Quantity"), )
     line_item_total = models.DecimalField(_("Line Item Total"), max_digits=6,decimal_places=2)
     
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.line_item_total) 
+
 
 SUPPLIERORDER_STATUS = (
     (_('Sent in'), _('Sent in')),
@@ -74,6 +83,8 @@ SUPPLIERORDER_STATUS = (
     (_('Received'), _('Received')),
 )
 
+
+@python_2_unicode_compatible
 class SupplierOrderStatus(models.Model):
     """
     Status of a supplier's order.  There will be multiple statuses as it is
@@ -84,7 +95,7 @@ class SupplierOrderStatus(models.Model):
     notes = models.CharField(_("Notes"), max_length=100, blank=True)
     date = models.DateTimeField(_('Date'), blank=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.status
         
     class Meta:

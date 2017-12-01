@@ -74,7 +74,7 @@ class Shipper(BaseShipper):
             self.service_type_code = '99'
             self.service_type_text = 'Uninitialized'
 
-        self.id = u'%s' % (self.service_type_text)
+        self.id = '%s' % (self.service_type_text)
         
         self._cost = Decimal('0.00')
         self._valid = None
@@ -86,8 +86,8 @@ class Shipper(BaseShipper):
         except KeyError:
             self._expected_delivery = ''
         
-    def __unicode__(self):
-        return u"Shipping via fedex_web_services"
+    def __str__(self):
+        return "Shipping via fedex_web_services"
         
     def description(self):
         return _('Fedex - %s' % self.service_type_text)

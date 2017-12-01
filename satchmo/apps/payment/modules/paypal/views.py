@@ -173,7 +173,7 @@ def ipn(request):
                 else:
                     notes = ""
 
-                order.notes = notes + _('---Comment via Paypal IPN---') + u'\n' + data['memo']
+                order.notes = notes + _('---Comment via Paypal IPN---') + '\n' + data['memo']
                 order.save()
                 log.debug("Saved order notes from Paypal")
 

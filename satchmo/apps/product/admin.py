@@ -167,7 +167,7 @@ class CategoryOptions(admin.ModelAdmin):
         return HttpResponseRedirect('')
 
     def which_site(self, obj):
-        return u', '.join(site.name for site in obj.site.all().order_by())
+        return ', '.join(site.name for site in obj.site.all().order_by())
     which_site.short_description = 'Site'
         
 
@@ -186,7 +186,7 @@ class OptionGroupOptions(admin.ModelAdmin):
     filter_horizontal = ('site',)
 
     def which_site(self, obj):
-        return u', '.join(site.name for site in obj.site.all().order_by())
+        return ', '.join(site.name for site in obj.site.all().order_by())
     which_site.short_description = 'Site'
 
     
@@ -282,7 +282,7 @@ class ProductOptions(admin.ModelAdmin):
         return field
 
     def which_site(self, obj):
-        return u', '.join(site.name for site in obj.site.all().order_by())
+        return ', '.join(site.name for site in obj.site.all().order_by())
     which_site.short_description = 'Site'
 
         

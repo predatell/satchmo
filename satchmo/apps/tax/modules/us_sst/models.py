@@ -1,6 +1,8 @@
 # coding=UTF-8
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
+
 from product.models import TaxClass
 from l10n.models import AdminArea, Country
 #from satchmo_store.shop.models import Order
@@ -14,6 +16,8 @@ try:
 except:
     from django.utils._decimal import Decimal
 
+
+@python_2_unicode_compatible
 class Taxable(models.Model):
     """
     Map that says what items are taxable in a jurisdiction.
@@ -77,8 +81,8 @@ class Taxable(models.Model):
     #_display_percentage.short_description = _('Percentage')
     #display_percentage = property(_display_percentage)
 
-    def __unicode__(self):
-        return u"%s - %s = %s" % (self.taxClass,
+    def __str__(self):
+        return "%s - %s = %s" % (self.taxClass,
                              self.taxZone and self.taxZone or self.taxCountry,
                              self.isTaxable)
 
@@ -129,6 +133,8 @@ JURISDICTION_CHOICES = (
     (79, 'Other Special Applications'),
 )
 
+
+@python_2_unicode_compatible
 class TaxRate(models.Model):
     """
     Records for tax rates in the default SST format as defined at:
@@ -153,8 +159,8 @@ class TaxRate(models.Model):
         verbose_name = _("Tax Rate")
         verbose_name_plural = _("Tax Rates")
 
-    def __unicode__(self):
-        return u'State %d: Jurisdiction: %s(%s)' % (
+    def __str__(self):
+        return 'State %d: Jurisdiction: %s(%s)' % (
             self.state,
             self.jurisdictionFipsCode,
             self.get_jurisdictionType_display(),
@@ -183,6 +189,9 @@ ODD_EVEN_CHOICES = (
     ('B', 'Both'),
 
 )
+
+
+@python_2_unicode_compatible
 class TaxBoundry(models.Model):
     """
     Records for tax boundries in the default SST format as defined at:
@@ -288,11 +297,11 @@ class TaxBoundry(models.Model):
 
     def get_zip_range(self):
         if self.zipExtensionLow:
-            return u'%05d-%04d -> %05d-%04d' % (
+            return '%05d-%04d -> %05d-%04d' % (
                 self.zipCodeLow, self.zipExtensionLow, self.zipCodeHigh, self.zipExtensionHigh
             )
         else:
-            return u'%05d -> %05d' % (self.zipCodeLow, self.zipCodeHigh)
+            return '%05d -> %05d' % (self.zipCodeLow, self.zipCodeHigh)
     zip_range = property(get_zip_range)
 
     def rates(self, date=None):
@@ -336,18 +345,18 @@ class TaxBoundry(models.Model):
         return pct
     percentage=property(get_percentage)
     
-    def __unicode__(self):
+    def __str__(self):
         if self.recordType == 'Z':
-            return u'TaxBoundry(Z): %i -- %i' % (
+            return 'TaxBoundry(Z): %i -- %i' % (
                 self.zipCodeLow, self.zipCodeHigh
             )
         elif self.recordType == '4':
-            return u'TaxBoundry(4): %i-%i -- %i-%i' % (
+            return 'TaxBoundry(4): %i-%i -- %i-%i' % (
                 self.zipCodeLow, self.zipExtensionLow,
                 self.zipCodeHigh, self.zipExtensionHigh,
             )
         else:
-            return u'TaxBoundry(A)'
+            return 'TaxBoundry(A)'
 
     @classmethod
     def lookup(cls, zip, ext=None, date=None):
@@ -404,4 +413,4 @@ class TaxBoundry(models.Model):
 
 #order_success.connect(save_taxes_colletecd)
 
-import config
+from . import config

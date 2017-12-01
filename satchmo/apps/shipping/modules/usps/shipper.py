@@ -110,7 +110,7 @@ class Shipper(BaseShipper):
         else:
             self.service_type_code = "99"
             self.service_type_text = "Uninitialized"
-        self.id = u"USPS-%s-%s" % (self.service_type_code, self.service_type_text)
+        self.id = "USPS-%s-%s" % (self.service_type_code, self.service_type_text)
         self.raw = "NO DATA"
         self.exact_date = False
         #if cart or contact:

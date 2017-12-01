@@ -200,7 +200,7 @@ class Zone(models.Model):
         if trans:
             return trans.delivery
         else:
-            return u''
+            return ''
     delivery = property(delivery)
 
 
@@ -212,7 +212,7 @@ class Zone(models.Model):
         if trans:
             return trans.description
         else:
-            return u''
+            return ''
     description = property(description)
 
 
@@ -224,7 +224,7 @@ class Zone(models.Model):
         if trans:
             return trans.method
         else:
-            return u''
+            return ''
     method = property(method)
 
 
@@ -292,4 +292,4 @@ class WeightTier(models.Model):
     cost = property(cost)
 
 
-import config
+from . import config

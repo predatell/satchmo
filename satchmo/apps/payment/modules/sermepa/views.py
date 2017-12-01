@@ -203,7 +203,7 @@ def notify_callback(request):
         log.error("Received incomplete SERMEPA transaction data")
         return HttpResponseBadRequest("Incomplete data")
     # success
-    order.add_status(status='New', notes=u"Paid through SERMEPA.")
+    order.add_status(status='New', notes="Paid through SERMEPA.")
     processor = get_processor_by_key('PAYMENT_SERMEPA')
     payment = processor.record_payment(
         order=order,

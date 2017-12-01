@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.generic.base import TemplateView
-from forms import RegistrationAddressForm, RegistrationForm, EmailAuthenticationForm
 from l10n.models import Country
 from livesettings.functions import config_get_group, config_value
 from satchmo_store.accounts.mail import send_welcome_email
@@ -16,6 +15,7 @@ from satchmo_store.accounts import signals
 from satchmo_store.contact import CUSTOMER_ID
 from satchmo_store.contact.models import Contact
 from satchmo_store.shop.models import Config, Cart
+from .forms import RegistrationAddressForm, RegistrationForm, EmailAuthenticationForm
 
 import logging
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.forms import models, ValidationError
 from django.utils.translation import get_language, ugettext_lazy as _
-from models import TaxRate
+from .models import TaxRate
 
 class TaxRateForm(models.ModelForm):
 

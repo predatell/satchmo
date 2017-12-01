@@ -9,7 +9,7 @@ from product.models import Option, Product, ProductPriceLookup, OptionGroup, Pri
 from product.prices import get_product_quantity_price, get_product_quantity_adjustments
 from satchmo_utils import cross_list
 from satchmo_utils.unique_id import slugify
-import config # livesettings options
+from . import config # livesettings options
 import datetime
 import logging
 import six
@@ -106,7 +106,7 @@ class ConfigurableProduct(models.Model):
         for options in self.get_all_options():
             self.create_variation(options)
 
-    def create_variation(self, options, name=u"", sku=u"", slug=u""):
+    def create_variation(self, options, name="", sku="", slug=""):
         """Create a productvariation with the specified options.
         Will not create a duplicate."""
         log.debug("Create variation: %s", options)
@@ -122,10 +122,10 @@ class ConfigurableProduct(models.Model):
             variant = Product(items_in_stock=0, name=name)
             optnames = [opt.value for opt in options]
             if not slug:
-                slug = slugify(u'%s_%s' % (self.product.slug, u'_'.join(optnames)))
+                slug = slugify('%s_%s' % (self.product.slug, '_'.join(optnames)))
 
             while Product.objects.filter(slug=slug).count():
-                slug = u'_'.join((slug, six.text_type(self.product.id)))
+                slug = '_'.join((slug, six.text_type(self.product.id)))
 
             variant.slug = slug
 
@@ -461,7 +461,7 @@ class ProductVariation(models.Model):
             name = self.parent.product.name
             options = [option.name for option in self.options.order_by("option_group")]
             if options:
-                name = u'%s (%s)' % (name, u'/'.join(options))
+                name = '%s (%s)' % (name, '/'.join(options))
             log.debug("Setting default name for ProductVariant: %s", name)
 
         self.product.name = name
@@ -490,6 +490,6 @@ class ProductVariation(models.Model):
         verbose_name = _("Product variation")
         verbose_name_plural = _("Product variations")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.product.slug
 

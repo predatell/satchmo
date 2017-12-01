@@ -1,17 +1,20 @@
 """Utility functions used by signals to attach Ratings to Comments"""
+import logging
+
+from django.contrib.sites.models import Site
+from django.core import urlresolvers
+from django.utils.encoding import smart_str
+from django.conf import settings
 try:
     from django.contrib.comments.models import Comment
 except ImportError:
     from django_comments.models import Comment
-from django.contrib.sites.models import Site
-from django.core import urlresolvers
-from django.utils.encoding import smart_str
+
 from livesettings.functions import config_value
-from models import ProductRating
 from product.models import Product
 from satchmo_utils import url_join
-import logging
-from django.conf import settings
+from .models import ProductRating
+
 
 log = logging.getLogger('productratings')
 

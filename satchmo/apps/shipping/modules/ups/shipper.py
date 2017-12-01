@@ -64,7 +64,7 @@ class Shipper(BaseShipper):
         else:
             self.service_type_code = "99"
             self.service_type_text = "Uninitialized"
-        self.id = u"UPS-%s-%s" % (self.service_type_code, self.service_type_text)
+        self.id = "UPS-%s-%s" % (self.service_type_code, self.service_type_text)
         self.raw = "NO DATA"
         #if cart or contact:
         #    self.calculate(cart, contact)

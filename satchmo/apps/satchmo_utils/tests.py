@@ -73,7 +73,7 @@ class TestSlugify(TestCase):
         val = slugify('&Aacute;&#193;&#xc1;&#352;&#x160;', entities=False, decimal=False, hexadecimal=False)
         self.assertEqual(val, 'aacute-193-xc1-352-x160')
         # A acute + S caron
-        val = slugify(u'\xc1\u0160')
+        val = slugify('\xc1\u0160')
         self.assertEqual(val, 'as')
         # Greek alpha beta gamma can not be converted to ascii
         val = slugify('&alpha;&beta;&gamma;')

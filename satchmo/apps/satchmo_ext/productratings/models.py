@@ -16,8 +16,8 @@ class ProductRating(models.Model):
     comment = models.OneToOneField(Comment, verbose_name="Rating", primary_key=True)
     rating = models.IntegerField(_("Rating"))
 
-import config
-from urls import add_product_urls, add_comment_urls
+from . import config
+from .urls import add_product_urls, add_comment_urls
 collect_urls.connect(add_product_urls, sender=product)
 collect_urls.connect(add_comment_urls, sender=satchmo_store)
 

@@ -235,7 +235,7 @@ class AddressCreateEditView(ContactFromRequestMixin, SingleObjectMixin, FormView
         self.next_url = request.GET.get('next', None)
         self.contact = self.get_contact()
         self.object = self.get_object()
-        if self.object and self.object.contact <> self.contact:
+        if self.object and not self.object.contact == self.contact:
             return http.HttpResponseRedirect(self.success_url)        
         return super(FormView, self).dispatch(request, *args, **kwargs)
             
@@ -278,7 +278,7 @@ address_create_edit = login_required(AddressCreateEditView.as_view())
 #     if id:
 #         initial_entry = get_object_or_404(AddressBook, pk=id)
 #         # Make sure we only edit entries associated with this contact
-#         if initial_entry.contact <> contact:
+#         if not initial_entry.contact == contact:
 #             return http.HttpResponseRedirect(urlresolvers.reverse('satchmo_account_info'))
 #         initial_data = model_to_dict(initial_entry, fields=[], exclude=['contact'])
 #         # This is a bit of a hack because we normally use jquery to populate the addressee
@@ -316,7 +316,7 @@ class AddressDeleteView(ContactFromRequestMixin, DeleteView):
     def dispatch(self, request, *args, **kwargs):
         self.contact = self.get_contact()
         self.object = self.get_object()
-        if self.object and self.object.contact <> self.contact:
+        if self.object and not self.object.contact == self.contact:
             return http.HttpResponseRedirect(self.success_url)        
         return super(DeleteView, self).dispatch(request, *args, **kwargs)
     
@@ -349,7 +349,7 @@ address_delete = login_required(AddressDeleteView.as_view())
 #     if id:
 #         initial_entry = get_object_or_404(AddressBook, pk=id)
 #         # Make sure we only edit entries associated with this contact
-#         if initial_entry.contact <> contact:
+#         if not initial_entry.contact == contact:
 #             return http.HttpResponseRedirect(urlresolvers.reverse('satchmo_account_info'))
 #     if request.method == 'POST' and initial_entry:
 #         if request.POST['delete_entry'] == 'Yes':

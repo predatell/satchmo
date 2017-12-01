@@ -37,7 +37,7 @@ class PaymentProcessor(BasePaymentProcessor):
 
         # convert exp date to mmyy from mm/yy or mm/yyyy
         cc = data.credit_card
-        exp = u"%.2d%.2d" % (int(cc.expire_month), (int(cc.expire_year) % 100))
+        exp = "%.2d%.2d" % (int(cc.expire_month), (int(cc.expire_year) % 100))
 
         invoice = "%s" % data.id
         failct = data.paymentfailures.count()
@@ -51,7 +51,7 @@ class PaymentProcessor(BasePaymentProcessor):
             'demo'	: self.demo,
 
             # Customer data
-            'name'  	: data.bill_first_name + u' ' + data.bill_last_name,
+            'name'  	: data.bill_first_name + ' ' + data.bill_last_name,
             'address1'	: data.full_bill_street,
             'city'	: data.bill_city,
             'state' 	: data.bill_state,
@@ -68,7 +68,7 @@ class PaymentProcessor(BasePaymentProcessor):
             'exp'	: exp, 		# 4 digits eg 0108
             'cvv'	: cc.ccv,
             'avs'	: self.AVS,		# address verification - see tclink dev guide
-            'ticket'	: u'Order: %s ' % invoice,
+            'ticket'	: 'Order: %s ' % invoice,
             'operator'	: 'Satchmo'
             }
         for key, value in self.transactionData.items():
@@ -105,17 +105,17 @@ class PaymentProcessor(BasePaymentProcessor):
 
         else:
             if status == 'decline':
-                msg = _(u'Transaction was declined.  Reason: %s' % result['declinetype'])
-                failmsg = u'Transaction was declined.  Reason: %s' % result['declinetype']
+                msg = _('Transaction was declined.  Reason: %s' % result['declinetype'])
+                failmsg = 'Transaction was declined.  Reason: %s' % result['declinetype']
 
             elif status == 'baddata':
-                msg = _(u'Improperly formatted data. Offending fields: %s' % result['offenders'])
-                failmsg = u'Improperly formatted data. Offending fields: %s' % result['offenders']
+                msg = _('Improperly formatted data. Offending fields: %s' % result['offenders'])
+                failmsg = 'Improperly formatted data. Offending fields: %s' % result['offenders']
 
             else:
                 status = "error"
-                msg = _(u'An error occurred: %s' % result['errortype'])
-                failmsg = u'An error occurred: %s' % result['errortype']
+                msg = _('An error occurred: %s' % result['errortype'])
+                failmsg = 'An error occurred: %s' % result['errortype']
 
             payment = self.record_failure(order=order, amount=amount,
                 transaction_id="", reason_code=status,

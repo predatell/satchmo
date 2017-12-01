@@ -177,7 +177,7 @@ class Section(object):
         for rule, targets in self.decisions.items():
             rule.do_copy(targets, self.lines)
 
-    def __unicode__(self):
+    def __str__(self):
         out = ['TARGETS: ',]
         out.extend(self.targets)
         out.append('DECISIONS: ')

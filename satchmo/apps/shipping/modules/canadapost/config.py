@@ -22,7 +22,7 @@ config_register_list(
         'CPCID',
         description=_('Canada Post Merchant ID'),
         help_text=_('The merchant ID assigned by Canada Post'),
-        default=u'CPC_DEMO_XML'),
+        default='CPC_DEMO_XML'),
 
     #http://sellonline.canadapost.ca/DevelopersResources/protocolV3/ProductID.html
     MultipleStringValue(SHIPPING_GROUP,
@@ -58,7 +58,7 @@ config_register_list(
             (('01', 'Variable')),
             (('02', 'Rectangular')),
         ),
-        default = u"00"),
+        default = "00"),
 
     BooleanValue(SHIPPING_GROUP,
         'LIVE',

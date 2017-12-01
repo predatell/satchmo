@@ -32,7 +32,7 @@ from tax.utils import get_tax_processor
 import keyedcache
 import logging
 import operator
-import signals
+from . import signals
 
 log = logging.getLogger('satchmo_store.shop.models')
 
@@ -1450,7 +1450,7 @@ class OrderTaxDetail(models.Model):
             return "Tax: %s" % self.tax
 
 
-import config
+from . import config
 
-import listeners
+from . import listeners
 listeners.start_default_listening()

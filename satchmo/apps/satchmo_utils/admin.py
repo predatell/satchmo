@@ -68,12 +68,12 @@ class ForeignKeySearchInput(forms.HiddenInput):
         if value:
             label = self.label_for_value(value)
         else:
-            label = u''
+            label = ''
         try:
             model_name = self.rel.to._meta.module_name
         except AttributeError:
             model_name = self.rel.to._meta.model_name            
-        return mark_safe(rendered + u'''
+        return mark_safe(rendered + '''
             <style type="text/css" media="screen">
                 #lookup_%(name)s {
                     padding-right:16px;
@@ -136,7 +136,7 @@ class AutocompleteAdmin(admin.ModelAdmin):
          input string,
        - related_string_functions: contains optional functions which
          take target model instance as only argument and return string
-         representation. By default __unicode__() method of target
+         representation. By default __str__() method of target
          object is used.
     """
 
@@ -188,7 +188,7 @@ class AutocompleteAdmin(admin.ModelAdmin):
         try:
             to_string_function = self.related_string_functions[model_name]
         except KeyError:
-            to_string_function = lambda x: x.__unicode__()
+            to_string_function = lambda x: x.__str__()
 
         if search_fields and app_label and model_name and query:
             def construct_search(field_name):
@@ -212,7 +212,7 @@ class AutocompleteAdmin(admin.ModelAdmin):
                 other_qs.query.select_related = qs.query.select_related
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs
-            data = ''.join([u'%s|%s\n' % (to_string_function(f), f.pk) for f in qs])
+            data = ''.join(['%s|%s\n' % (to_string_function(f), f.pk) for f in qs])
             return HttpResponse(data)
         return HttpResponseNotFound()
 
