@@ -85,6 +85,6 @@ class PriceAdjustment(object):
         self.label = label
         self.amount = amount
 
-    def __unicode__(self):
-        return u"%s: %s=%s" % (_('Price Adjustment'), self.label, moneyfmt(self.amount))
+    def __str__(self):
+        return "%s: %s=%s" % (_('Price Adjustment'), self.label, moneyfmt(self.amount))
 

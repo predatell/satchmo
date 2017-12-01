@@ -25,7 +25,7 @@ class ContactOptions(admin.ModelAdmin):
     ordering = ['last_name']
     search_fields = ('first_name', 'last_name', 'email')
     # related_search_fields = {'user': ('username', 'first_name', 'last_name', 'email')}
-    # related_string_functions = {'user': lambda u: u"%s (%s)" % (u.username, u.get_full_name())}
+    # related_string_functions = {'user': lambda u: "%s (%s)" % (u.username, u.get_full_name())}
     inlines = [PhoneNumber_Inline, AddressBook_Inline]
 
 class InteractionOptions(admin.ModelAdmin):

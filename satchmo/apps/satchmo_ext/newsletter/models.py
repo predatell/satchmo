@@ -1,14 +1,18 @@
 from __future__ import unicode_literals
+import datetime
+import logging
+
 from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from satchmo_store.contact.models import Contact
-import datetime
-import logging
+
 
 log = logging.getLogger('newsletter.models')
 
 _NOTSET = object()
+
 
 class NullContact(object):
     """Simple object emulating a Contact, so that we can add users who aren't Satchmo Contacts.
@@ -22,6 +26,7 @@ class NullContact(object):
 
         self.full_name = full_name
         self.email = email
+
 
 def get_contact_or_fake(full_name, email):
     """Get a `Contact` by email or if it doesn't exist, then a `NullContact`"""
@@ -110,6 +115,7 @@ class SubscriptionAttribute(models.Model):
         verbose_name = _("Subscription Attribute")
         verbose_name_plural = _("Subscription Attributes")
 
-import config
-import listeners
+
+from . import config
+from . import listeners
 listeners.start_listening()

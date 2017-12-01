@@ -1,17 +1,19 @@
+import logging
+
 from django import http
 from django.contrib.sites.models import Site
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
-from forms import GiftCertCodeForm, GiftCertPayShipForm
-from models import GiftCertificate, GIFTCODE_KEY
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+
 from livesettings.functions import config_get_group
 from satchmo_store.shop.models import Order
 from payment.utils import pay_ship_save, get_or_create_order
 from payment.views import confirm, payship
 from satchmo_utils.dynamic import lookup_url
-from django.contrib.sites.models import Site
-import logging
-from django.core.urlresolvers import reverse
+from .models import GiftCertificate, GIFTCODE_KEY
+from .forms import GiftCertCodeForm, GiftCertPayShipForm
 
 
 log = logging.getLogger("giftcertificate.views")

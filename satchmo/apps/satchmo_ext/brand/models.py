@@ -1,15 +1,18 @@
 from __future__ import unicode_literals
+import logging
+
 from django.utils.encoding import python_2_unicode_compatible
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from l10n.mixins import TranslatedObjectMixin
 import product
 from product.models import Product
 from satchmo_utils.satchmo_thumbnail.field import ImageWithThumbnailField
 from satchmo_utils.signals import collect_urls
-import logging
+
 
 log = logging.getLogger('brand.models')
 
@@ -144,7 +147,7 @@ class BrandCategory(models.Model, TranslatedObjectMixin):
         return self.active_products().count > 0
 
     def __str__(self):
-        return u"%s: %s" % (self.brand.slug, self.slug)
+        return "%s: %s" % (self.brand.slug, self.slug)
 
     class Meta:
         ordering=('ordering', 'slug')
@@ -183,6 +186,6 @@ class BrandCategoryTranslation(models.Model):
         ordering=('languagecode', )
         verbose_name_plural = _('Brand Category Translations')
 
-#import config        
+#from . import config        
 from urls import add_brand_urls
 collect_urls.connect(add_brand_urls, sender=product)

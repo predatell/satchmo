@@ -13,8 +13,8 @@ l10n_settings_defaults = {
     # the add_setting_defaults method !
 
     'currency_formats' : {
-        'USD' : {'symbol': u'$', 'positive' : u"$%(val)0.2f", 'negative': u"-$%(val)0.2f", 'decimal' : '.'},
-        'GBP' : {'symbol': u'£', 'positive' : u"£%(val)0.2f", 'negative': u"-£%(val)0.2f", 'decimal' : '.'},
+        'USD' : {'symbol': '$', 'positive' : "$%(val)0.2f", 'negative': "-$%(val)0.2f", 'decimal' : '.'},
+        'GBP' : {'symbol': '£', 'positive' : "£%(val)0.2f", 'negative': "-£%(val)0.2f", 'decimal' : '.'},
     },
     
     'default_currency' : 'USD',

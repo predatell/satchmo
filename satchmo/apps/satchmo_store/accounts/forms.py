@@ -12,7 +12,7 @@ from satchmo_utils.unique_id import generate_id
 from satchmo_utils.signals import form_init, form_initialdata, form_postsave
 
 import logging
-import signals
+from . import signals
 
 # I put this on all required fields, because it's easier to pick up
 # on them with CSS or JavaScript if they have a class of "required"
@@ -44,7 +44,7 @@ class RegistrationForm(forms.Form):
                                 required=False,
                                 max_length=30,
                                 widget=forms.TextInput(attrs=attrs_dict),
-                                label=_(u'Username'),
+                                label=_('Username'),
                                 error_messages={'invalid':_('Please use only letters, numbers and @/./+/-/_')})
 
 

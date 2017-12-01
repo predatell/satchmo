@@ -15,7 +15,7 @@ else:
 
 from django.core.mail import EmailMultiAlternatives
 
-class NoRecipientsException(StandardError):
+class NoRecipientsException(Exception):
     pass
 
 class ShouldNotSendMail(Exception):

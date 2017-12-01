@@ -11,7 +11,7 @@ from satchmo_store.shop.utils import clean_field
 from satchmo_utils.signals import form_init, form_initialdata, form_postsave
 import datetime
 import logging
-import signals
+from . import signals
 
 log = logging.getLogger('satchmo_store.contact.forms')
 
@@ -203,7 +203,7 @@ class ContactInfoForm(ProxyContactForm):
 
     def clean_addressee(self):
         if not self.cleaned_data.get('addressee'):
-            first_and_last = u' '.join((self.cleaned_data.get('first_name', ''),
+            first_and_last = ' '.join((self.cleaned_data.get('first_name', ''),
                                        self.cleaned_data.get('last_name', '')))
             return first_and_last
         else:
@@ -212,7 +212,7 @@ class ContactInfoForm(ProxyContactForm):
     def clean_ship_addressee(self):
         if not self.cleaned_data.get('ship_addressee') and \
                 not self.cleaned_data.get('copy_address'):
-            first_and_last = u' '.join((self.cleaned_data.get('first_name', ''),
+            first_and_last = ' '.join((self.cleaned_data.get('first_name', ''),
                                        self.cleaned_data.get('last_name', '')))
             return first_and_last
         else:
@@ -492,7 +492,7 @@ class AddressBookForm(forms.Form):
             log.debug('Saving Addressbook info for %s', address_entry)
         for field in data.keys():
             # Getting around the issue where we normally want this auto created on the front end
-            if field <> 'addressee_name':
+            if not field == 'addressee_name':
                 setattr(address_entry, field, data[field])
         address_entry.addressee = data['addressee_name']
         address_entry.contact = contact

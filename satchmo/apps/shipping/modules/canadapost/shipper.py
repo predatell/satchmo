@@ -37,18 +37,11 @@ class Shipper(BaseShipper):
             self.service_type_code = '99'
             self.service_type_text = 'Uninitialized'
 
-        self.id = u'canadapost-%s' % (self.service_type_code)
+        self.id = 'canadapost-%s' % (self.service_type_code)
   
     def __str__(self):
         '''
           This is mainly helpful for debugging purposes
-        '''
-
-        return 'Canada Post'
-
-    def __unicode__(self):
-        '''
-          As is this.
         '''
 
         return 'Canada Post'

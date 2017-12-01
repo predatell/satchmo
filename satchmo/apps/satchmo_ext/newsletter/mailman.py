@@ -3,7 +3,7 @@
 To use this plugin, enable the newsletter module and set the newsletter module and name settings
 in the admin settings page.
 """
-
+from __future__ import print_function
 from django.utils.translation import ugettext as _
 from Mailman import MailList, Errors
 from models import Subscription

@@ -17,25 +17,25 @@ config_register_list(
         'XML_KEY',
         description=_("UPS XML Access Key"),
         help_text=_("XML Access Key Provided by UPS"),
-        default=u""),
+        default=""),
 
     StringValue(SHIPPING_GROUP,
         'USER_ID',
         description=_("UPS User ID"),
         help_text=_("User ID provided by UPS site."),
-        default=u""),
+        default=""),
 
     StringValue(SHIPPING_GROUP,
         'ACCOUNT',
         description=_("UPS Account Number"),
         help_text=_("UPS Account Number."),
-        default=u""),
+        default=""),
 
     StringValue(SHIPPING_GROUP,
         'USER_PASSWORD',
         description=_("UPS User Password"),
         help_text=_("User password provided by UPS site."),
-        default=u""),
+        default=""),
 
     MultipleStringValue(SHIPPING_GROUP,
         'UPS_SHIPPING_CHOICES',
@@ -65,7 +65,7 @@ config_register_list(
             (('01', 'UPS LETTER')),
             (('02', 'PACKAGE / CUSTOMER SUPPLIED')),
         ),
-        default = u"00"),
+        default = "00"),
 
     BooleanValue(SHIPPING_GROUP,
         'SINGLE_BOX',
@@ -88,7 +88,7 @@ config_register_list(
             (('06', 'ONE TIME PICKUP')),
             (('07', 'ON CALL PICKUP')),
             ),
-        default = u"07"),
+        default = "07"),
 
     BooleanValue(SHIPPING_GROUP,
         'LIVE',

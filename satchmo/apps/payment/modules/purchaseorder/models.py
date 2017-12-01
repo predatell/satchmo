@@ -1,9 +1,12 @@
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
+
 from decimal import Decimal
+
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
+
 from l10n.utils import moneyfmt
 from satchmo_store.shop.models import Order
 
@@ -29,7 +32,7 @@ class PurchaseOrder(models.Model):
         return moneyfmt(b)
 
     def order_link(self):
-        return mark_safe(u'<a href="/admin/shop/order/%i/">%s #%i (%s)</a>' % (
+        return mark_safe('<a href="/admin/shop/order/%i/">%s #%i (%s)</a>' % (
             self.order.id,
             ugettext('Order'), 
             self.order.id, 
@@ -42,5 +45,5 @@ class PurchaseOrder(models.Model):
             self.balance = self.order.balance
         super(PurchaseOrder, self).save()
 
-import config
+from . import config
 PAYMENT_PROCESSOR=True

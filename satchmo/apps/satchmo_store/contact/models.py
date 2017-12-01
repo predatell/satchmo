@@ -168,7 +168,7 @@ class Contact(models.Model):
 
     def _get_full_name(self):
         """Return the person's full name."""
-        return u'%s %s' % (self.first_name, self.last_name)
+        return '%s %s' % (self.first_name, self.last_name)
     full_name = property(_get_full_name)
 
     def _shipping_address(self):
@@ -349,4 +349,4 @@ class AddressBook(models.Model):
         verbose_name = _("Address Book")
         verbose_name_plural = _("Address Books")
 
-from .config import *
+from . import config

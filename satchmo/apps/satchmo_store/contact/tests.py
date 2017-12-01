@@ -16,7 +16,7 @@ class ContactTest(TestCase):
         contact1 = Contact.objects.create(first_name="Jim", last_name="Tester",
             role=ContactRole.objects.get(pk='Customer'), email="Jim@JimWorld.com")
 
-        self.assertEqual(contact1.full_name, u'Jim Tester')
+        self.assertEqual(contact1.full_name, 'Jim Tester')
 
         # Add a phone number for this person and make sure that it's the default
         phone1 = PhoneNumber.objects.create(contact=contact1, type='Home', phone="800-111-9900")

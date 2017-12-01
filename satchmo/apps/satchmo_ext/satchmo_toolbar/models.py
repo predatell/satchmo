@@ -1,4 +1,4 @@
-import listeners
+from . import listeners
 listeners.start_listening()
 
-import config
+from . import config

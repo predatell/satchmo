@@ -1,8 +1,4 @@
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
-
+from __future__ import unicode_literals
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -20,6 +16,7 @@ import logging
 import os
 import time
 import zipfile
+from six import StringIO
 
 log = logging.getLogger('product.forms')
 
@@ -444,8 +441,8 @@ class VariationManagerForm(forms.Form):
                     self.edit_urls[key] = urlresolvers.reverse('admin:product_product_change',
                                                                args=(variation.id,))
                 else:
-                    basename = u'%s (%s)' % (self.product.name, u'/'.join(optnames))
-                    slug = slugify(u'%s_%s' % (self.product.slug, u'_'.join(optnames)))
+                    basename = '%s (%s)' % (self.product.name, '/'.join(optnames))
+                    slug = slugify('%s_%s' % (self.product.slug, '_'.join(optnames)))
                     sku = ""
 
                 pv = forms.BooleanField(**kw)

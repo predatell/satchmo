@@ -2,7 +2,8 @@
 Stores details about the available payment options.
 Also stores credit card info in an encrypted format.
 """
-
+import base64
+import logging
 from Crypto.Cipher import Blowfish
 from datetime import datetime
 from decimal import Decimal
@@ -11,17 +12,16 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+import keyedcache
 from livesettings.functions import config_value
 #from satchmo_utils.iterchoices import iterchoices_db
 #import payment.config
 from satchmo_store.contact.models import Contact
-import base64
-import config
-import keyedcache
-import logging
 import satchmo_utils.sslurllib
+from . import config
 
 log = logging.getLogger('payment.models')
+        
         
 class PaymentOption(models.Model):
     """
@@ -120,6 +120,6 @@ def _encrypt_code(code):
     encryption_object = Blowfish.new(secret_key)
     # block cipher length must be a multiple of 8
     padding = ''
-    if (len(code) % 8) <> 0:
+    if not (len(code) % 8) == 0:
         padding = 'X' * (8 - (len(code) % 8))
     return base64.b64encode(encryption_object.encrypt(code + padding))

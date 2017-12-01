@@ -1,13 +1,16 @@
-from django.db import models
+import datetime
 import json
+
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from listeners import wishlist_cart_add_listener
+
 from satchmo_store import shop
 from satchmo_store.contact.models import Contact
 from product.models import Product
 from satchmo_store.shop.signals import cart_add_view
 from satchmo_utils.signals import collect_urls
-import datetime
+from .listeners import wishlist_cart_add_listener
+
 
 class ProductWishManager(models.Manager):
     def create_if_new(self, product, contact, details):
@@ -29,6 +32,7 @@ class ProductWishManager(models.Manager):
             
         return wish        
 
+
 class ProductWish(models.Model):
     contact = models.ForeignKey(Contact, verbose_name=_("Contact"), related_name="wishlist")
     product = models.ForeignKey(Product, verbose_name=_("Product"), related_name="wishes")
@@ -36,6 +40,10 @@ class ProductWish(models.Model):
     create_date = models.DateTimeField(_("Creation Date"))
     
     objects = ProductWishManager()
+
+    class Meta:
+        verbose_name = _('Product Wish')
+        verbose_name_plural = _('Product Wishes')
 
     def set_details(self, raw):
         """Set the details from a raw list"""
@@ -56,13 +64,10 @@ class ProductWish(models.Model):
         if not self.pk:
             self.create_date = datetime.date.today()
         super(ProductWish, self).save(**kwargs)
-        
-    class Meta:
-        verbose_name = _('Product Wish')
-        verbose_name_plural = _('Product Wishes')
+
 
 cart_add_view.connect(wishlist_cart_add_listener)
 
-import config
+from . import config
 from urls import add_wishlist_urls
 collect_urls.connect(add_wishlist_urls, sender=shop)

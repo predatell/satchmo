@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+
 from decimal import Decimal
+import datetime
+import keyedcache
+import signals
+import six
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import urlresolvers
@@ -6,24 +13,11 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import timezone
+
 from product.forms import ProductExportForm
-from product.models import (
-    Category,
-    Discount,
-    Option,
-    OptionGroup,
-    Product,
-    Price,
-)
-from product.prices import (
-import six
-    get_product_quantity_adjustments,
-    PriceAdjustment,
-    PriceAdjustmentCalc,
-)
-import datetime
-import keyedcache
-import signals
+from product.models import Category, Discount, Option, OptionGroup, Product, Price
+from product.prices import get_product_quantity_adjustments, PriceAdjustment, PriceAdjustmentCalc
+
 
 class OptionGroupTest(TestCase):
 
@@ -62,7 +56,7 @@ class OptionGroupTest(TestCase):
 
     def testValues(self):
         opt = Option.objects.get(id=self.option_white.id)
-        self.assertEqual(opt.value, u'white')
+        self.assertEqual(opt.value, 'white')
         self.assertEqual(opt.price_change, 5)
         self.assertEqual(opt.sort_order, 2)
 
@@ -132,7 +126,7 @@ class CategoryTest(TestCase):
 
 #        kids = Category.objects.by_site(site=self.site).order_by('name')
 #        slugs = [cat.slug for cat in kids]
-#        self.assertEqual(slugs, [u'pet-jewelry', u'womens-jewelry'])
+#        self.assertEqual(slugs, ['pet-jewelry', 'womens-jewelry'])
 
 class DiscountTest(TestCase):
 
@@ -154,7 +148,7 @@ class DiscountTest(TestCase):
 
         v = self.discount.isValid()
         self.assert_(v[0])
-        self.assertEqual(v[1], u'Valid.')
+        self.assertEqual(v[1], 'Valid.')
 
     def testFutureDate(self):
         """Test a future date for discount start"""
@@ -164,7 +158,7 @@ class DiscountTest(TestCase):
         self.discount.isValid()
         v = self.discount.isValid()
         self.assertFalse(v[0])
-        self.assertEqual(v[1], u'This coupon is not active yet.')
+        self.assertEqual(v[1], 'This coupon is not active yet.')
 
     def testPastDate(self):
         """Test an expired discount"""
@@ -176,7 +170,7 @@ class DiscountTest(TestCase):
         self.discount.save()
         v = self.discount.isValid()
         self.assertFalse(v[0])
-        self.assertEqual(v[1], u'This coupon has expired.')
+        self.assertEqual(v[1], 'This coupon has expired.')
 
     def testNotActive(self):
         """Not active should always be invalid."""
@@ -186,7 +180,7 @@ class DiscountTest(TestCase):
         self.discount.save()
         v = self.discount.isValid()
         self.assertFalse(v[0], False)
-        self.assertEqual(v[1], u'This coupon is disabled.')
+        self.assertEqual(v[1], 'This coupon is disabled.')
 
 
 class CalcFunctionTest(TestCase):
@@ -437,7 +431,7 @@ class ProductExportTest(TestCase):
         """Test the ProductExportForm behavior
         Specifically, we're checking that a unicode 'format' is converted to ascii
         in the 'export' method of 'ProductExportForm'."""
-        form = ProductExportForm({'format': u'yaml', 'include_images': True})
+        form = ProductExportForm({'format': 'yaml', 'include_images': True})
         response = form.export(None)
         self.assert_(isinstance(response, HttpResponse))
 

@@ -1,12 +1,16 @@
+from decimal import Decimal
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from payment.forms import SimplePayShipForm
 from django.contrib.sites.models import Site
-from models import GiftCertificate
-from decimal import Decimal
+
+from payment.forms import SimplePayShipForm
+from .models import GiftCertificate
+
 
 class GiftCertCodeForm(forms.Form):
     code = forms.CharField(required=True)
+       
        
 class GiftCertPayShipForm(SimplePayShipForm):
     giftcode = forms.CharField(max_length=100)

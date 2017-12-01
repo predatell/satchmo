@@ -47,8 +47,8 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Satchmo'
-copyright = u'2014, Chris Moffitt'
+project = 'Satchmo'
+copyright = '2014, Chris Moffitt'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -193,8 +193,8 @@ htmlhelp_basename = 'SatchmoProjectdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Satchmo.tex', u'Satchmo Documentation',
-   u'Chris Moffitt', 'manual'),
+  ('index', 'Satchmo.tex', 'Satchmo Documentation',
+   'Chris Moffitt', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

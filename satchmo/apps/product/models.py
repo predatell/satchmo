@@ -2,10 +2,10 @@
 Base model used for products.  Stores hierarchical categories
 as well as individual product level information which includes
 options.
-"""from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
-
+"""
+from __future__ import unicode_literals
 from __future__ import print_function
+
 from decimal import Context, Decimal, ROUND_FLOOR
 from django import forms
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.core import urlresolvers
 from django.core.cache import cache
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, python_2_unicode_compatible
 from django.utils.translation import get_language, ugettext, ugettext_lazy as _
 from l10n.utils import moneyfmt, lookup_translation
 from livesettings.functions import config_value, config_value_safe
@@ -26,12 +26,12 @@ from satchmo_utils import get_flat_list
 from satchmo_utils.fields import CurrencyField
 from satchmo_utils.satchmo_thumbnail.field import ImageWithThumbnailField
 from satchmo_utils.unique_id import slugify
-from .config import *   #This import is required to make sure livesettings picks up the config values
+from . import config   #This import is required to make sure livesettings picks up the config values
 import datetime
 import keyedcache
 import logging
 import operator
-from .signals import *
+from . import signals
 import six
 from six.moves import reduce
 

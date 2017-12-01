@@ -5,7 +5,7 @@ class ShopConfig(AppConfig):
     name = 'satchmo_store.shop'
 
     def ready(self):
-        from satchmo_settings import get_satchmo_setting
+        from .satchmo_settings import get_satchmo_setting
         import logging
 
         log = logging.getLogger('satchmo_store.shop')
@@ -14,7 +14,7 @@ class ShopConfig(AppConfig):
             log.debug('patching for multishop')
             from threaded_multihost import multihost_patch
 
-        import config
+        from . import config
 
-        import listeners
+        from . import listeners
         listeners.start_default_listening()

@@ -1,8 +1,12 @@
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
+
 from product.models import TaxClass
 from l10n.models import AdminArea, Country
 
+
+@python_2_unicode_compatible
 class TaxRate(models.Model):
     """
     Actual percentage tax based on area and product class
@@ -27,8 +31,8 @@ class TaxRate(models.Model):
     _display_percentage.short_description = _('Percentage')
     display_percentage = property(_display_percentage)    
 
-    def __unicode__(self):
-        return u"%s - %s = %s" % (self.taxClass,
+    def __str__(self):
+        return "%s - %s = %s" % (self.taxClass,
                              self.taxZone and self.taxZone or self.taxCountry,
                              self.display_percentage)
 
@@ -36,5 +40,5 @@ class TaxRate(models.Model):
         verbose_name = _("Tax Rate")
         verbose_name_plural = _("Tax Rates")
         
-import config
-
+        
+from . import config

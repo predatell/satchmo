@@ -376,10 +376,10 @@ class ProcessorResult(object):
         self.message = message
         self.payment = payment
 
-    def __unicode__(self):
+    def __str__(self):
         if self.success:
             yn = _('Success')
         else:
             yn = _('Failure')
 
-        return u"ProcessorResult: %s [%s] %s" % (self.processor, yn, self.message)
+        return "ProcessorResult: %s [%s] %s" % (self.processor, yn, self.message)
