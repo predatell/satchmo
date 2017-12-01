@@ -77,7 +77,6 @@ def round_decimal(val='0', places=None, roundfactor='0', normalize=True):
     #-- Edit function arguments and set necessary defaults
 
     if str(normalize) == 'False': normalize = False     #Allow templates to submit False from filter
-
     try:
         roundfactor = Decimal(str(roundfactor))
     except (InvalidOperation, ValueError):
@@ -88,7 +87,7 @@ def round_decimal(val='0', places=None, roundfactor='0', normalize=True):
         if places != None: places = int(places)
     except ValueError:
         raise RoundedDecimalError(val=places, id=3, msg='ValueError, Invalid Integer ')
-    if places > getcontext().prec:
+    if not places is None and places > getcontext().prec:
         raise RoundedDecimalError(val=places, id=4, msg='places Exceeds Decimal Context Precision')
     try:
         decval =Decimal(str(val))
@@ -123,6 +122,8 @@ def trunc_decimal(val, places):
     """Legacy compatibility, rounds the way the old satchmo 0.8.1 used to round."""
     if val is None or val == '':
        return val
+    if isinstance(val, str):
+        val = Decimal(val)
     if val < 0:
         roundfactor = "-0.01"
     else:

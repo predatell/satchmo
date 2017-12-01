@@ -187,5 +187,5 @@ class BrandCategoryTranslation(models.Model):
         verbose_name_plural = _('Brand Category Translations')
 
 #from . import config        
-from urls import add_brand_urls
+from .urls import add_brand_urls
 collect_urls.connect(add_brand_urls, sender=product)

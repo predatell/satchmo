@@ -1,8 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
+
 from django.test import TestCase
 from django.utils import timezone
-from models import Carrier, QuantityTier, Shipper
+
+from .models import Carrier, QuantityTier, Shipper
+
 
 def make_tiers(carrier, prices, expires=None):
     for qty, handling, price in prices:
@@ -30,6 +33,7 @@ class TieredCarrierSimpleTest(TestCase):
         
         self.assertEqual(c.price(1), Decimal("10.00"))
         self.assertEqual(c.price(4), Decimal("10.00"))
+        
         
 class TieredCarrierPricingTest(TestCase):
     fixtures = []
@@ -61,6 +65,7 @@ class TieredCarrierPricingTest(TestCase):
         self.assertEqual(self.carrier.price(9), Decimal("10.00"))
         self.assertEqual(self.carrier.price(10), Decimal("110.00"))
         self.assertEqual(self.carrier.price(100), Decimal("200.00"))
+
 
 class TieredCarrierExpiringTest(TestCase):
     fixtures = []

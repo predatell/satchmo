@@ -1,8 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
+
 from django.test import TestCase
-from models import Carrier, ProductShippingPrice, Shipper
+
 from product.models import Product
+
+from .models import Carrier, ProductShippingPrice, Shipper
+
 
 class ProductShippingSimpleTest(TestCase):
     fixtures = ['products.yaml',]
@@ -62,4 +66,3 @@ class ProductShippingPricingTest(TestCase):
         t.save()
         
         self.assertEqual(self.carrier.price(variant), Decimal("20.00"))
-        

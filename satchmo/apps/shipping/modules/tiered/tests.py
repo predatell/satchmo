@@ -1,7 +1,10 @@
 from decimal import Decimal
+
 from django.test import TestCase
 from django.utils import timezone
-from models import Carrier, ShippingTier, Shipper
+
+from .models import Carrier, ShippingTier, Shipper
+
 
 def make_tiers(carrier, prices, expires=None):
     for min_total, price in prices:
@@ -119,7 +122,3 @@ class TieredCarrierExpiringTest(TestCase):
         self.assertEqual(self.carrier.price(Decimal("20.00")), Decimal("2.00"))
         self.assertEqual(self.carrier.price(Decimal("30.00")), Decimal("3.00"))
         self.assertEqual(self.carrier.price(Decimal("40.01")), Decimal("4.00"))
-
-        
-        
-        
