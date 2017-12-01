@@ -27,7 +27,7 @@ def calc_discounted_by_percentage(price, percentage):
     return work.quantize(cents)
 
 def find_auto_discounts(product):
-    if not type(product) in (types.ListType, types.TupleType):
+    if not type(product) in (list, tuple):
         product = (product,)
     today = datetime.date.today()
     discs = Discount.objects.filter(automatic=True, active=True, startDate__lte=today, endDate__gt=today)

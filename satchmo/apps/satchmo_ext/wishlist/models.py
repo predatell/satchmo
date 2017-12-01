@@ -69,5 +69,5 @@ class ProductWish(models.Model):
 cart_add_view.connect(wishlist_cart_add_listener)
 
 from . import config
-from urls import add_wishlist_urls
+from .urls import add_wishlist_urls
 collect_urls.connect(add_wishlist_urls, sender=shop)

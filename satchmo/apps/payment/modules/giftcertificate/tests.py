@@ -1,14 +1,16 @@
 from decimal import Decimal
+
 from django.contrib.sites.models import Site
 from django.test import TestCase
+
 from keyedcache import cache_delete
 from l10n.models import Country
 from livesettings.functions import config_value
-from models import *
 from product.models import Product
 from satchmo_store.contact.models import AddressBook, Contact, ContactRole
 from satchmo_store.shop.models import Order, OrderItem, OrderItemDetail
-from utils import generate_certificate_code, generate_code
+from .utils import generate_certificate_code, generate_code
+from .models import *
 import logging
 
 log = logging.getLogger('giftcertificate.tests')

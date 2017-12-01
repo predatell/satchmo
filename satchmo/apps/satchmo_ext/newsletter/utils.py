@@ -8,7 +8,7 @@ from satchmo_store.contact.signals import satchmo_contact_view
 from satchmo_utils import load_module
 from satchmo_utils.signals import form_initialdata
 import logging
-import signals
+from . import signals
 
 log = logging.getLogger('newsletter')
 

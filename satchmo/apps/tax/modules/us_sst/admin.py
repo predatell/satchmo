@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.forms import models, ValidationError
 from django.utils.translation import get_language, ugettext_lazy as _
-from models import TaxBoundry, TaxRate, Taxable
+from .models import TaxBoundry, TaxRate, Taxable
 
 ADDRESS_FIELDS = (
     'oddEven', 'lowAddress', 'highAddress',

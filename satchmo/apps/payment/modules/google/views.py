@@ -1,9 +1,15 @@
+import hashlib
+import base64
+import hmac
+import logging
+
 from django import http
 from django.shortcuts import render
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
+
 from livesettings.functions import config_get_group, config_value
 from payment.config import gateway_live
 from payment.views import confirm, payship
@@ -12,12 +18,9 @@ from satchmo_store.shop.models import Cart, NullCart
 from satchmo_store.shop.satchmo_settings import get_satchmo_setting
 from satchmo_utils.dynamic import lookup_url
 from satchmo_utils.views import bad_or_missing
-import auth
-import base64
-import hmac
-import logging
-import notifications
-import sha
+from . import notifications
+from . import auth
+
 
 # Notes: payments are recorded in notifications.py
 # This module uses method 3 of Google's choices, notifications by html; you'll need SSL for it to work
@@ -49,7 +52,7 @@ class GoogleCart(object):
         else:
             merchkey = self.settings.MERCHANT_TEST_KEY.value
 
-        s = hmac.new(str(merchkey), self.cart_xml, sha)
+        s = hmac.new(str(merchkey), self.cart_xml, hashlib.sha)
         rawsig = s.digest()
         return rawsig
 

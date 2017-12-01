@@ -20,7 +20,7 @@ def contact_form_listener(sender, object=None, formdata=None, form=None, **kwarg
     update_subscription(object, subscribed)
     
 def start_listening():
-    from urls import add_newsletter_urls
+    from .urls import add_newsletter_urls
     from satchmo_store import shop
     
     form_postsave.connect(contact_form_listener, sender=ContactInfoForm)

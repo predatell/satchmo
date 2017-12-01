@@ -1,9 +1,12 @@
-import shipper
 from livesettings.functions import config_choice_values, config_get_group
 from fedex.config import FedexConfig
+
+from . import shipper
+
 import logging
 
 log = logging.getLogger('fedex_web_service.shipper')
+
 
 def get_config_obj(settings):
     return FedexConfig(

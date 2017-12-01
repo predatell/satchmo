@@ -12,7 +12,7 @@ from product.models import *
 from satchmo_store.contact.models import *
 from satchmo_store.shop.models import *
 from satchmo_utils.dynamic import lookup_template, lookup_url
-from urls import make_urlpatterns
+from .urls import make_urlpatterns
 import keyedcache
 
 alphabet = 'abcdefghijklmnopqrstuvwxyz'

@@ -1,10 +1,10 @@
 """Simple wrapper for standard checkout as implemented in payment.views"""
-
 from django import http
-from forms import PurchaseorderPayShipForm
+
 from livesettings.functions import config_get_group
 from payment.views import confirm, payship
 from satchmo_utils.dynamic import lookup_url
+from .forms import PurchaseorderPayShipForm
 import logging
 
 log = logging.getLogger('purchaseorder.views')
