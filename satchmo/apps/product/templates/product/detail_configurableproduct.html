@@ -41,20 +41,10 @@ satchmo.thumbnails = new Array();
 	{% endspaceless %}</h3>
 
 <span id="product_images">
-{% for pic in product.productimage_set.all %}
-    {% thumbnail pic.picture "280x280" as image %}
-    <img src="{{ image.url }}" width="{{ image.width }}" height="{{ image.height }}" />
-    {% endthumbnail %}
-{% endfor %}
+  {% include "product/product_images.html" %}
 </span>
 
-{% with product.translated_attributes as atts %}{% if atts %}
-<p class="productattributes">
-{% for att in product.translated_attributes %}
-{{ att.description }}: {{ att.value }}<br/>
-{% endfor %}
-</p>
-{% endif %}{% endwith %}
+{% include "product/product_attributes.html" %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <form id="options" action="{% url 'satchmo_smart_add' %}" method="post">{% csrf_token %}

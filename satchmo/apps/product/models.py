@@ -12,10 +12,13 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import urlresolvers
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q
 from django.utils.encoding import smart_str, python_2_unicode_compatible
 from django.utils.translation import get_language, ugettext, ugettext_lazy as _
+from django.utils.functional import cached_property
+
 from l10n.utils import moneyfmt, lookup_translation
 from livesettings.functions import config_value, config_value_safe
 from livesettings.models import SettingNotSet
@@ -140,7 +143,8 @@ class Category(models.Model):
         verbose_name=_('Related Categories'), related_name='related_categories')
     objects = CategoryManager()
 
-    def _get_mainImage(self):
+    @cached_property
+    def main_image(self):
         img = False
         images = self.images.order_by('sort')
         if images:
@@ -158,12 +162,11 @@ class Category(models.Model):
                 print('Warning: default category image not found', file=sys.stderr)
         return img
 
-    main_image = property(_get_mainImage)
-
     def active_products(self, variations=False, include_children=False, **kwargs):
         """Variations determines whether or not product variations are included
         in most templates we are not returning all variations, just the parent product.
         """
+        print(self)
         site = Site.objects.get_current()
         
         if not include_children:
@@ -342,12 +345,12 @@ class CategoryImage(models.Model):
     def translated_caption(self, language_code=None):
         return lookup_translation(self, 'caption', language_code)
 
-    def _get_filename(self):
+    @cached_property
+    def _filename(self):
         if self.category:
             return '%s-%s' % (self.category.slug, self.id)
         else:
             return 'default'
-    _filename = property(_get_filename)
 
     def __str__(self):
         if self.category:
@@ -440,8 +443,10 @@ class DiscountManager(models.Manager):
                 site=site,
                 startDate__lte=today,
                 endDate__gt=today).order_by('-percentage')
-            if discs.count() > 0:
+            try:
                 sale = discs[0]
+            except IndexError:
+                pass
 
             keyedcache.cache_set(nce.key, value=sale)
 
@@ -527,14 +532,16 @@ class Discount(models.Model):
             success=success)
         return (success['valid'], success['message'])
 
+    @cached_property
     def _valid_products_in_categories(self):
+        print("_valid_products_in_categories")
         slugs = set()
         for cat in Category.objects.filter(id__in=self.valid_categories.values_list('id', flat=True)):
             slugs.update([p.slug for p in cat.active_products(variations=True, include_children=True)])
         return slugs
 
     def _valid_products(self, item_query):
-        slugs_from_cat = self._valid_products_in_categories()
+        slugs_from_cat = self._valid_products_in_categories
         validslugs = self.valid_products.values_list('slug', flat=True)
         itemslugs = item_query.values_list('product__slug', flat=True)
         return ProductPriceLookup.objects.filter(
@@ -593,29 +600,27 @@ class Discount(models.Model):
         self._calculated = True
 
     def save(self, **kwargs):
+        super(Discount, self).save(**kwargs)
         if self.automatic:
             today = datetime.date.today()
             for site in self.site.all():
                 keyedcache.cache_delete('discount', 'sale', site, today)
-        super(Discount, self).save(**kwargs)
 
-
-    def _total(self):
+    @cached_property
+    def total(self):
         assert(self._calculated)
         return reduce(operator.add, self.item_discounts.values())
-    total = property(_total)
 
-    def _item_discounts(self):
+    @cached_property
+    def item_discounts(self):
         """Get the dictionary of orderitem -> discounts."""
         assert(self._calculated)
         return self._item_discounts
-    item_discounts = property(_item_discounts)
 
-    def _percentage_text(self):
+    @cached_property
+    def percentage_text(self):
         """Get the human readable form of the sale percentage."""
         return "%d%%" % self.percentage
-
-    percentage_text = property(_percentage_text)
 
     def valid_for_product(self, product):
         """Tests if discount is valid for a single product"""
@@ -624,8 +629,7 @@ class Discount(models.Model):
         elif self.allValid:
             return True
         p = self.valid_products.filter(id__exact = product.id)
-        return p.count() > 0 or \
-            (product.slug in self._valid_products_in_categories())
+        return p.exists() or (product.slug in self._valid_products_in_categories)
 
     class Meta:
         verbose_name = _("Discount")
@@ -892,21 +896,20 @@ class Product(models.Model):
 
     objects = ProductManager()
 
-    def _get_mainCategory(self):
+    @cached_property
+    def main_category(self):
         """Return the first category for the product"""
-
-        if self.category.count() > 0:
+        try:
             return self.category.all()[0]
-        else:
+        except IndexError:
             return None
 
-    main_category = property(_get_mainCategory)
-
-    def _get_mainImage(self):
+    @cached_property
+    def main_image(self):
         img = False
-        if self.productimage_set.count() > 0:
+        try:
             img = self.productimage_set.order_by('sort')[0]
-        else:
+        except IndexError:
             # try to get a main image by looking at the parent if this has one
             p = self.get_subtype_with_attr('parent', 'product')
             if p:
@@ -922,8 +925,6 @@ class Product(models.Model):
 
         return img
 
-    main_image = property(_get_mainImage)
-
     def _is_discountable(self):
         p = self.get_subtype_with_attr('discountable')
         if p:
@@ -937,7 +938,7 @@ class Product(models.Model):
         if not language_code:
             language_code = get_language()
         q = self.productattribute_set.filter(languagecode__exact = language_code)
-        if q.count() == 0:
+        if not q.exists():
             q = self.productattribute_set.filter(Q(languagecode__isnull = True) | Q(languagecode__exact = ""))
         return q
 
@@ -965,7 +966,7 @@ class Product(models.Model):
         if not price:
             price = Decimal("0.00")
         return price
-
+    
     unit_price = property(_get_fullPrice)
 
     def get_qty_price(self, qty, include_discount=True):
@@ -1008,23 +1009,21 @@ class Product(models.Model):
 
         return self.items_in_stock > 0
 
-    def _has_full_dimensions(self):
+    @cached_property
+    def has_full_dimensions(self):
         """Return true if the dimensions all have units and values. Used in shipping calcs. """
         for att in ('length', 'length_units', 'width', 'width_units', 'height', 'height_units'):
             if self.smart_attr(att) is None:
                 return False
         return True
 
-    has_full_dimensions = property(_has_full_dimensions)
-
-    def _has_full_weight(self):
+    @cached_property
+    def has_full_weight(self):
         """Return True if we have weight and weight units"""
         for att in ('weight', 'weight_units'):
             if self.smart_attr(att) is None:
                 return False
         return True
-
-    has_full_weight = property(_has_full_weight)
 
     def __str__(self):
         return self.name
@@ -1133,13 +1132,13 @@ class Product(models.Model):
 
                 return getattr(subtype, relation)
 
-    def _has_variants(self):
+    @cached_property
+    def has_variants(self):
         subtype = self.get_subtype_with_attr('has_variants')
         return subtype and subtype.has_variants
 
-    has_variants = property(_has_variants)
-
-    def _get_category(self):
+    @cached_property
+    def get_category(self):
         """
         Return the primary category associated with this product
         """
@@ -1152,18 +1151,16 @@ class Product(models.Model):
         except IndexError:
             return None
 
-    get_category = property(_get_category)
-
-    def _get_downloadable(self):
+    @cached_property
+    def is_downloadable(self):
         """
         If this Product has any subtypes associated with it that are downloadable, then
         consider it downloadable
         """
         return self.get_subtype_with_attr('is_downloadable') is not None
 
-    is_downloadable = property(_get_downloadable)
-
-    def _get_subscription(self):
+    @cached_property
+    def is_subscription(self):
         """
         If this Product has any subtypes associated with it that are subscriptions, then
         consider it subscription based.
@@ -1173,9 +1170,9 @@ class Product(models.Model):
             if hasattr(subtype, 'is_subscription'):
                 return subtype.is_subscription
         return False
-    is_subscription = property(_get_subscription)
 
-    def _get_shippable(self):
+    @cached_property
+    def is_shippable(self):
         """
         If this Product has any subtypes associated with it that are not
         shippable, then consider the product not shippable.
@@ -1190,8 +1187,6 @@ class Product(models.Model):
             return True
         else:
             return False
-
-    is_shippable = property(_get_shippable)
 
     def add_template_context(self, context, *args, **kwargs):
         """
@@ -1350,30 +1345,26 @@ class ProductPriceLookup(models.Model):
 
     objects = ProductPriceLookupManager()
 
-    def _product(self):
+    @cached_property
+    def product(self):
         return Product.objects.get(slug=self.productslug, site__id=self.siteid)
 
-    product = property(fget=_product)
-
-    def _productimage_set(self):
+    @cached_property
+    def productimage_set(self):
         try:
-                return ProductImage.objects.filter(product=self.product)
-        except ProductImage.DoesNotExist:
-                return None
-        except Product.DoesNotExist:
-                return None
+            return ProductImage.objects.filter(product=self.product)
+        except ObjectDoesNotExist:
+            pass
+        return None
 
-    productimage_set = property(fget=_productimage_set)
-
-    def _dynamic_price(self):
+    @cached_property
+    def dynamic_price(self):
         """Get the current price as modified by all listeners."""
         adjust = PriceAdjustmentCalc(self)
         signals.satchmo_price_query.send(self, adjustment=adjust,
             slug=self.productslug, discountable=self.discountable)
         self.price = adjust.final_price()
         return self.price
-
-    dynamic_price = property(fget=_dynamic_price)
 
 # Support the user's setting of custom expressions in the settings.py file
 try:
@@ -1428,13 +1419,13 @@ class ProductAttribute(models.Model):
     option = models.ForeignKey(AttributeOption)
     value = models.CharField(_("Value"), max_length=255)
 
-    def _name(self):
+    @cached_property
+    def name(self):
         return self.option.name
-    name = property(_name)
 
-    def _description(self):
+    @cached_property
+    def description(self):
         return self.option.description
-    description = property(_description)
 
     class Meta:
         verbose_name = _("Product Attribute")
@@ -1455,13 +1446,13 @@ class CategoryAttribute(models.Model):
     option = models.ForeignKey(AttributeOption)
     value = models.CharField(_("Value"), max_length=255)
 
-    def _name(self):
+    @cached_property
+    def name(self):
         return self.option.name
-    name = property(_name)
 
-    def _description(self):
+    @cached_property
+    def description(self):
         return self.option.description
-    description = property(_description)
 
     class Meta:
         verbose_name = _("Category Attribute")
@@ -1504,13 +1495,12 @@ class Price(models.Model):
             slug=product.slug, discountable=product.is_discountable)
         return adjust
 
-    def _dynamic_price(self):
+    @cached_property
+    def dynamic_price(self):
         """Get the current price as modified by all listeners."""
 
         adjustment = self.adjustments()
         return adjustment.final_price()
-
-    dynamic_price = property(fget=_dynamic_price)
 
     def save(self, **kwargs):
         prices = Price.objects.filter(product=self.product, quantity=self.quantity)
@@ -1552,7 +1542,8 @@ class ProductImage(models.Model):
     def translated_caption(self, language_code=None):
         return lookup_translation(self, 'caption', language_code)
 
-    def _get_filename(self):
+    @cached_property
+    def _filename(self):
         if self.product:
             # In some cases the name could be too long to fit into the field
             # Truncate it if this is the case
@@ -1562,7 +1553,6 @@ class ProductImage(models.Model):
             return '%s-%s' % (slug, self.id)
         else:
             return 'default'
-    _filename = property(_get_filename)
 
     def __str__(self):
         if self.product:

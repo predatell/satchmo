@@ -7,7 +7,6 @@ ProductVariations or CustomProducts, look for product/detail_xxx.html
 -------------------------------------------------------------------
 {% endcomment %}
 {% load i18n %}
-{% load thumbnail %}
 {% load satchmo_price %}
 {% load satchmo_currency satchmo_category %}
 {% load satchmo_util satchmo_discounts %}
@@ -36,19 +35,10 @@ ProductVariations or CustomProducts, look for product/detail_xxx.html
 	{% if sale %}<strike id="fullprice" style="display: block;">{{ product|discount_price:""|currency }}</strike>{% endif %}
 	<span id="price">{{ product|discount_price:sale|currency }}</span>
 </h3>
-{% for pic in product.productimage_set.all %}
-    {% thumbnail pic.picture "280x280" as image %}
-    <img src="{{ image.url }}" width="{{ image.width }}" height="{{ image.height }}" />
-    {% endthumbnail %}
-{% endfor %}
 
-{% with product.translated_attributes as atts %}{% if atts %}
-<p class="productattributes">
-{% for att in product.translated_attributes %}
-{{ att.description }}: {{ att.value }}<br/>
-{% endfor %}
-</p>
-{% endif %}{% endwith %}
+{% include "product/product_images.html" %}
+
+{% include "product/product_attributes.html" %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <form id="options" action="{% url 'satchmo_smart_add' %}" method="post">{% csrf_token %}

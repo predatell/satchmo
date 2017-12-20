@@ -212,7 +212,7 @@ class ProductShippingPrice(models.Model):
     price = models.DecimalField(_("Shipping Price"), max_digits=10, decimal_places=2, )
     
     def __str__(self):
-        return "ProductShippingPrice: %s" % (self.price)
+        return "ProductShippingPrice: %s" % self.price
     
     class Meta:
         ordering = ('carrier','price')

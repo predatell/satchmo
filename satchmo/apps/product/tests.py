@@ -2,9 +2,6 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 import datetime
-import keyedcache
-import signals
-import six
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -14,9 +11,13 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import timezone
 
+import keyedcache
+import six
+
 from product.forms import ProductExportForm
 from product.models import Category, Discount, Option, OptionGroup, Product, Price
 from product.prices import get_product_quantity_adjustments, PriceAdjustment, PriceAdjustmentCalc
+from . import signals
 
 
 class OptionGroupTest(TestCase):
@@ -196,8 +197,8 @@ class CalcFunctionTest(TestCase):
         d = dict(enumerate(dd))
         amount = Decimal(str(amount_str)).quantize(Decimal("0.01"))
         s = Discount.apply_even_split(d, amount)
-        self.assertEqual(s.keys(), d.keys())
-        output_str = ' '.join(map(lambda (k, v): str(v), sorted(s.items())))
+        self.assertEqual(list(s.keys()), list(d.keys()))
+        output_str = ' '.join([str(v) for k, v in sorted(s.items())])
         self.assertEqual(output_str, expect_str)
 
     def testEvenSplit1Duplicate(self):

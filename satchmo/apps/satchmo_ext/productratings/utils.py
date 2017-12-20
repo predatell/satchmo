@@ -16,7 +16,7 @@ log = logging.getLogger('product.comments.utils')
 def average(ratings):
     """ Average a list of numbers, return None if it fails """
     if ratings:
-        ratings = filter(lambda x: x is not None, ratings)
+        ratings = list(filter(lambda x: x is not None, ratings))
     if ratings:
         total = reduce(operator.add, ratings)
         if total != None:

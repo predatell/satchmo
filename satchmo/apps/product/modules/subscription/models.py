@@ -1,8 +1,11 @@
 from __future__ import unicode_literals
+
 from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.functional import cached_property
+
 from product.models import Product, get_product_quantity_price, get_product_quantity_adjustments
 from decimal import Decimal
 from satchmo_utils import add_month
@@ -44,13 +47,12 @@ class SubscriptionProduct(models.Model):
     def __str__(self):
         return self.product.slug
 
-    def _get_fullPrice(self):
+    @cached_property
+    def unit_price(self):
         """
         returns price as a Decimal
         """
         return self.get_qty_price(1)
-
-    unit_price = property(_get_fullPrice)
 
     def get_qty_price(self, qty, show_trial=True, include_discount=True):
         """
@@ -84,6 +86,7 @@ class SubscriptionProduct(models.Model):
                 price = self.product._get_fullPrice()
         return price
 
+    @cached_property
     def recurring_price(self):
         """
         Get the non-trial price.

@@ -11,7 +11,6 @@ from livesettings.functions import config_value
 from satchmo_store.contact.models import Contact
 from payment.config import gateway_live
 from payment.forms import CreditPayShipForm, SimplePayShipForm
-from product.utils import find_best_auto_discount
 from satchmo_store.shop.models import Cart
 from satchmo_store.shop.models import Order, OrderPayment
 from satchmo_utils.dynamic import lookup_url, lookup_template

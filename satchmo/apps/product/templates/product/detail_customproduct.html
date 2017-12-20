@@ -12,19 +12,10 @@
 <h4>{% blocktrans with product.translated_name as name %}Custom order for {{ name }}{% endblocktrans %}</h4>
 <p>{% autoescape off %}{{ product.translated_description }}{% endautoescape %}</p>
 {% trans "Price" %}: <h3>{% if sale %}<strike id="fullprice">{{ product|discount_price:""|currency }}</strike><br/>{% endif %}<span id="price">{{ product|discount_price:sale|currency }}</span></h3>
-{% for pic in product.productimage_set.all %}
-    {% thumbnail pic.picture "280x280" as image %}
-    <img src="{{ image.url }}" width="{{ image.width }}" height="{{ image.height }}" />
-    {% endthumbnail %}
-{% endfor %}
 
-{% with product.translated_attributes as atts %}{% if atts %}
-<p class="productattributes">
-{% for att in product.translated_attributes %}
-{{ att.description }}: {{ att.value }}<br/>
-{% endfor %}
-</p>
-{% endif %}{% endwith %}
+{% include "product/product_images.html" %}
+
+{% include "product/product_attributes.html" %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <form id="options" action="{% url 'satchmo_smart_add' %}" method="post">{% csrf_token %}

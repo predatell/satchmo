@@ -254,7 +254,7 @@ class PaymentProcessor(BasePaymentProcessor):
                 if price and subscription.product.taxable:
                     trial_amount = taxer.by_price(subscription.product.taxClass, price)
                     #todo, maybe add shipping for trial?
-                amount = sub.recurring_price()
+                amount = sub.recurring_price
                 trial_occurrences = trial.occurrences
                 if not trial_occurrences:
                     self.log.warn("Trial expiration period is less than one recurring billing cycle. " +
