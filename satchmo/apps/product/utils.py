@@ -213,7 +213,7 @@ def serialize_options(product, selected_options=()):
 
         if values:
             values.sort()
-            values = zip(*values)[1]
+            values = list(zip(*values))[1]
 
         #now go back and make sure option items are sorted properly.
         for v in values:
@@ -225,7 +225,7 @@ def serialize_options(product, selected_options=()):
 def _sort_options(lst):
     work = [(opt.sort_order, opt) for opt in lst]
     work.sort()
-    return zip(*work)[1]
+    return list(zip(*work))[1]
 
 # All the functions below are used to validate custom attributes
 # associated with a product or category.

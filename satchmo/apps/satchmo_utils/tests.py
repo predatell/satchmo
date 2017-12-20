@@ -67,16 +67,16 @@ class TestRoundedDecimals(TestCase):
 class TestSlugify(TestCase):
     def testSlugify(self):
         # 3x A acute + 2x S caron
-        val = slugify('&Aacute;&#193;&#xc1;&#352;&#x160;')
+        val = slugify(b'&Aacute;&#193;&#xc1;&#352;&#x160;')
         self.assertEqual(val, 'aaass')
         # the same with disabled all "&" conversions (is not nice)
-        val = slugify('&Aacute;&#193;&#xc1;&#352;&#x160;', entities=False, decimal=False, hexadecimal=False)
+        val = slugify(b'&Aacute;&#193;&#xc1;&#352;&#x160;', entities=False, decimal=False, hexadecimal=False)
         self.assertEqual(val, 'aacute-193-xc1-352-x160')
         # A acute + S caron
-        val = slugify('\xc1\u0160')
+        val = slugify(u'\xc1\u0160')
         self.assertEqual(val, 'as')
         # Greek alpha beta gamma can not be converted to ascii
-        val = slugify('&alpha;&beta;&gamma;')
+        val = slugify(b'&alpha;&beta;&gamma;')
         self.assertEqual(val, '')
         # arguments instance, slug_field and filter_dict can be better tested in 'product' tests
 

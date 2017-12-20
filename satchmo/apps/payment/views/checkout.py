@@ -44,7 +44,7 @@ class SuccessDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(SuccessDetailView, self).get_context_data(**kwargs)
         gc_email_sent = False
-        gc_in_orderitems = len(filter(lambda x: 'GiftCertificateProduct' in x.product.get_subtypes(), self.object.orderitem_set.all()))
+        gc_in_orderitems = len(list(filter(lambda x: 'GiftCertificateProduct' in x.product.get_subtypes(), self.object.orderitem_set.all())))
         if gc_in_orderitems:
             gc_email_sent = gift_certificate_processor(self.object)
         context['gc_email_sent'] = gc_email_sent

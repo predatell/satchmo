@@ -1,4 +1,4 @@
-import shipper
+from . import shipper
 from livesettings.functions import config_choice_values
 
 def get_methods():

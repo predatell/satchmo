@@ -16,7 +16,13 @@ import logging
 import os
 import time
 import zipfile
-from six import StringIO
+#from six import StringIO, BytesIO
+import six
+try:
+    from cStringIO import StringIO
+    BytesIO = StringIO
+except ImportError:
+    from six import StringIO, BytesIO
 
 log = logging.getLogger('product.forms')
 
@@ -228,13 +234,13 @@ class ProductExportForm(forms.Form):
             raise CommandError("Unable to serialize database: %s" % e)
 
         if include_images:
-            buf = StringIO()
+            buf = BytesIO()
             zf = zipfile.ZipFile(buf, 'a', zipfile.ZIP_STORED)
 
             export_file = 'products.%s' % format
-            zf.writestr(str(export_file), raw)
+            zf.writestr(export_file, raw)
 
-            zinfo = zf.getinfo(str(export_file))
+            zinfo = zf.getinfo(export_file)
             # Caution, highly magic number, chmods the file to 644
             zinfo.external_attr = 2175008768
 

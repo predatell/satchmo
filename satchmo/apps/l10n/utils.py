@@ -32,66 +32,39 @@ def lookup_translation(obj, attr, language_code=None, version=-1):
         obj._translationcache = {}
 
     short_code = language_code
-    pos = language_code.find('_')
+    pos = min(language_code.find('_'), language_code.find('-'))
     if pos > -1:
         short_code = language_code[:pos]
 
-    else:
-        pos = language_code.find('-')
-        if pos > -1:
-            short_code = language_code[:pos]
-
     trans = None
-    has_key = language_code in obj._translationcache
-    if has_key:
-        if obj._translationcache[language_code] == None and short_code != language_code:
+    if language_code in obj._translationcache:
+        trans = obj._translationcache[language_code]
+        if trans == None and short_code != language_code:
             return lookup_translation(obj, attr, short_code)
+    else:
+        q = obj.translations.filter(languagecode__iexact=language_code).order_by('-version')
 
-    if not has_key:
-        q = obj.translations.filter(
-            languagecode__iexact = language_code)
-
-        if q.count() == 0:
-            obj._translationcache[language_code] = None
-
+        if not q:
             if short_code != language_code:
                 return lookup_translation(obj, attr, language_code=short_code, version=version)
-
             else:
-                q = obj.translations.filter(
-                    languagecode__istartswith = language_code)
+                q = obj.translations.filter(languagecode__istartswith=language_code).order_by('-version')
 
-        if q.count() > 0:
-            trans = None
-            if version > -1:
-                trans = q.order_by('-version')[0]
-            else:
-                # try to get the requested version, if it is available,
-                # else fallback to the most recent version
-                fallback = None
-                for t in q.order_by('-version'):
-                    if not fallback:
-                        fallback = t
-                    if t.version == version:
-                        trans = t
-                        break
-                if not trans:
-                    trans = fallback
+        for t in q:
+            if not trans:
+                trans = t
+                if version > -1:
+                    break
+            if t.version == version:
+                trans = t
+                break
+        obj._translationcache[language_code] = trans
 
-            obj._translationcache[language_code] = trans
-
-    if not trans:
-        trans = obj._translationcache[language_code]
-
-    if not trans:
-        trans = obj
-
-    val = getattr(trans, attr, UNSET)
-    if trans != obj and (val in (None, UNSET)):
+    val = getattr(trans, attr, None)
+    if not val:
         val = getattr(obj, attr)
 
     return mark_safe(val)
-
 
 
 def moneyfmt(val, currency_code=None, wrapcents='', places=None):

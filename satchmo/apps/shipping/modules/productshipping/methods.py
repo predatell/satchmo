@@ -1,4 +1,4 @@
-from models import Carrier, Shipper
+from .models import Carrier, Shipper
 from satchmo_utils import load_once
 
 load_once('productshipping', 'shipping.modules.productshipping')

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from datetime import datetime
 from decimal import Decimal
 from django.http import HttpResponse

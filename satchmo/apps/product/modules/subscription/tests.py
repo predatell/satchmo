@@ -65,11 +65,11 @@ class TestRecurringBilling(TestCase):
         url = urlresolvers.reverse('satchmo_cron_rebill')
         self.response = self.c.get(url)
         self.assertEqual(self.response.status_code, 200)
-        self.assertEqual(self.response.content, 'Authentication Key Required')
+        self.assertEqual(self.response.content, b'Authentication Key Required')
 
         self.response = self.c.get(url, data={'key': config_value('PAYMENT','CRON_KEY')})
         self.assertEqual(self.response.status_code, 200)
-        self.assertEqual(self.response.content, '')
+        self.assertEqual(self.response.content, b'')
         self.assert_(order_count < OrderItem.objects.count())
         self.assertEqual(order_count, OrderItem.objects.count()/2.0)
         for order in OrderItem.objects.filter(expire_date__gt=timezone.now()):
