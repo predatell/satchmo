@@ -57,22 +57,11 @@ def highest_rated(count=0, site=None):
         log.debug('calculated highest rated products, set to cache: %s', pkstring)
         cache_set(nce.key, value=pkstring)
     
-    if pks:
-        pks = [pk for pk in pks if isinstance(pk, six.integer_types)]
-        productdict = Product.objects.in_bulk(pks)
-        products = []
-        for pk in pks:
-            try:
-                if (int(pk)) in productdict:
-                    key = int(pk)
-                elif long(pk) in productdict:
-                    key = long(pk)
-                else:
-                    continue
-                products.append(productdict[key])
-            except ValueError:
-                pass
-    else:
-        products = []
-        
-    return products
+    ids = []
+    for pk in pks:
+        try:
+            _id = int(pk)
+            ids.append(_id)
+        except ValueError:
+            pass
+    return Product.objects.filter(pk__in=ids)
