@@ -492,6 +492,10 @@ class Discount(models.Model):
 
     objects = DiscountManager()
 
+    class Meta:
+        verbose_name = _("Discount")
+        verbose_name_plural = _("Discounts")
+        
     def __init__(self, *args, **kwargs):
         self._calculated = False
         super(Discount, self).__init__(*args, **kwargs)
@@ -499,6 +503,17 @@ class Discount(models.Model):
     def __str__(self):
         return self.description
 
+    def save(self, **kwargs):
+        super(Discount, self).save(**kwargs)
+        if self.automatic:
+            today = datetime.date.today()
+            for site in self.site.all():
+                keyedcache.cache_delete('discount', 'sale', site, today)
+                
+    def clean(self):
+        if self.amount and self.automatic:
+            raise forms.ValidationError(_("Automatic discounts may only be percentages"))
+        
     def isValid(self, cart=None, contact=None):
         """
         Make sure this discount still has available uses and is in the current date range.
@@ -599,13 +614,6 @@ class Discount(models.Model):
         self._item_discounts = discounted
         self._calculated = True
 
-    def save(self, **kwargs):
-        super(Discount, self).save(**kwargs)
-        if self.automatic:
-            today = datetime.date.today()
-            for site in self.site.all():
-                keyedcache.cache_delete('discount', 'sale', site, today)
-
     @cached_property
     def total(self):
         assert(self._calculated)
@@ -630,10 +638,6 @@ class Discount(models.Model):
             return True
         p = self.valid_products.filter(id__exact = product.id)
         return p.exists() or (product.slug in self._valid_products_in_categories)
-
-    class Meta:
-        verbose_name = _("Discount")
-        verbose_name_plural = _("Discounts")
 
     def apply_even_split(cls, discounted, amount):
         """Splits ``amount`` to the most even values,

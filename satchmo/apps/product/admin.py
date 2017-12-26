@@ -40,20 +40,10 @@ class CategoryImageTranslation_Inline(admin.StackedInline):
     model = CategoryImageTranslation
     extra = 1
 
-class DiscountForm(models.ModelForm):
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        automatic = cleaned_data.get("automatic")
-        amount = cleaned_data.get("amount")
-        if (automatic and amount):
-            raise ValidationError(_("Automatic discounts may only be percentages"))
-        return cleaned_data
-
 class DiscountOptions(admin.ModelAdmin):
     list_display=('description','active')
     list_display_links = ('description',)
     raw_id_fields = ('valid_products',)
-    form = DiscountForm
     filter_horizontal = ('site',)
 
 class OptionGroupTranslation_Inline(admin.StackedInline):
