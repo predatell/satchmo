@@ -37,32 +37,18 @@ def save_rating(comment=None, request=None, **kwargs):
         return
         
     if comment.content_type.app_label == "product" and comment.content_type.model == "product":
-        if hasattr(comment, 'rating'):
-            log.debug('editing existing comment %s, setting rating=%i', comment, rating)
-            productrating = comment.rating
-            productrating.rating = rating
-    
-        else:
-            log.debug("Creating new rating for comment: %s = %i", comment, rating)
-            p = Product.objects.get(pk=comment.object_pk)
-            productrating = ProductRating(comment=comment, rating=rating)
-        
-            productrating.save()
+        ProductRating.objects.update_or_create(comment=comment, defaults = {'rating': rating})
     else:
         log.debug('Not saving rating for comment on a %s object', comment.content_type.model)
     
 def one_rating_per_product(comment=None, request=None, **kwargs):
     site = Site.objects.get_current()
-    comments = Comment.objects.filter(object_pk__exact=comment.object_pk,
-                               content_type__app_label__exact='product',
-                               content_type__model__exact='product',
-                               site__exact=site,
-                               is_public__exact=True,
-                               user__exact=request.user)
+    product_ratings = ProductRating.objects.rated_products()
+    product_ratings = product_ratings.filter(comment__object_pk=comment.object_pk, comment__site=site,
+                                             comment__user=request.user).exclude(comment__pk=comment.pk).distinct()
                                
-    for c in comments:
-        if not c == comment:
-            c.delete()            
+    for product_rating in product_ratings:
+        product_rating.comment.delete()            
 
 def check_with_akismet(comment=None, request=None, **kwargs):
     if config_value("PRODUCT", "AKISMET_ENABLE"):

@@ -8,7 +8,8 @@ else:
 from django.contrib.sites.models import Site
 from keyedcache import cache_get, cache_set, NotCachedError
 from product.models import Product
-from satchmo_ext.productratings.utils import average
+from .utils import average
+from .models import ProductRating
 import logging
 import math
 
@@ -29,22 +30,15 @@ def highest_rated(count=0, site=None):
     except NotCachedError as nce:
         # here were are going to do just one lookup for all product comments
 
-        comments = Comment.objects.filter(content_type__app_label='product',
-            content_type__model='product',
-            site__id=site_id,
-            productrating__rating__gt=0,
-            is_public=True).order_by('object_pk')
+        product_ratings = ProductRating.objects.rated_products().filter(comment__site__id=site_id).distinct().order_by('comment__object_pk')
         
         # then make lists of ratings for each
         commentdict = {}
-        for comment in comments:
-            if hasattr(comment, 'productrating'):
-                rating = comment.productrating.rating
-                if rating>0:
-                    commentdict.setdefault(comment.object_pk, []).append(rating)
+        for rating in product_ratings:
+            commentdict.setdefault(rating.comment.object_pk, []).append(rating.rating)
         
         # now take the average of each, and make a nice list suitable for sorting
-        ratelist = [(average(ratings), int(pk)) for pk, ratings in commentdict.items()]
+        ratelist = [(average(ratings), pk) for pk, ratings in commentdict.items()]
         ratelist.sort()
         #log.debug(ratelist)
         
@@ -52,7 +46,7 @@ def highest_rated(count=0, site=None):
         ratelist = ratelist[-count:]
         ratelist.reverse()
 
-        pks = ["%i" % p[1] for p in ratelist]
+        pks = ["%s" % p[1] for p in ratelist]
         pkstring = ",".join(pks)
         log.debug('calculated highest rated products, set to cache: %s', pkstring)
         cache_set(nce.key, value=pkstring)
@@ -70,6 +64,6 @@ def highest_rated(count=0, site=None):
         for _id in ids:
             try:
                 products.append(productdict[_id])
-            except ValueError:
+            except KeyError:
                 pass
     return products

@@ -11,11 +11,32 @@ from satchmo_utils.signals import collect_urls
 import product
 import satchmo_store
 
+
+class ProductRatingQuerySet(models.query.QuerySet):
+    
+    def rated_products(self):
+        return self.filter(comment__content_type__app_label='product',
+                           comment__content_type__model='product',
+                           comment__is_public=True, rating__gt=0).distinct()
+
+
+class ProductRatingManager(models.Manager):
+
+    def get_queryset(self):
+        return ProductRatingQuerySet(self.model)
+    
+    def rated_products(self):
+        return self.get_queryset().rated_products()
+
+
 class ProductRating(models.Model):
     """A rating attached to a comment"""
     comment = models.OneToOneField(Comment, verbose_name="Rating", primary_key=True)
     rating = models.IntegerField(_("Rating"))
 
+    objects = ProductRatingManager()
+    
+    
 from . import config
 from .urls import add_product_urls, add_comment_urls
 collect_urls.connect(add_product_urls, sender=product)
