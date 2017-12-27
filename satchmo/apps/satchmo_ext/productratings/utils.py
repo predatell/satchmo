@@ -27,16 +27,12 @@ def get_product_rating(product, site=None):
     """Get the average product rating"""
     if site is None:
         site = Site.objects.get_current()
-    
-    site = site.id
-    manager = Comment.objects
-    comment_pks = manager.filter(object_pk__exact=str(product.id),
-                               content_type__app_label__exact='product',
-                               content_type__model__exact='product',
-                               site__id__exact=site,
-                               is_public__exact=True).values_list('pk', flat=True)
-    rating = ProductRating.objects.filter(comment__in=comment_pks
-        ).aggregate(average=Avg('rating'))['average']
+
+    rating = ProductRating.objects.filter(comment__object_pk=product.pk,
+                                          comment__content_type__app_label='product',
+                                          comment__content_type__model='product',
+                                          comment__site__id=site.pk, comment__is_public=True,
+                                          rating__gt=0).distinct().aggregate(average=Avg('rating'))['average']
     log.debug("Rating: %s", rating)
     return rating
 
