@@ -1,6 +1,7 @@
 from django import template
 from django.template.loader import render_to_string
-from satchmo_ext.productratings.utils import get_product_rating_string, get_product_rating
+
+from ..utils import get_product_rating_string, get_product_rating
 import logging
 
 log = logging.getLogger('shop.templatetags')

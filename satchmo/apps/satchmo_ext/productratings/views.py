@@ -3,15 +3,17 @@ from django.views.generic import ListView
 from livesettings.functions import config_value
 from satchmo_ext.productratings.queries import highest_rated
 
+from product.models import Product
+
 
 class BestratingsListView(ListView):
-    #model = Product
+    model = Product
     template_name = "product/best_ratings.html"
     context_object_name = "products"
     count = 0
 
     def get_queryset(self):
-        count = config_value('PRODUCT','NUM_DISPLAY') if self.count is None else self.count
+        count = self.count if self.count else config_value('PRODUCT','NUM_DISPLAY')
         return highest_rated(count)
 
 display_bestratings = BestratingsListView.as_view()
