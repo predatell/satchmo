@@ -29,11 +29,11 @@ def highest_rated(count=0, site=None):
     except NotCachedError as nce:
         # here were are going to do just one lookup for all product comments
 
-        comments = Comment.objects.filter(content_type__app_label__exact='product',
-            content_type__model__exact='product',
-            site__id__exact=site_id,
+        comments = Comment.objects.filter(content_type__app_label='product',
+            content_type__model='product',
+            site__id=site_id,
             productrating__rating__gt=0,
-            is_public__exact=True).order_by('object_pk')
+            is_public=True).order_by('object_pk')
         
         # then make lists of ratings for each
         commentdict = {}
@@ -57,11 +57,19 @@ def highest_rated(count=0, site=None):
         log.debug('calculated highest rated products, set to cache: %s', pkstring)
         cache_set(nce.key, value=pkstring)
     
-    ids = []
-    for pk in pks:
-        try:
-            _id = int(pk)
-            ids.append(_id)
-        except ValueError:
-            pass
-    return Product.objects.filter(pk__in=ids)
+    products = []
+    if pks:
+        ids = []
+        for pk in pks:
+            try:
+                _id = int(pk)
+                ids.append(_id)
+            except ValueError:
+                pass
+        productdict = Product.objects.in_bulk(ids)
+        for _id in ids:
+            try:
+                products.append(productdict[_id])
+            except ValueError:
+                pass
+    return products
