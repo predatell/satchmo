@@ -6,6 +6,8 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
+from django.core.urlresolvers import reverse
 
 from l10n.mixins import TranslatedObjectMixin
 import product
@@ -40,39 +42,37 @@ class Brand(models.Model, TranslatedObjectMixin):
     
     objects = BrandManager()
     
-    def _active_categories(self):
+    class Meta:
+        ordering=('ordering', 'slug')
+        verbose_name = _('Brand')
+        verbose_name_plural = _('Brands')
+    
+    def __str__(self):
+        return "%s" % self.slug    
+    
+    @cached_property
+    def active_categories(self):
         return [cat for cat in self.categories.all() if cat.has_content()]
     
-    active_categories = property(fget=_active_categories)
-    
-    def _translation(self):
+    @cached_property
+    def translation(self):
         return self._find_translation()
-    translation = property(fget=_translation)
 
-    def _get_absolute_url(self):
-        return ('satchmo_brand_view', None, {'brandname' : self.slug})
-        
-    get_absolute_url = models.permalink(_get_absolute_url)
+    def get_absolute_url(self):
+        return reverse('satchmo_brand_view', kwargs={'brandname' : self.slug})
         
     def active_products(self):
         return self.products.filter(site=self.site, active=True)        
 
     def has_categories(self):
-        return self.active_categories().count() > 0
+        return self.active_categories
 
     def has_content(self):
         return self.has_products() or self.has_categories()
 
     def has_products(self):
-        return self.active_products().count() > 0
-            
-    def __str__(self):
-        return "%s" % self.slug
-            
-    class Meta:
-        ordering=('ordering', 'slug')
-        verbose_name = _('Brand')
-        verbose_name_plural = _('Brands')
+        return self.active_products().exists()
+        
 
 class BrandProduct(models.Model):
     brand = models.ForeignKey(Brand)
@@ -81,6 +81,7 @@ class BrandProduct(models.Model):
     class Meta:
         verbose_name=_("Brand Product")
         verbose_name_plural=_("Brand Products")
+
 
 class BrandTranslation(models.Model):
     brand = models.ForeignKey(Brand, related_name="translations")
@@ -94,20 +95,21 @@ class BrandTranslation(models.Model):
         null=True, blank=True,
         max_length=200) #Media root is automatically prepended
     
-    def _get_filename(self):
+    class Meta:
+        ordering=('languagecode', )      
+        verbose_name = _('Brand Translation')
+        verbose_name_plural = _('Brand Translations')      
+    
+    @cached_property
+    def _filename(self):
         if self.brand:
             return '%s-%s' % (self.brand.slug, self.id)
         else:
             return 'default'
-    _filename = property(_get_filename)
-
-    class Meta:
-        ordering=('languagecode', )      
-        verbose_name = _('Brand Translation')
-        verbose_name_plural = _('Brand Translations')  
 
 
 class BrandCategoryManager(models.Manager):
+    
     def by_slug(self, brandname, slug):
         brand = Brand.objects.by_slug(brandname)
         return brand.categories.get(slug=slug)
@@ -116,8 +118,7 @@ class BrandCategoryManager(models.Manager):
 @python_2_unicode_compatible
 class BrandCategory(models.Model, TranslatedObjectMixin):
     """A category within a brand"""
-    slug = models.SlugField(_("Slug"),
-        help_text=_("Used for URLs"))
+    slug = models.SlugField(_("Slug"), help_text=_("Used for URLs"))
     brand = models.ForeignKey(Brand, related_name="categories")
     products = models.ManyToManyField(Product, blank=True, verbose_name=_("Products"), through='BrandCategoryProduct')
     ordering = models.IntegerField(_("Ordering"))
@@ -125,34 +126,33 @@ class BrandCategory(models.Model, TranslatedObjectMixin):
 
     objects = BrandCategoryManager()
 
-    def _translation(self):
-        return self._find_translation()
-    translation = property(fget=_translation)
+    class Meta:
+        ordering=('ordering', 'slug')
+        verbose_name = _('Brand Category')
+        verbose_name_plural = _('Categories')
 
-    def _get_absolute_url(self):
-        return ('satchmo_brand_category_view', None, {'brandname' : self.brand.slug, 'catname' : self.slug})
-    
-    get_absolute_url = models.permalink(_get_absolute_url)
+    def __str__(self):
+        return "%s: %s" % (self.brand.slug, self.slug)
+
+    @cached_property
+    def translation(self):
+        return self._find_translation()
+
+    def get_absolute_url(self):
+        return reverse('satchmo_brand_category_view', kwargs={'brandname' : self.brand.slug, 'catname' : self.slug})
         
     def active_products(self):
-        return self.products.filter(site=self.brand.site).filter(active=True)                
+        return self.products.filter(site=self.brand.site, active=True)                
         
     def has_categories(self):
         return False    
     
     def has_content(self):
-        return self.active_products()
+        return self.active_products().exists()
 
     def has_products(self):
-        return self.active_products().count > 0
+        return self.active_products().exists()
 
-    def __str__(self):
-        return "%s: %s" % (self.brand.slug, self.slug)
-
-    class Meta:
-        ordering=('ordering', 'slug')
-        verbose_name = _('Brand Category')
-        verbose_name_plural = _('Categories')
 
 class BrandCategoryProduct(models.Model):
     brandcategory = models.ForeignKey(BrandCategory)
@@ -162,8 +162,8 @@ class BrandCategoryProduct(models.Model):
         verbose_name = _('Brand Category Product')
         verbose_name_plural = _('Brand Category Products')
 
-class BrandCategoryTranslation(models.Model):
 
+class BrandCategoryTranslation(models.Model):
     brandcategory = models.ForeignKey(BrandCategory, related_name="translations")
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_('title'), max_length=100, blank=False)
@@ -175,17 +175,17 @@ class BrandCategoryTranslation(models.Model):
         null=True, blank=True,
         max_length=200) #Media root is automatically prepended
     
-    def _get_filename(self):
+    class Meta:
+        ordering=('languagecode', )
+        verbose_name_plural = _('Brand Category Translations')    
+    
+    @cached_property
+    def _filename(self):
         if self.brandcategory:
             return '%s-%s' % (self.brandcategory.brand.slug, self.id)
         else:
             return 'default'
-    _filename = property(_get_filename)
     
-    class Meta:
-        ordering=('languagecode', )
-        verbose_name_plural = _('Brand Category Translations')
-
-#from . import config        
+    
 from .urls import add_brand_urls
 collect_urls.connect(add_brand_urls, sender=product)
