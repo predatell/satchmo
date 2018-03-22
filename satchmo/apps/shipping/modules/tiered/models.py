@@ -12,6 +12,7 @@ import datetime
 import logging
 import operator
 from six.moves import reduce
+from livesettings.functions import config_value
 
 log = logging.getLogger('shipping.Tiered')
 
@@ -43,10 +44,13 @@ class Shipper(BaseShipper):
         Complex calculations can be done here as long as the return value is a dollar figure
         """
         assert(self._calculated)
-        total = Decimal("0.00")
-        for cartitem in self.cart.cartitem_set.all():
-            if cartitem.product.is_shippable:
-                total += cartitem.line_total
+        if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'SHIPPABLE':
+            total = self.cart.undiscounted_total
+        else:
+            total = Decimal("0.00")
+            for cartitem in self.cart.cartitem_set.all():
+                if cartitem.product.is_shippable:
+                    total += cartitem.line_total
         return self.carrier.price(total)
 
     def method(self):
@@ -68,12 +72,15 @@ class Shipper(BaseShipper):
         or location.
         """
         if order:
-            itemprices = [ item.sub_total for item in order.orderitem_set.all() if item.product.is_shippable]
-            if itemprices:
-                sub_total = reduce(operator.add, itemprices)
+            if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'SHIPPABLE':
+                sub_total = order.sub_total
             else:
-                sub_total = Decimal('0.00')
-                
+                itemprices = [ item.sub_total for item in order.orderitem_set.all() if item.product.is_shippable]
+                if itemprices:
+                    sub_total = reduce(operator.add, itemprices)
+                else:
+                    sub_total = Decimal('0.00')
+
             try:
                 price = self.carrier.price(sub_total)
                 

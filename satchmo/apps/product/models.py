@@ -166,7 +166,6 @@ class Category(models.Model):
         """Variations determines whether or not product variations are included
         in most templates we are not returning all variations, just the parent product.
         """
-        print(self)
         site = Site.objects.get_current()
         
         if not include_children:
@@ -549,7 +548,6 @@ class Discount(models.Model):
 
     @cached_property
     def _valid_products_in_categories(self):
-        print("_valid_products_in_categories")
         slugs = set()
         for cat in Category.objects.filter(id__in=self.valid_categories.values_list('id', flat=True)):
             slugs.update([p.slug for p in cat.active_products(variations=True, include_children=True)])

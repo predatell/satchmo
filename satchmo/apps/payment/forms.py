@@ -237,92 +237,93 @@ class PaymentMethodForm(ProxyContactForm):
         form_validate.send(PaymentMethodForm, form=self)
         return self.cleaned_data
 
+        
 class PaymentContactInfoForm(PaymentMethodForm, ContactInfoForm):
-        payment_required_fields = None
+    payment_required_fields = None
 
-        def __init__(self, *args, **kwargs):
-            super(PaymentContactInfoForm, self).__init__(*args, **kwargs)
-            if not self.cart:
-                request = threadlocals.get_current_request()
-                self.cart = Cart.objects.from_request(request)
+    def __init__(self, *args, **kwargs):
+        super(PaymentContactInfoForm, self).__init__(*args, **kwargs)
+        if not self.cart:
+            request = threadlocals.get_current_request()
+            self.cart = Cart.objects.from_request(request)
 
-            self.fields['discount'] = forms.CharField(max_length=30, required=False)
+        self.fields['discount'] = forms.CharField(max_length=30, required=False)
 
-            self.payment_required_fields = {}
+        self.payment_required_fields = {}
 
-            if config_value('PAYMENT', 'USE_DISCOUNTS'):
-                if not self.fields['discount'].initial:
-                    sale = _find_sale(self.cart)
-                    if sale:
-                        self.fields['discount'].initial = sale.code
-            else:
-                self.fields['discount'].widget = forms.HiddenInput()
+        if config_value('PAYMENT', 'USE_DISCOUNTS'):
+            if not self.fields['discount'].initial:
+                sale = _find_sale(self.cart)
+                if sale:
+                    self.fields['discount'].initial = sale.code
+        else:
+            self.fields['discount'].widget = forms.HiddenInput()
 
-            # Listeners of the form_init signal (below) may modify the dict of
-            # payment_required_fields. For example, if your CUSTOM_PAYMENT requires
-            # customer's city, put the following code in the listener:
-            #
-            #   form.payment_required_fields['CUSTOM_PAYMENT'] = ['city']
-            #
-            form_init.send(PaymentContactInfoForm, form=self)
+        # Listeners of the form_init signal (below) may modify the dict of
+        # payment_required_fields. For example, if your CUSTOM_PAYMENT requires
+        # customer's city, put the following code in the listener:
+        #
+        #   form.payment_required_fields['CUSTOM_PAYMENT'] = ['city']
+        #
+        form_init.send(PaymentContactInfoForm, form=self)
 
-        def save(self, request, *args, **kwargs):
-            form_presave.send(PaymentContactInfoForm, form=self)
-            contactid = super(PaymentContactInfoForm, self).save(*args, **kwargs)
-            contact = Contact.objects.get(pk=contactid)
-            cart = kwargs.get('cart', None)
-            if not cart:
-                cart = Cart.objects.from_request(request)
-            if not cart.customer:
-                cart.customer = contact
-                cart.save()
-            self.order = get_or_create_order(request, cart, contact, self.cleaned_data)
-            form_postsave.send(PaymentContactInfoForm, form=self)
-            return contactid
+    def save(self, request, *args, **kwargs):
+        form_presave.send(PaymentContactInfoForm, form=self)
+        contactid = super(PaymentContactInfoForm, self).save(*args, **kwargs)
+        contact = Contact.objects.get(pk=contactid)
+        cart = kwargs.get('cart', None)
+        if not cart:
+            cart = Cart.objects.from_request(request)
+        if not cart.customer:
+            cart.customer = contact
+            cart.save()
+        self.order = get_or_create_order(request, cart, contact, self.cleaned_data)
+        form_postsave.send(PaymentContactInfoForm, form=self)
+        return contactid
 
-        def clean(self):
-            try:
-                paymentmethod = self.cleaned_data['paymentmethod']
-            except KeyError:
-                self._errors['paymentmethod'] = forms.util.ErrorList([_('This field is required')])
-                return self.cleaned_data
-            required_fields = self.payment_required_fields.get(paymentmethod, [])
-            msg = _('Selected payment method requires this field to be filled')
-            for fld in required_fields:
-                if not (fld in self.cleaned_data and self.cleaned_data[fld]):
-                    self._errors[fld] = forms.util.ErrorList([msg])
-                elif fld == 'state':
-                    self.enforce_state = True
-                    try:
-                        self._check_state(self.cleaned_data['state'], self.cleaned_data['country'])
-                    except forms.ValidationError as e:
-                        self._errors[fld] = e.messages
-            super(PaymentContactInfoForm, self).clean()
+    def clean(self):
+        try:
+            paymentmethod = self.cleaned_data['paymentmethod']
+        except KeyError:
+            self._errors['paymentmethod'] = forms.util.ErrorList([_('This field is required')])
             return self.cleaned_data
-
-        def clean_discount(self):
-            """ Check if discount exists and is valid. """
-            if not config_value('PAYMENT', 'USE_DISCOUNTS'):
-                return ''
-            data = self.cleaned_data['discount']
-            if data:
+        required_fields = self.payment_required_fields.get(paymentmethod, [])
+        msg = _('Selected payment method requires this field to be filled')
+        for fld in required_fields:
+            if not (fld in self.cleaned_data and self.cleaned_data[fld]):
+                self._errors[fld] = forms.util.ErrorList([msg])
+            elif fld == 'state':
+                self.enforce_state = True
                 try:
-                    discount = Discount.objects.get(code=data, active=True)
-                except Discount.DoesNotExist:
-                    raise forms.ValidationError(_('Invalid discount code.'))
+                    self._check_state(self.cleaned_data['state'], self.cleaned_data['country'])
+                except forms.ValidationError as e:
+                    self._errors[fld] = e.messages
+        super(PaymentContactInfoForm, self).clean()
+        return self.cleaned_data
 
-                request = threadlocals.get_current_request()
-                try:
-                    contact = Contact.objects.from_request(request)
-                except Contact.DoesNotExist:
-                    contact = None
+    def clean_discount(self):
+        """ Check if discount exists and is valid. """
+        if not config_value('PAYMENT', 'USE_DISCOUNTS'):
+            return ''
+        data = self.cleaned_data['discount']
+        if data:
+            try:
+                discount = Discount.objects.get(code=data, active=True)
+            except Discount.DoesNotExist:
+                raise forms.ValidationError(_('Invalid discount code.'))
 
-                valid, msg = discount.isValid(self.cart, contact=contact)
+            request = threadlocals.get_current_request()
+            try:
+                contact = Contact.objects.from_request(request)
+            except Contact.DoesNotExist:
+                contact = None
 
-                if not valid:
-                    raise forms.ValidationError(msg)
-                # TODO: validate that it can work with these products
-            return data
+            valid, msg = discount.isValid(self.cart, contact=contact)
+
+            if not valid:
+                raise forms.ValidationError(msg)
+            # TODO: validate that it can work with these products
+        return data
 
 
 class SimplePayShipForm(forms.Form):
@@ -399,6 +400,9 @@ class SimplePayShipForm(forms.Form):
             if config_value('SHIPPING','SELECT_CHEAPEST'):
                 if cheapshipping is not None:
                     self.fields['shipping'].initial = cheapshipping
+                    initial = kwargs.get('initial') or {}
+                    initial['shipping'] = cheapshipping
+                    kwargs['initial'] = initial
             self.shipping_hidden = False
                 
         self.shipping_dict = shipping_dict
@@ -417,7 +421,6 @@ class SimplePayShipForm(forms.Form):
         - the order balance is zero
         - No shipping needs to be selected
         """
-
         needed = True
         if self.order and self.tempContact and self.tempCart:
             order = self.order

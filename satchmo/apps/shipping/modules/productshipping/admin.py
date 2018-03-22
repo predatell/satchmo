@@ -15,6 +15,7 @@ class CarrierOptions(admin.ModelAdmin):
 
 class ProductShippingPriceInline(admin.TabularInline):
     model = ProductShippingPrice
+    extra = 1
 
 admin.site.register(Carrier, CarrierOptions)
 admin.site.unregister(Product)

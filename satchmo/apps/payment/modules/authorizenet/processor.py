@@ -12,6 +12,8 @@ from six.moves import urllib
 from tax.utils import get_tax_processor
 from xml.dom import minidom
 import random
+
+
 class PaymentProcessor(BasePaymentProcessor):
     """
     Authorize.NET payment processing module
