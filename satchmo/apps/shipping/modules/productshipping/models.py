@@ -178,11 +178,9 @@ class Carrier(models.Model):
     def price(self, product):
         """Get a price for this product."""
         prices = product.smart_relation('shipping_price')
-        q = prices.filter(carrier=self)
-        if q.count() > 0:
-            return q[0].price
-
-        else:
+        try:
+            return prices.filter(carrier=self)[0].price
+        except (AttributeError, IndexError):
             log.debug("No %s shipping price found for %s", self, product.slug)
             raise ProductShippingPriceException('No price available')
             
