@@ -44,7 +44,7 @@ class Shipper(BaseShipper):
         Complex calculations can be done here as long as the return value is a dollar figure
         """
         assert(self._calculated)
-        if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'SHIPPABLE':
+        if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'NOT_DISCOUNTABLE':
             total = self.cart.undiscounted_total
         else:
             total = Decimal("0.00")
@@ -72,7 +72,7 @@ class Shipper(BaseShipper):
         or location.
         """
         if order:
-            if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'SHIPPABLE':
+            if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'NOT_DISCOUNTABLE':
                 sub_total = order.sub_total
             else:
                 itemprices = [ item.sub_total for item in order.orderitem_set.all() if item.product.is_shippable]
