@@ -2,6 +2,7 @@
 Stores details about the available payment options.
 Also stores credit card info in an encrypted format.
 """
+import sys
 import base64
 import logging
 from Crypto.Cipher import Blowfish
@@ -39,6 +40,7 @@ class PaymentOption(models.Model):
         verbose_name = _("Payment Option")
         verbose_name_plural = _("Payment Options")
 
+        
 class CreditCardDetail(models.Model):
     """
     Stores an encrypted CC number, its information, and its
@@ -105,14 +107,19 @@ class CreditCardDetail(models.Model):
         verbose_name = _("Credit Card")
         verbose_name_plural = _("Credit Cards")
 
+        
 def _decrypt_code(code):
     """Decrypt code encrypted by _encrypt_code"""
     # In some blowfish implementations, > 56 char keys can cause problems
     secret_key = settings.SECRET_KEY[:56]
     encryption_object = Blowfish.new(secret_key)
     # strip padding from decrypted credit card number
-    return encryption_object.decrypt(base64.b64decode(code)).rstrip('X')
+    decrypt_code = encryption_object.decrypt(base64.b64decode(code))
+    if isinstance(decrypt_code, bytes):
+        decrypt_code = decrypt_code.decode("utf-8")
+    return decrypt_code.rstrip('X')
 
+    
 def _encrypt_code(code):
     """Quick encrypter for CC codes or code fragments"""
     # In some blowfish implementations, > 56 char keys can cause problems
@@ -122,4 +129,7 @@ def _encrypt_code(code):
     padding = ''
     if not (len(code) % 8) == 0:
         padding = 'X' * (8 - (len(code) % 8))
-    return base64.b64encode(encryption_object.encrypt(code + padding))
+    encrypt_code = base64.b64encode(encryption_object.encrypt(code + padding))
+    if isinstance(encrypt_code, bytes):
+        encrypt_code = encrypt_code.decode("utf-8")
+    return encrypt_code

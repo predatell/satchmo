@@ -223,6 +223,13 @@ class OrderCart(NullCart):
 
     total = property(_total)
 
+    def _get_undiscounted_total(self):
+        if self._order.sub_total is None:
+            self._order.force_recalculate_total(save=True)
+        return trunc_decimal(self._order.sub_total-self._order.balance_paid, 2)
+
+    undiscounted_total = property(_get_undiscounted_total)
+
     def __str__(self):
         return "OrderCart (%i) = %i" % (self._order.id, len(self))
 
@@ -1187,7 +1194,7 @@ class OrderItem(models.Model):
         ordering = ('id',)
 
     def __str__(self):
-        return self.product.translated_name()
+        return self.product.name
 
     def _get_category(self):
         category = self.product.get_category
