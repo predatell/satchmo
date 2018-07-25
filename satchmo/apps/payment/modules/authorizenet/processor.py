@@ -12,6 +12,7 @@ from six.moves import urllib
 from tax.utils import get_tax_processor
 from xml.dom import minidom
 import random
+import sys
 
 
 class PaymentProcessor(BasePaymentProcessor):
@@ -449,7 +450,9 @@ class PaymentProcessor(BasePaymentProcessor):
 
         t = loader.get_template('shop/checkout/authorizenet/arb_create_subscription.xml')
         request = t.render(data)
-
+        if sys.version_info >= (3,):
+            request = request.encode("utf-8")
+            
         if self.settings.EXTRA_LOGGING.value:
             data['redact'] = True
             redacted = t.render(data)
@@ -460,6 +463,8 @@ class PaymentProcessor(BasePaymentProcessor):
         try:
             f = urllib.request.urlopen(conn)
             all_results = f.read()
+            if isinstance(all_results, bytes):
+                all_results = all_results.decode("utf-8")
         except urllib.error.URLError as ue:
             self.log.error("error opening %s\n%s", data['connection'], ue)
             return (False, 'ERROR', _('Could not talk to Authorize.net gateway'), None)
@@ -517,11 +522,16 @@ class PaymentProcessor(BasePaymentProcessor):
         - ProcessorResult
         """
         self.log.info("About to send a request to authorize.net: %(connection)s\n%(logPostString)s", data)
-
-        conn = urllib.request.Request(url=data['connection'], data=data['postString'])
+        if sys.version_info >= (3,):
+            post_data = data['postString'].encode("utf-8")
+        else:
+            post_data = data['postString']
+        conn = urllib.request.Request(url=data['connection'], data=post_data)
         try:
             f = urllib.request.urlopen(conn)
             all_results = f.read()
+            if isinstance(all_results, bytes):
+                all_results = all_results.decode("utf-8")
             self.log_extra('Authorize response: %s', all_results)
         except urllib.error.URLError as ue:
             self.log.error("error opening %s\n%s", data['connection'], ue)

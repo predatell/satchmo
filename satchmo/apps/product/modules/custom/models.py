@@ -69,7 +69,7 @@ class CustomProduct(models.Model):
         if include_discount:
             price = get_product_quantity_price(self.product, qty)
         else:
-            adjustment = get_product_quantity_adjustments(self, qty)
+            adjustment = get_product_quantity_adjustments(self.product, qty)
             if adjustment.price is not None:
                 price = adjustment.price.price
             else:

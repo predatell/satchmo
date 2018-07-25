@@ -99,7 +99,7 @@ def discount_used_listener(sender, order=None, **kwargs):
     """
     if order.discount_code:
         try:
-            discount = Discount.objects.by_code(order.discount_code)
+            discount = Discount.objects.by_code(order.discount_code, raises=True)
             if discount.numUses:
                 discount.numUses += 1
             else:
