@@ -201,6 +201,7 @@ def serialize_options(product, selected_options=()):
                     'name': option.option_group.translated_name(),
                     'description': option.option_group.translated_description(),
                     'id': option.option_group.id,
+                    'sort_order': option.option_group.sort_order,
                     'items': [],
                 }
             if not option in serialized[option.option_group_id]['items']:
@@ -208,16 +209,12 @@ def serialize_options(product, selected_options=()):
                 option.selected = option.unique_id in selected_options
 
         # first sort the option groups
-        for k, v in serialized.items():
-            values.append((group_sortmap[k], v))
-
-        if values:
-            values.sort()
-            values = list(zip(*values))[1]
+        values = list(serialized.values())
+        values.sort(key=lambda item: item.get("sort_order", 0))
 
         #now go back and make sure option items are sorted properly.
         for v in values:
-            v['items'] = _sort_options(v['items'])
+            v['items'].sort(key=lambda item: item.sort_order)
 
     log.debug('Serialized Options %s: %s', product.product.slug, values)
     return values
