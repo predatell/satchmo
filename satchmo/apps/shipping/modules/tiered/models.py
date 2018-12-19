@@ -213,7 +213,7 @@ class Carrier(models.Model):
         
         
 class CarrierTranslation(models.Model):
-    carrier = models.ForeignKey('Carrier', related_name='translations')
+    carrier = models.ForeignKey('Carrier', related_name='translations', on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES, )
     name = models.CharField(_('Carrier'), max_length=50, )
     description = models.CharField(_('Description'), max_length=200)
@@ -226,7 +226,7 @@ class CarrierTranslation(models.Model):
 
 @python_2_unicode_compatible
 class ShippingTier(models.Model):
-    carrier = models.ForeignKey('Carrier', related_name='tiers')
+    carrier = models.ForeignKey('Carrier', related_name='tiers', on_delete=models.CASCADE)
     min_total = models.DecimalField(_("Min Price"), 
         help_text=_('The minimum price for this tier to apply'), 
         max_digits=10, decimal_places=2, )

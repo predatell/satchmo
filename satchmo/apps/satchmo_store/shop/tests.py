@@ -227,17 +227,17 @@ class ShopTest(TestCase):
         response = self.client.post(prefix+'/product/dj-rocks/prices/', {"1" : "S",
                                                       "2" : "B",
                                                       "quantity" : '1'})
-        content = response.content.split(',')
-        self.assertEquals(content[0], '["dj-rocks-s-b"')
-        self.assert_(content[1].endswith('20.00"]'))
+        content = response.content.split(b',')
+        self.assertEquals(content[0], b'["dj-rocks-s-b"')
+        self.assert_(content[1].endswith(b'20.00"]'))
 
         # This tests the option price_change feature, and again the productname
         response = self.client.post(prefix+'/product/dj-rocks/prices/', {"1" : "L",
                                                       "2" : "BL",
                                                       "quantity" : '2'})
-        content = response.content.split(',')
-        self.assertEqual(content[0], '["dj-rocks-l-bl"')
-        self.assert_(content[1].endswith('23.00"]'))
+        content = response.content.split(b',')
+        self.assertEqual(content[0], b'["dj-rocks-l-bl"')
+        self.assert_(content[1].endswith(b'23.00"]'))
 
     def test_cart_removing(self):
         """

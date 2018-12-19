@@ -1,6 +1,6 @@
 from django import template
 from django.conf import settings
-from django.core import urlresolvers
+from django.urls import reverse, NoReverseMatch
 from django.utils.safestring import mark_safe
 from l10n.l10n_settings import get_l10n_setting
 from product.models import Category
@@ -158,8 +158,8 @@ def satchmo_category_search_form(category=None):
     Display the form for customer to specify category to search.
     """
     try:
-        url = urlresolvers.reverse('satchmo_search')
-    except urlresolvers.NoReverseMatch:
+        url = reverse('satchmo_search')
+    except NoReverseMatch:
         url = ""
         log.warning('No url found for satchmo_search (OK if running tests)')
 
@@ -180,10 +180,9 @@ def satchmo_language_selection_form(context):
     languages = []
     if enabled:
         try:
-            url = urlresolvers.reverse('satchmo_set_language')
+            url = reverse('satchmo_set_language')
             languages = settings.LANGUAGES
-
-        except urlresolvers.NoReverseMatch:
+        except NoReverseMatch:
             url = ""
             log.warning('No url found for satchmo_set_language (OK if running tests)')
 
@@ -204,8 +203,8 @@ def satchmo_search_form():
     Display the search form.
     """
     try:
-        url = urlresolvers.reverse('satchmo_search')
-    except urlresolvers.NoReverseMatch:
+        url = reverse('satchmo_search')
+    except NoReverseMatch:
         url = ""
         log.warning('No url found for satchmo_search (OK if running tests)')
 

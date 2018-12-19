@@ -5,7 +5,10 @@ from django.contrib.sites.models import Site
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 from livesettings.functions import config_get_group
 from satchmo_store.shop.models import Order

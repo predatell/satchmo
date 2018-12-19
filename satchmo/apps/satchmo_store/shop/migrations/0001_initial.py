@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('desc', models.CharField(max_length=10, null=True, verbose_name='Description', blank=True)),
                 ('date_time_created', models.DateTimeField(verbose_name='Creation Date')),
-                ('customer', models.ForeignKey(verbose_name='Customer', blank=True, to='contact.Contact', null=True)),
+                ('customer', models.ForeignKey(verbose_name='Customer', blank=True, to='contact.Contact', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Shopping Cart',
@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('quantity', models.DecimalField(verbose_name='Quantity', max_digits=18, decimal_places=6)),
-                ('cart', models.ForeignKey(verbose_name='Cart', to='shop.Cart')),
-                ('product', models.ForeignKey(verbose_name='Product', to='product.Product')),
+                ('cart', models.ForeignKey(verbose_name='Cart', to='shop.Cart', on_delete=models.CASCADE)),
+                ('product', models.ForeignKey(verbose_name='Product', to='product.Product', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('id',),
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=100, verbose_name='name')),
                 ('price_change', satchmo_utils.fields.CurrencyField(null=True, verbose_name='Item Detail Price Change', max_digits=6, decimal_places=2, blank=True)),
                 ('sort_order', models.IntegerField(help_text='The display order for this group.', verbose_name='Sort Order')),
-                ('cartitem', models.ForeignKey(related_name='details', to='shop.CartItem')),
+                ('cartitem', models.ForeignKey(related_name='details', to='shop.CartItem', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('sort_order',),
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Config',
             fields=[
-                ('site', models.OneToOneField(primary_key=True, serialize=False, to='sites.Site', verbose_name='Site')),
+                ('site', models.OneToOneField(primary_key=True, serialize=False, to='sites.Site', verbose_name='Site', on_delete=models.CASCADE)),
                 ('store_name', models.CharField(unique=True, max_length=100, verbose_name='Store Name')),
                 ('store_description', models.TextField(null=True, verbose_name='Description', blank=True)),
                 ('store_email', models.EmailField(max_length=75, null=True, verbose_name='Email', blank=True)),
@@ -77,8 +77,8 @@ class Migration(migrations.Migration):
                 ('postal_code', models.CharField(max_length=9, null=True, verbose_name='Zip Code', blank=True)),
                 ('phone', models.CharField(max_length=30, null=True, verbose_name='Phone Number', blank=True)),
                 ('in_country_only', models.BooleanField(default=True, verbose_name='Only sell to in-country customers?')),
-                ('country', models.ForeignKey(verbose_name='Country', to='l10n.Country')),
-                ('sales_country', models.ForeignKey(related_name='sales_country', verbose_name='Default country for customers', blank=True, to='l10n.Country', null=True)),
+                ('country', models.ForeignKey(verbose_name='Country', to='l10n.Country', on_delete=models.CASCADE)),
+                ('sales_country', models.ForeignKey(related_name='sales_country', verbose_name='Default country for customers', blank=True, to='l10n.Country', null=True, on_delete=models.SET_NULL)),
                 ('shipping_countries', models.ManyToManyField(related_name='shop_configs', verbose_name='Shipping Countries', to='l10n.Country', blank=True)),
             ],
             options={
@@ -119,8 +119,8 @@ class Migration(migrations.Migration):
                 ('tax', satchmo_utils.fields.CurrencyField(null=True, verbose_name='Tax', max_digits=18, decimal_places=10, blank=True)),
                 ('time_stamp', models.DateTimeField(null=True, verbose_name='Timestamp', blank=True)),
                 ('status', models.CharField(blank=True, help_text='This is set automatically.', max_length=20, verbose_name='Status', choices=[(b'Temp', 'Temp'), (b'New', 'New'), (b'Blocked', 'Blocked'), (b'In Process', 'In Process'), (b'Billed', 'Billed'), (b'Shipped', 'Shipped'), (b'Complete', 'Complete'), (b'Cancelled', 'Cancelled')])),
-                ('contact', models.ForeignKey(verbose_name='Contact', to='contact.Contact')),
-                ('site', models.ForeignKey(verbose_name='Site', to='sites.Site')),
+                ('contact', models.ForeignKey(verbose_name='Contact', to='contact.Contact', on_delete=models.CASCADE)),
+                ('site', models.ForeignKey(verbose_name='Site', to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Product Order',
@@ -158,8 +158,8 @@ class Migration(migrations.Migration):
                 ('expire_date', models.DateField(help_text='Subscription expiration date.', null=True, verbose_name='Subscription End', blank=True)),
                 ('completed', models.BooleanField(default=False, verbose_name='Completed')),
                 ('discount', satchmo_utils.fields.CurrencyField(null=True, verbose_name='Line item discount', max_digits=18, decimal_places=10, blank=True)),
-                ('order', models.ForeignKey(verbose_name='Order', to='shop.Order')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, verbose_name='Product', to='product.Product')),
+                ('order', models.ForeignKey(verbose_name='Order', to='shop.Order', on_delete=models.CASCADE)),
+                ('product', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Product', to='product.Product')),
             ],
             options={
                 'ordering': ('id',),
@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
                 ('value', models.CharField(max_length=255, verbose_name='Value')),
                 ('price_change', satchmo_utils.fields.CurrencyField(null=True, verbose_name='Price Change', max_digits=18, decimal_places=10, blank=True)),
                 ('sort_order', models.IntegerField(help_text='The display order for this group.', verbose_name='Sort Order')),
-                ('item', models.ForeignKey(verbose_name='Order Item', to='shop.OrderItem')),
+                ('item', models.ForeignKey(verbose_name='Order Item', to='shop.OrderItem', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('sort_order',),
@@ -195,7 +195,7 @@ class Migration(migrations.Migration):
                 ('transaction_id', models.CharField(max_length=45, null=True, verbose_name='Transaction ID', blank=True)),
                 ('details', models.CharField(max_length=255, null=True, verbose_name='Details', blank=True)),
                 ('reason_code', models.CharField(max_length=255, null=True, verbose_name='Reason Code', blank=True)),
-                ('order', models.ForeignKey(related_name='payments', to='shop.Order')),
+                ('order', models.ForeignKey(related_name='payments', to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Order Payment',
@@ -213,7 +213,7 @@ class Migration(migrations.Migration):
                 ('transaction_id', models.CharField(max_length=45, null=True, verbose_name='Transaction ID', blank=True)),
                 ('details', models.CharField(max_length=255, null=True, verbose_name='Details', blank=True)),
                 ('reason_code', models.CharField(max_length=255, null=True, verbose_name='Reason Code', blank=True)),
-                ('order', models.ForeignKey(related_name='paymentfailures', blank=True, to='shop.Order', null=True)),
+                ('order', models.ForeignKey(related_name='paymentfailures', blank=True, to='shop.Order', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,
@@ -230,8 +230,8 @@ class Migration(migrations.Migration):
                 ('transaction_id', models.CharField(max_length=45, null=True, verbose_name='Transaction ID', blank=True)),
                 ('details', models.CharField(max_length=255, null=True, verbose_name='Details', blank=True)),
                 ('reason_code', models.CharField(max_length=255, null=True, verbose_name='Reason Code', blank=True)),
-                ('capture', models.ForeignKey(related_name='pendingpayments', to='shop.OrderPayment')),
-                ('order', models.ForeignKey(related_name='pendingpayments', to='shop.Order')),
+                ('capture', models.ForeignKey(related_name='pendingpayments', to='shop.OrderPayment', on_delete=models.CASCADE)),
+                ('order', models.ForeignKey(related_name='pendingpayments', to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Order Pending Payment',
@@ -246,7 +246,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(blank=True, max_length=20, verbose_name='Status', choices=[(b'Temp', 'Temp'), (b'New', 'New'), (b'Blocked', 'Blocked'), (b'In Process', 'In Process'), (b'Billed', 'Billed'), (b'Shipped', 'Shipped'), (b'Complete', 'Complete'), (b'Cancelled', 'Cancelled')])),
                 ('notes', models.CharField(max_length=100, verbose_name='Notes', blank=True)),
                 ('time_stamp', models.DateTimeField(verbose_name='Timestamp')),
-                ('order', models.ForeignKey(verbose_name='Order', to='shop.Order')),
+                ('order', models.ForeignKey(verbose_name='Order', to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('time_stamp',),
@@ -263,7 +263,7 @@ class Migration(migrations.Migration):
                 ('method', models.CharField(max_length=50, verbose_name='Model')),
                 ('description', models.CharField(max_length=50, verbose_name='Description', blank=True)),
                 ('tax', satchmo_utils.fields.CurrencyField(null=True, verbose_name='Tax', max_digits=18, decimal_places=10, blank=True)),
-                ('order', models.ForeignKey(related_name='taxes', to='shop.Order')),
+                ('order', models.ForeignKey(related_name='taxes', to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('id',),
@@ -278,7 +278,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('key', models.SlugField(verbose_name='key')),
                 ('value', models.CharField(max_length=100, verbose_name='value')),
-                ('order', models.ForeignKey(related_name='variables', to='shop.Order')),
+                ('order', models.ForeignKey(related_name='variables', to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('key',),
@@ -290,19 +290,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='orderauthorization',
             name='capture',
-            field=models.ForeignKey(related_name='authorizations', to='shop.OrderPayment'),
+            field=models.ForeignKey(related_name='authorizations', to='shop.OrderPayment', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='orderauthorization',
             name='order',
-            field=models.ForeignKey(related_name='authorizations', to='shop.Order'),
+            field=models.ForeignKey(related_name='authorizations', to='shop.Order', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='cart',
             name='site',
-            field=models.ForeignKey(verbose_name='Site', to='sites.Site'),
+            field=models.ForeignKey(verbose_name='Site', to='sites.Site', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

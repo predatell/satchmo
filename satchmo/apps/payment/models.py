@@ -46,7 +46,7 @@ class CreditCardDetail(models.Model):
     Stores an encrypted CC number, its information, and its
     displayable number.
     """
-    orderpayment = models.OneToOneField('shop.OrderPayment', related_name="creditcard")
+    orderpayment = models.OneToOneField('shop.OrderPayment', related_name="creditcard", on_delete=models.CASCADE)
     credit_type = models.CharField(_("Credit Card Type"), max_length=16) #, choices=iterchoices_db(payment.config.credit_choices))
     display_cc = models.CharField(_("CC Number (Last 4 digits)"), max_length=4)
     encrypted_cc = models.CharField(_("Encrypted Credit Card"), max_length=40, blank=True, null=True, editable=False)

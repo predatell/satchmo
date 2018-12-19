@@ -1,8 +1,12 @@
 from django import forms
 from django.db.models import Q
-from django.forms.extras.widgets import SelectDateWidget
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils import timezone
+try:
+    from django.forms.widgets import SelectDateWidget
+except ImportError:
+    from django.forms.extras.widgets import SelectDateWidget
+    
 from l10n.models import Country
 from livesettings.functions import config_value
 from satchmo_store.contact.models import Contact, AddressBook, PhoneNumber, Organization, ContactRole

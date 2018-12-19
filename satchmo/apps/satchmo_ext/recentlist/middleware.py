@@ -1,4 +1,6 @@
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.utils.deprecation import MiddlewareMixin
+from django.urls import NoReverseMatch, reverse
+
 from livesettings.functions import config_value
 import logging
 import re
@@ -15,7 +17,7 @@ except NoReverseMatch:
     log.debug("Could not find product url.")
     urlre = None
 
-class RecentProductMiddleware(object):
+class RecentProductMiddleware(MiddlewareMixin):
     """Remember recent products"""
     def process_response(self, request, response):
         if urlre is not None: # If the product url was found earlier.

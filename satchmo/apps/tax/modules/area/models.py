@@ -11,10 +11,10 @@ class TaxRate(models.Model):
     """
     Actual percentage tax based on area and product class
     """
-    taxClass = models.ForeignKey(TaxClass, verbose_name=_('Tax Class'))
-    taxZone = models.ForeignKey(AdminArea, blank=True, null=True,
+    taxClass = models.ForeignKey(TaxClass, verbose_name=_('Tax Class'), on_delete=models.CASCADE)
+    taxZone = models.ForeignKey(AdminArea, blank=True, null=True, on_delete=models.SET_NULL,
         verbose_name=_('Tax Zone'))
-    taxCountry = models.ForeignKey(Country, blank=True, null=True,
+    taxCountry = models.ForeignKey(Country, blank=True, null=True, on_delete=models.SET_NULL,
         verbose_name=_('Tax Country'))
     percentage = models.DecimalField(_("Percentage"), max_digits=7,
         decimal_places=6, help_text=_("% tax for this area and type"))

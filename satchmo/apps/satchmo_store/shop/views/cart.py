@@ -1,7 +1,7 @@
 from decimal import Decimal
+import six
 
 from django.contrib import messages
-from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -11,7 +11,10 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.generic import DetailView, FormView
-import six
+try:
+    from django.core.urlresolvers import reverse_lazy, reverse
+except ImportError:
+    from django.urls import reverse_lazy, reverse
 
 from livesettings.functions import config_value
 from product.models import Product, OptionManager
@@ -240,7 +243,7 @@ def add(request, id=0, redirect_to='satchmo_cart'):
 
         return _json_response(data)
     else:
-        url = urlresolvers.reverse(redirect_to)
+        url = reverse(redirect_to)
         return HttpResponseRedirect(url)
 
         
@@ -255,7 +258,7 @@ def add_ajax(request, id=0, **kwargs):
 class AddMultipleView(FormView):
     template_name = "shop/multiple_product_form.html"
     form_class = forms.MultipleProductForm
-    success_url = urlresolvers.reverse_lazy('satchmo_cart')
+    success_url = reverse_lazy('satchmo_cart')
     products = None
     
     def form_valid(self, form):
@@ -288,7 +291,7 @@ add_multiple = AddMultipleView.as_view()
 #             form.save(cart, request)
 #             satchmo_cart_changed.send(cart, cart=cart, request=request)
 
-#             url = urlresolvers.reverse(redirect_to)
+#             url = reverse(redirect_to)
 #             return HttpResponseRedirect(url)
 #     else:
 #         form = forms.MultipleProductForm(products=products)
@@ -298,7 +301,7 @@ add_multiple = AddMultipleView.as_view()
 
 class AgreeTermsView(DisplayView):
     error_message = _('You must accept the terms and conditions.')    
-    success_url = urlresolvers.reverse_lazy('satchmo_checkout-step1')
+    success_url = reverse_lazy('satchmo_checkout-step1')
     
     def post(self, request, *args, **kwargs):
         if request.POST.get('agree_terms', False):
@@ -311,7 +314,7 @@ agree_terms = AgreeTermsView.as_view()
 #     """Agree to terms"""
 #     if request.method == "POST":
 #         if request.POST.get('agree_terms', False):
-#             url = urlresolvers.reverse('satchmo_checkout-step1')
+#             url = reverse('satchmo_checkout-step1')
 #             return HttpResponseRedirect(url)
 
 #     return display(request, error_message=_('You must accept the terms and conditions.'))
@@ -339,7 +342,7 @@ def remove(request):
         if errors:
             return display(request, cart=cart, error_message=errors)
         else:
-            url = urlresolvers.reverse('satchmo_cart')
+            url = reverse('satchmo_cart')
             return HttpResponseRedirect(url)
 
             
@@ -358,7 +361,7 @@ def set_quantity(request):
 
     Intended to be called via the cart itself, returning to the cart after done.
     """
-    cart_url = urlresolvers.reverse('satchmo_cart')
+    cart_url = reverse('satchmo_cart')
 
     if not request.POST:
         return HttpResponseRedirect(cart_url)

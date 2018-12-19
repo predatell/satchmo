@@ -1,12 +1,15 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
-from django.core import urlresolvers
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.db import IntegrityError
 from django.views.generic import ListView, FormView, View
 from django.views.generic.detail import SingleObjectMixin
+try:
+    from django.core.urlresolvers import reverse_lazy, reverse
+except ImportError:
+    from django.urls import reverse_lazy, reverse
 
 from product.forms import VariationManagerForm, InventoryForm, ProductExportForm, ProductImportForm
 from product.models import Product
@@ -20,7 +23,7 @@ log = logging.getLogger('product.views.adminviews')
 class InventoryEditView(FormView):
     template_name = "product/admin/inventory_form.html"
     form_class = InventoryForm
-    success_url = urlresolvers.reverse_lazy('satchmo_admin_edit_inventory')
+    success_url = reverse_lazy('satchmo_admin_edit_inventory')
     page_title = _('Inventory Editor')
     
     def form_valid(self, form):
@@ -39,7 +42,7 @@ class InventoryEditView(FormView):
 #         form = InventoryForm(new_data)
 #         if form.is_valid():
 #             form.save(request)
-#             url = urlresolvers.reverse('satchmo_admin_edit_inventory')
+#             url = reverse('satchmo_admin_edit_inventory')
 #             return HttpResponseRedirect(url)
 #     else:
 #         form = InventoryForm()
@@ -51,7 +54,7 @@ class InventoryEditView(FormView):
 
 #     return render(request, 'product/admin/inventory_form.html', ctx)
 
-edit_inventory = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(InventoryEditView.as_view())
+edit_inventory = user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')(InventoryEditView.as_view())
 
 
 class ExportProductsView(FormView):
@@ -89,13 +92,13 @@ class ExportProductsView(FormView):
 
 #     return render(request, template, ctx)
 
-export_products = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(ExportProductsView.as_view())
+export_products = user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')(ExportProductsView.as_view())
 
 
 class ImportProductsView(View):
     form_class = ProductImportForm
     template_name = "product/admin/product_import_result.html"
-    redirect_url = urlresolvers.reverse_lazy('satchmo_admin_product_export')
+    redirect_url = reverse_lazy('satchmo_admin_product_export')
     maxsize = 10000000
     
     def get(self, request, *args, **kwargs):
@@ -141,10 +144,10 @@ class ImportProductsView(View):
 #         }
 #         return render(request, "product/admin/product_import_result.html", ctx)
 #     else:
-#         url = urlresolvers.reverse('satchmo_admin_product_export')
+#         url = reverse('satchmo_admin_product_export')
 #         return HttpResponseRedirect(url)
 
-import_products = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(ImportProductsView.as_view())
+import_products = user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')(ImportProductsView.as_view())
 
 # def product_active_report(request):
 #
@@ -153,7 +156,7 @@ import_products = user_passes_test(lambda u: u.is_authenticated() and u.is_staff
 #     ctx = {title: 'Active Product Report', 'products' : products }
 #     return render(request, 'product/admin/active_product_report.html', ctx)
 #
-# product_active_report = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(product_active_report)
+# product_active_report = user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')(product_active_report)
 
 
 class VariationListView(ListView):
@@ -184,7 +187,7 @@ class VariationManagerView(SingleObjectMixin, FormView):
         if 'ProductVariation' in subtypes:
             self.product = self.product.productvariation.parent.product
             if 'ConfigurableProduct' in self.product.get_subtypes():
-                url = urlresolvers.reverse("satchmo_admin_variation_manager", kwargs={ 'product_id' : self.product.id })
+                url = reverse("satchmo_admin_variation_manager", kwargs={ 'product_id' : self.product.id })
                 return HttpResponseRedirect(url)            
 
         if 'ConfigurableProduct' not in subtypes:
@@ -223,7 +226,7 @@ class VariationManagerView(SingleObjectMixin, FormView):
 #             # got a variation, we want to work with its parent
 #             product = product.productvariation.parent.product
 #             if 'ConfigurableProduct' in product.get_subtypes():
-#                 url = urlresolvers.reverse("satchmo_admin_variation_manager",
+#                 url = reverse("satchmo_admin_variation_manager",
 #                     kwargs = {'product_id' : product.id})
 #                 return HttpResponseRedirect(url)
 
@@ -255,4 +258,4 @@ class VariationManagerView(SingleObjectMixin, FormView):
 #     }
 #     return render(request, 'product/admin/variation_manager.html', ctx)
 
-variation_manager = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(VariationManagerView.as_view())
+variation_manager = user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')(VariationManagerView.as_view())

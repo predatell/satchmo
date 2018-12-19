@@ -1,8 +1,10 @@
 from django import http
-from django.core import urlresolvers
 from django.shortcuts import render
 from django.views.generic import FormView
-from django.core.urlresolvers import reverse_lazy
+try:
+    from django.core.urlresolvers import reverse_lazy
+except ImportError:
+    from django.urls import reverse_lazy
 
 from satchmo_store.mail import send_store_mail
 from satchmo_store.shop.signals import contact_sender
@@ -20,7 +22,7 @@ class ContactFormView(FormView):
     
     def get_initial(self):
         initial = super(ContactFormView, self).get_initial()
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             initial['sender'] = self.request.user.email
             initial['name'] = "%s %s" % (self.request.user.first_name, self.request.user.last_name)
         return initial

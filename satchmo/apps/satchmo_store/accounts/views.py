@@ -2,12 +2,16 @@ from django.conf import settings
 from django.contrib.auth import login, REDIRECT_FIELD_NAME
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
-from django.core import urlresolvers
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.generic.base import TemplateView
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+
 from l10n.models import Country
 from livesettings.functions import config_get_group, config_value
 from satchmo_store.accounts.mail import send_welcome_email
@@ -35,7 +39,7 @@ def emaillogin(request, template_name='registration/login.html',
     else:
         redirect_to = request.GET.get(redirect_field_name, '')
     # Avoid redirecting to logout if the user clicked on login after logout
-    if redirect_to == urlresolvers.reverse('auth_logout'):
+    if redirect_to == reverse('auth_logout'):
         redirect_to = None
 
     success, todo = _login(request, redirect_to)
@@ -151,7 +155,7 @@ def register_handle_address_form(request, redirect=None, action_required=''):
             contact = form.save(request, force_new=True)
 
             if not redirect:
-                redirect = urlresolvers.reverse('registration_complete')
+                redirect = reverse('registration_complete')
             return (True, HttpResponseRedirect(redirect))
         else:
             log.debug("createform errors: %s", form.errors)
@@ -205,7 +209,7 @@ def register_handle_form(request, redirect=None):
                 if redirect:
                     next = redirect
                 else:
-                    next = urlresolvers.reverse('registration_complete')
+                    next = reverse('registration_complete')
             return (True, HttpResponseRedirect(next))
 
     else:

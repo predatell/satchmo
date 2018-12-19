@@ -7,13 +7,16 @@ from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal, ROUND_CEILING
 from django.contrib.sites.models import Site
 from django.conf import settings
-from django.core import urlresolvers
 from django.db import models
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 import six
 from six.moves import reduce
 
@@ -84,7 +87,7 @@ class Config(models.Model):
     Used to store specific information about a store.  Also used to
     configure various store behaviors
     """
-    site = models.OneToOneField(Site, verbose_name=_("Site"), primary_key=True)
+    site = models.OneToOneField(Site, verbose_name=_("Site"), primary_key=True, on_delete=models.CASCADE)
     store_name = models.CharField(_("Store Name"),max_length=100, unique=True)
     store_description = models.TextField(_("Description"), blank=True, null=True)
     store_email = models.EmailField(_("Email"), blank=True, null=True, max_length=75)
@@ -93,13 +96,13 @@ class Config(models.Model):
     city=models.CharField(_("City"), max_length=50, blank=True, null=True)
     state=models.CharField(_("State"), max_length=30, blank=True, null=True)
     postal_code=models.CharField(_("Zip Code"), blank=True, null=True, max_length=9)
-    country=models.ForeignKey(Country, blank=False, null=False, verbose_name=_('Country'))
+    country=models.ForeignKey(Country, verbose_name=_('Country'), on_delete=models.PROTECT)
     phone = models.CharField(_("Phone Number"), blank=True, null=True, max_length=30)
     in_country_only = models.BooleanField(
         _("Only sell to in-country customers?"),
         default=True)
     sales_country = models.ForeignKey(
-        Country, blank=True, null=True,
+        Country, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='sales_country',
         verbose_name=_("Default country for customers"))
     shipping_countries = models.ManyToManyField(
@@ -300,10 +303,10 @@ class Cart(models.Model):
     The desc isn't used but it is needed to make the admin interface work appropriately
     Could be used for debugging
     """
-    site = models.ForeignKey(Site, verbose_name=_('Site'))
+    site = models.ForeignKey(Site, verbose_name=_('Site'), on_delete=models.CASCADE)
     desc = models.CharField(_("Description"), blank=True, null=True, max_length=10)
     date_time_created = models.DateTimeField(_("Creation Date"))
-    customer = models.ForeignKey(Contact, blank=True, null=True, verbose_name=_('Customer'))
+    customer = models.ForeignKey(Contact, blank=True, null=True, verbose_name=_('Customer'), on_delete=models.SET_NULL)
 
     objects = CartManager()
 
@@ -489,8 +492,8 @@ class CartItem(models.Model):
     """
     An individual item in the cart
     """
-    cart = models.ForeignKey(Cart, verbose_name=_('Cart'))
-    product = models.ForeignKey(Product, verbose_name=_('Product'))
+    cart = models.ForeignKey(Cart, verbose_name=_('Cart'), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name=_('Product'), on_delete=models.CASCADE)
     quantity = models.DecimalField(_("Quantity"),  max_digits=18,  decimal_places=6)
 
     class Meta:
@@ -586,7 +589,7 @@ class CartItemDetails(models.Model):
     """
     An arbitrary detail about a cart item.
     """
-    cartitem = models.ForeignKey(CartItem, related_name='details', )
+    cartitem = models.ForeignKey(CartItem, related_name='details', on_delete=models.CASCADE)
     value = models.TextField(_('detail'))
     name = models.CharField(_('name'), max_length=100)
     price_change = CurrencyField(_("Item Detail Price Change"), max_digits=6,
@@ -657,7 +660,7 @@ class OrderManager(models.Manager):
 
 @python_2_unicode_compatible
 class OrderVariable(models.Model):
-    order = models.ForeignKey("Order", related_name="variables")
+    order = models.ForeignKey("Order", related_name="variables", on_delete=models.CASCADE)
     key = models.SlugField(_('key'), )
     value = models.CharField(_('value'), max_length=100)
 
@@ -680,8 +683,8 @@ class Order(models.Model):
     Orders contain a copy of all the information at the time the order was
     placed.
     """
-    site = models.ForeignKey(Site, verbose_name=_('Site'))
-    contact = models.ForeignKey(Contact, verbose_name=_('Contact'))
+    site = models.ForeignKey(Site, verbose_name=_('Site'), on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contact, verbose_name=_('Contact'), on_delete=models.CASCADE)
     ship_addressee = models.CharField(_("Addressee"), max_length=61, blank=True)
     ship_street1 = models.CharField(_("Street"), max_length=80, blank=True)
     ship_street2 = models.CharField(_("Street"), max_length=80, blank=True)
@@ -932,7 +935,7 @@ class Order(models.Model):
         super(Order, self).save(**kwargs) # Call the "real" save() method.
 
     def invoice(self):
-        url = urlresolvers.reverse('satchmo_print_shipping', kwargs={'doc' : 'invoice', 'id' : self.id})
+        url = reverse('satchmo_print_shipping', kwargs={'doc' : 'invoice', 'id' : self.id})
         return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
     invoice.allow_tags = True
 
@@ -942,7 +945,7 @@ class Order(models.Model):
     item_discount = property(_item_discount)
 
     def packingslip(self):
-        url = urlresolvers.reverse('satchmo_print_shipping', kwargs={'doc' : 'packingslip', 'id' : self.id})
+        url = reverse('satchmo_print_shipping', kwargs={'doc' : 'packingslip', 'id' : self.id})
         return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
     packingslip.allow_tags = True
 
@@ -1060,7 +1063,7 @@ class Order(models.Model):
             self.save()
 
     def shippinglabel(self):
-        url = urlresolvers.reverse('satchmo_print_shipping', None, None, {'doc' : 'shippinglabel', 'id' : self.id})
+        url = reverse('satchmo_print_shipping', None, None, {'doc' : 'shippinglabel', 'id' : self.id})
         return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
     shippinglabel.allow_tags = True
 
@@ -1172,7 +1175,7 @@ class OrderItem(models.Model):
     """
     A line item on an order.
     """
-    order = models.ForeignKey(Order, verbose_name=_("Order"))
+    order = models.ForeignKey(Order, verbose_name=_("Order"), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name=_("Product"), on_delete=models.PROTECT)
     quantity = models.DecimalField(_("Quantity"),  max_digits=18,  decimal_places=6)
     unit_price = CurrencyField(_("Unit price"),
@@ -1263,7 +1266,7 @@ class OrderItemDetail(models.Model):
     """
     Name, value pair and price delta associated with a specific item in an order
     """
-    item = models.ForeignKey(OrderItem, verbose_name=_("Order Item"), )
+    item = models.ForeignKey(OrderItem, verbose_name=_("Order Item"), on_delete=models.CASCADE)
     name = models.CharField(_('Name'), max_length=100)
     value = models.CharField(_('Value'), max_length=255)
     price_change = CurrencyField(_("Price Change"), max_digits=18, decimal_places=10, blank=True, null=True)
@@ -1284,7 +1287,7 @@ class OrderStatus(models.Model):
     """
     An order will have multiple statuses as it moves its way through processing.
     """
-    order = models.ForeignKey(Order, verbose_name=_("Order"))
+    order = models.ForeignKey(Order, verbose_name=_("Order"), on_delete=models.CASCADE)
     status = models.CharField(_("Status"),
         max_length=20, choices=ORDER_STATUS, blank=True)
     notes = models.CharField(_("Notes"), max_length=100, blank=True)
@@ -1339,8 +1342,8 @@ class OrderPaymentBase(models.Model):
 
 @python_2_unicode_compatible
 class OrderAuthorization(OrderPaymentBase):
-    order = models.ForeignKey(Order, related_name="authorizations")
-    capture = models.ForeignKey('OrderPayment', related_name="authorizations")
+    order = models.ForeignKey(Order, related_name="authorizations", on_delete=models.CASCADE)
+    capture = models.ForeignKey('OrderPayment', related_name="authorizations", on_delete=models.CASCADE)
     complete = models.BooleanField(_('Complete'), default=False)
 
     class Meta:
@@ -1392,7 +1395,7 @@ class OrderPaymentManager(models.Manager):
 
 @python_2_unicode_compatible
 class OrderPayment(OrderPaymentBase):
-    order = models.ForeignKey(Order, related_name="payments")
+    order = models.ForeignKey(Order, related_name="payments", on_delete=models.CASCADE)
 
     objects = OrderPaymentManager()
 
@@ -1409,8 +1412,8 @@ class OrderPayment(OrderPaymentBase):
 
 @python_2_unicode_compatible
 class OrderPendingPayment(OrderPaymentBase):
-    order = models.ForeignKey(Order, related_name="pendingpayments")
-    capture = models.ForeignKey('OrderPayment', related_name="pendingpayments")
+    order = models.ForeignKey(Order, related_name="pendingpayments", on_delete=models.CASCADE)
+    capture = models.ForeignKey('OrderPayment', related_name="pendingpayments", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Order Pending Payment")
@@ -1433,13 +1436,13 @@ class OrderPendingPayment(OrderPaymentBase):
 
 
 class OrderPaymentFailure(OrderPaymentBase):
-    order = models.ForeignKey(Order, null=True, blank=True, related_name='paymentfailures')
+    order = models.ForeignKey(Order, null=True, blank=True, related_name='paymentfailures', on_delete=models.SET_NULL)
 
 
 @python_2_unicode_compatible
 class OrderTaxDetail(models.Model):
     """A tax line item"""
-    order = models.ForeignKey(Order, related_name="taxes")
+    order = models.ForeignKey(Order, related_name="taxes", on_delete=models.CASCADE)
     method = models.CharField(_("Model"), max_length=50, )
     description = models.CharField(_("Description"), max_length=50, blank=True)
     tax = CurrencyField(_("Tax"),

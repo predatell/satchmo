@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from keyedcache import cache_get, cache_set, NotCachedError
 from product.models import Product
 import logging
@@ -11,15 +13,13 @@ def bestsellers(count):
     try:
         pks = cache_get('BESTSELLERS', count=count)
         if pks:
-            pks = [long(pk) for pk in pks.split(',')]
+            pks = [int(pk) for pk in pks.split(',')]
             productdict = Product.objects.in_bulk(pks)
             #log.debug(productdict)
             for pk in pks:
                 try:
                     if (int(pk)) in productdict:
                         key = int(pk)
-                    elif long(pk) in productdict:
-                        key = long(pk)
                     else:
                         continue
                     sellers.append(productdict[key])
@@ -35,26 +35,10 @@ def bestsellers(count):
         pass
 
     if not cached:
-        products = Product.objects.active_by_site()
-        work = []
-        for p in products:
-            ct = p.orderitem_set.count()
-            if ct>0:
-                work.append((ct, p))
-        
-        work.sort()
-        work = work[-count:]
-        work.reverse()
-    
-        sellers = []
-        pks = []
-    
-        for p in work:
-            product = p[1]
-            pks.append("%i" % product.pk)
-            sellers.append(product)
-         
-        pks = ",".join(pks)
+        products = Product.objects.active_by_site().annotate(item_count=Count('orderitem')) \
+                                                   .filter(item_count__gt=0).order_by('-item_count')
+        sellers = products[:count] 
+        pks = ",".join(str(pk) for pk in products.values_list('pk', flat=True)[:count])
         log.debug('calculated bestselling %i products, set to cache: %s', count, pks)
         cache_set('BESTSELLERS', count=count, value=pks)
         

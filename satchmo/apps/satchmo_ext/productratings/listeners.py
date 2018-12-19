@@ -2,9 +2,12 @@
 import logging
 
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
 from django.utils.encoding import smart_str
 from django.conf import settings
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 try:
     from django.contrib.comments.models import Comment
 except ImportError:
@@ -55,7 +58,7 @@ def check_with_akismet(comment=None, request=None, **kwargs):
         akismet_key = config_value("PRODUCT", "AKISMET_KEY")
         if akismet_key:             
             site = Site.objects.get_current()
-            shop = urlresolvers.reverse('satchmo_shop_home')
+            shop = reverse('satchmo_shop_home')
             from akismet import Akismet
             akismet = Akismet(
                 key=akismet_key,

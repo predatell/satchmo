@@ -59,7 +59,7 @@ class ConfigurableProduct(models.Model):
     This is a sort of virtual product that is visible to the customer, but isn't actually stocked on a shelf,
     the specific "shelf" product is determined by the selected options.
     """
-    product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True)
+    product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True, on_delete=models.CASCADE)
     option_group = models.ManyToManyField(OptionGroup, blank=True, verbose_name=_("Option Group"))
     create_subs = models.BooleanField(_("Create Variations"), default=False, help_text =_("Create ProductVariations for all this product's options.  To use this, you must first add an option, save, then return to this page and select this option."))
 
@@ -284,9 +284,9 @@ class ProductVariation(models.Model):
     ConfigurableProduct with the matching Options selected
 
     """
-    product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True)
+    product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True, on_delete=models.CASCADE)
     options = models.ManyToManyField(Option, verbose_name=_('Options'))
-    parent = models.ForeignKey(ConfigurableProduct, verbose_name=_('Parent'))
+    parent = models.ForeignKey(ConfigurableProduct, verbose_name=_('Parent'), on_delete=models.CASCADE)
 
     objects = ProductVariationManager()
 

@@ -192,8 +192,8 @@ class Carrier(models.Model):
         
         
 class CarrierTranslation(models.Model):
-    carrier = models.ForeignKey('Carrier', related_name='translations')
-    languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES, )
+    carrier = models.ForeignKey('Carrier', related_name='translations', on_delete=models.CASCADE)
+    languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_('Carrier'), max_length=50, )
     description = models.CharField(_('Description'), max_length=200)
     method = models.CharField(_('Method'), help_text=_("i.e. US Mail"), max_length=200)
@@ -205,8 +205,8 @@ class CarrierTranslation(models.Model):
 
 @python_2_unicode_compatible
 class ProductShippingPrice(models.Model):
-    product = models.ForeignKey(Product, related_name="shipping_price")
-    carrier = models.ForeignKey('Carrier', related_name='tiers')
+    product = models.ForeignKey(Product, related_name="shipping_price", on_delete=models.CASCADE)
+    carrier = models.ForeignKey('Carrier', related_name='tiers', on_delete=models.CASCADE)
     price = models.DecimalField(_("Shipping Price"), max_digits=10, decimal_places=2, )
     
     def __str__(self):

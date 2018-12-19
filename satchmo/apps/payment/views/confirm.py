@@ -1,13 +1,16 @@
 ####################################################################
 # Last step in the order process - confirm the info and process it
 #####################################################################
-
-from django.core import urlresolvers
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+
 from livesettings.functions import config_value
 from satchmo_store.shop.models import Order, OrderStatus
 from payment.config import gateway_live
@@ -182,7 +185,7 @@ class ConfirmController(object):
             self.order = Order.objects.from_request(self.request)
             
         except Order.DoesNotExist:
-            url = urlresolvers.reverse('satchmo_checkout-step1')
+            url = reverse('satchmo_checkout-step1')
             self.invalidate(HttpResponseRedirect(url))
             return False
 
@@ -223,7 +226,7 @@ class ConfirmController(object):
             else:
                 error_message = _('The following products %(prod)s are no longer available. Please modify your order.') % {'prod':prod_list}
             messages.error(self.request, error_message)
-            url = urlresolvers.reverse('satchmo_cart')
+            url = reverse('satchmo_cart')
             self.invalidate(HttpResponseRedirect(url))
             return False
         self.valid = True

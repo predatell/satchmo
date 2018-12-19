@@ -183,6 +183,7 @@ class TestMinimumOrder(TestCase):
         response = self.client.get(url('satchmo_checkout-step1'))
         self.assertContains(response, "Billing Information", count=1, status_code=200)
 
+
 class TestPaymentHandling(TestCase):
     fixtures = ['initial_data.yaml', 'l10n-data.yaml', 'sample-store-data.yaml', 'products.yaml', 'test-config.yaml']
 
@@ -315,8 +316,6 @@ class TestPaymentHandling(TestCase):
         self.assertEqual(pmt1, payment)
         self.assertEqual(order.orderstatus_set.latest().status, 'New')
         self.assertEqual(order.balance, Decimal('0'))
-
-
 
     def test_multiple_pending(self):
         """Test that creating a second pending payment deletes the first one."""

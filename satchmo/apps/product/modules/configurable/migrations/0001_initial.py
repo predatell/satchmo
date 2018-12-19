@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ConfigurableProduct',
             fields=[
-                ('product', models.OneToOneField(primary_key=True, serialize=False, to='product.Product', verbose_name='Product')),
+                ('product', models.OneToOneField(primary_key=True, serialize=False, to='product.Product', verbose_name='Product', on_delete=models.CASCADE)),
                 ('create_subs', models.BooleanField(default=False, help_text="Create ProductVariations for all this product's options.  To use this, you must first add an option, save, then return to this page and select this option.", verbose_name='Create Variations')),
                 ('option_group', models.ManyToManyField(to='product.OptionGroup', verbose_name='Option Group', blank=True)),
             ],
@@ -27,9 +27,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ProductVariation',
             fields=[
-                ('product', models.OneToOneField(primary_key=True, serialize=False, to='product.Product', verbose_name='Product')),
+                ('product', models.OneToOneField(primary_key=True, serialize=False, to='product.Product', verbose_name='Product', on_delete=models.CASCADE)),
                 ('options', models.ManyToManyField(to='product.Option', verbose_name='Options')),
-                ('parent', models.ForeignKey(verbose_name='Parent', to='configurable.ConfigurableProduct')),
+                ('parent', models.ForeignKey(verbose_name='Parent', to='configurable.ConfigurableProduct', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Product variation',

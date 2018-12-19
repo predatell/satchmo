@@ -1,5 +1,9 @@
 from django.contrib.sitemaps import Sitemap
-from django.core import urlresolvers
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+
 from product.models import Category, Product
 from satchmo_store.shop import get_satchmo_setting
 
@@ -44,14 +48,13 @@ class MainSitemap(Sitemap):
         
 def satchmo_main():
     base = get_satchmo_setting('SHOP_BASE')
-    rv = urlresolvers.reverse
     urls = (
         (base + '/', 1.0, 'hourly'),
-        (rv('satchmo_contact'), 1.0, 'monthly'),
-        (rv('satchmo_cart'), 0.5, 'monthly'),
-        (rv('auth_login'), 0.8, 'monthly'),
-        (rv('registration_register'), 0.8, 'monthly'),
-        (rv('auth_password_reset'), 0.8, 'monthly'),
+        (reverse('satchmo_contact'), 1.0, 'monthly'),
+        (reverse('satchmo_cart'), 0.5, 'monthly'),
+        (reverse('auth_login'), 0.8, 'monthly'),
+        (reverse('registration_register'), 0.8, 'monthly'),
+        (reverse('auth_password_reset'), 0.8, 'monthly'),
     )
     sitemap = MainSitemap()
     for url in urls:

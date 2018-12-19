@@ -43,7 +43,7 @@ class Processor(object):
             if country == 'US':
                 area = state
 
-        elif self.user and self.user.is_authenticated():
+        elif self.user and self.user.is_authenticated:
             try:
                 contact = Contact.objects.get(user=self.user)
                 try:

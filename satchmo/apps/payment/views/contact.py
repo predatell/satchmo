@@ -4,9 +4,13 @@
 
 import logging
 from django import http
-from django.core import urlresolvers
 from django.shortcuts import render
 from django.views.generic import FormView
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+
 from satchmo_utils.signals import form_initialdata
 from livesettings.functions import config_get_group, config_value
 from satchmo_store.contact import CUSTOMER_ID
@@ -70,7 +74,7 @@ class CheckoutForm(FormView):
         Returns the initial data to use for forms on this view.
         """
         init_data = {}
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             if self.request.user.email:
                 init_data['email'] = self.request.user.email
             if self.request.user.first_name:
@@ -110,10 +114,10 @@ class CheckoutForm(FormView):
         contact = self.get_contact()
         init_data = self.get_initial()
 
-        if not self.request.user.is_authenticated() and \
+        if not self.request.user.is_authenticated and \
                 config_value('SHOP', 'AUTHENTICATION_REQUIRED'):
-            url = urlresolvers.reverse('satchmo_checkout_auth_required')
-            thisurl = urlresolvers.reverse('satchmo_checkout-step1')
+            url = reverse('satchmo_checkout_auth_required')
+            thisurl = reverse('satchmo_checkout-step1')
             return http.HttpResponseRedirect(url + "?next=" + thisurl)
 
         if contact:
@@ -164,7 +168,7 @@ class CheckoutForm(FormView):
         tempCart = self.get_cart()
 
         if contact is None and self.request.user \
-            and self.request.user.is_authenticated():
+            and self.request.user.is_authenticated:
             contact = Contact(user=self.request.user)
         custID = form.save(self.request, cart=tempCart, contact=contact)
         self.request.session[CUSTOMER_ID] = custID

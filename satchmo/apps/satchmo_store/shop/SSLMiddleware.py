@@ -61,13 +61,14 @@ __author__ = "Stephen Zabel"
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils.encoding import iri_to_uri
+from django.utils.deprecation import MiddlewareMixin
 from satchmo_utils import request_is_secure
 
 HTTPS_PATHS = getattr(settings, "HTTPS_PATHS", [])
 SSL = 'SSL'
 SSLPORT=getattr(settings, 'SSL_PORT', None)
 
-class SSLRedirect:
+class SSLRedirect(MiddlewareMixin):
     def process_view(self, request, view_func, view_args, view_kwargs):
         if SSL in view_kwargs:
             secure = view_kwargs[SSL]

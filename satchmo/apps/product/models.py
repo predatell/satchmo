@@ -10,7 +10,6 @@ from decimal import Context, Decimal, ROUND_FLOOR
 from django import forms
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -18,6 +17,10 @@ from django.db.models import Q
 from django.utils.encoding import smart_str, python_2_unicode_compatible
 from django.utils.translation import get_language, ugettext, ugettext_lazy as _
 from django.utils.functional import cached_property
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 from l10n.utils import moneyfmt, lookup_translation
 from livesettings.functions import config_value, config_value_safe
@@ -131,8 +134,7 @@ class Category(models.Model):
     site = models.ManyToManyField(Site, verbose_name=_('Site'))
     name = models.CharField(_("Name"), max_length=200)
     slug = models.SlugField(_("Slug"), help_text=_("Used for URLs, auto-generated from name if blank"), blank=True)
-    parent = models.ForeignKey('self', blank=True, null=True,
-        related_name='child')
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='child', on_delete=models.SET_NULL)
     meta = models.TextField(_("Meta Description"), blank=True, null=True,
         help_text=_("Meta description for this category"))
     description = models.TextField(_("Description"), blank=True,
@@ -217,8 +219,7 @@ class Category(models.Model):
             slug_list = "/".join(slug_list) + "/"
         else:
             slug_list = ""
-        return urlresolvers.reverse('satchmo_category',
-            kwargs={'parent_slugs' : slug_list, 'slug' : self.slug})
+        return reverse('satchmo_category', kwargs={'parent_slugs' : slug_list, 'slug' : self.slug})
 
     def get_separator(self):
         return ' :: '
@@ -308,7 +309,7 @@ class CategoryTranslation(models.Model):
     """A specific language translation for a `Category`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    category = models.ForeignKey(Category, related_name="translations")
+    category = models.ForeignKey(Category, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_("Translated Category Name"), max_length=255, )
     description = models.TextField(_("Description of category"), default='', blank=True)
@@ -331,14 +332,12 @@ class CategoryImage(models.Model):
     A picture of an item.  Can have many pictures associated with an item.
     Thumbnails are automatically created.
     """
-    category = models.ForeignKey(Category, null=True, blank=True,
-        related_name="images")
+    category = models.ForeignKey(Category, null=True, blank=True, related_name="images", on_delete=models.CASCADE)
     picture = ImageWithThumbnailField(verbose_name=_('Picture'),
         upload_to="__DYNAMIC__",
         name_field="_filename",
         max_length=200) #Media root is automatically prepended
-    caption = models.CharField(_("Optional caption"), max_length=100,
-        null=True, blank=True)
+    caption = models.CharField(_("Optional caption"), max_length=100, null=True, blank=True)
     sort = models.IntegerField(_("Sort Order"), default=0)
 
     def translated_caption(self, language_code=None):
@@ -371,7 +370,7 @@ class CategoryImageTranslation(models.Model):
     """A specific language translation for a `CategoryImage`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    categoryimage = models.ForeignKey(CategoryImage, related_name="translations")
+    categoryimage = models.ForeignKey(CategoryImage, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     caption = models.CharField(_("Translated Caption"), max_length=255, )
     version = models.IntegerField(_('version'), default=1)
@@ -626,7 +625,7 @@ class Discount(models.Model):
     @cached_property
     def percentage_text(self):
         """Get the human readable form of the sale percentage."""
-        return "%d%%" % self.percentage
+        return "%d%%" % self.percentage if self.percentage else self.amount
 
     def valid_for_product(self, product):
         """Tests if discount is valid for a single product"""
@@ -737,7 +736,7 @@ class OptionGroupTranslation(models.Model):
     """A specific language translation for an `OptionGroup`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    optiongroup = models.ForeignKey(OptionGroup, related_name="translations")
+    optiongroup = models.ForeignKey(OptionGroup, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_("Translated OptionGroup Name"), max_length=255, )
     description = models.TextField(_("Description of OptionGroup"), default='', blank=True)
@@ -768,7 +767,7 @@ class Option(models.Model):
     would be Small.
     """
     objects = OptionManager()
-    option_group = models.ForeignKey(OptionGroup)
+    option_group = models.ForeignKey(OptionGroup, on_delete=models.CASCADE)
     name = models.CharField(_("Display value"), max_length=50, )
     value = models.CharField(_("Stored value"), max_length=50)
     price_change = CurrencyField(_("Price Change"), null=True, blank=True,
@@ -801,7 +800,7 @@ class OptionTranslation(models.Model):
     """A specific language translation for an `Option`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    option = models.ForeignKey(Option, related_name="translations")
+    option = models.ForeignKey(Option, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_("Translated Option Name"), max_length=255, )
     version = models.IntegerField(_('version'), default=1)
@@ -892,7 +891,7 @@ class Product(models.Model):
     also_purchased = models.ManyToManyField('self', blank=True, verbose_name=_('Previously Purchased'), related_name='also_products')
     total_sold = models.DecimalField(_("Total sold"),  max_digits=18, decimal_places=6, default='0')
     taxable = models.BooleanField(_("Taxable"), default=get_taxable)
-    taxClass = models.ForeignKey('TaxClass', verbose_name=_('Tax Class'), blank=True, null=True, help_text=_("If it is taxable, what kind of tax?"))
+    taxClass = models.ForeignKey('TaxClass', verbose_name=_('Tax Class'), blank=True, null=True, help_text=_("If it is taxable, what kind of tax?"), on_delete=models.SET_NULL)
     shipclass = models.CharField(_('Shipping'), choices=SHIP_CLASS_CHOICES, default="DEFAULT", max_length=10,
         help_text=_("If this is 'Default', then we'll use the product type to determine if it is shippable."))
 
@@ -1031,8 +1030,7 @@ class Product(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return urlresolvers.reverse('satchmo_product',
-            kwargs={'product_slug': self.slug})
+        return reverse('satchmo_product', kwargs={'product_slug': self.slug})
 
     class Meta:
         ordering = ('ordering', 'name')
@@ -1213,7 +1211,7 @@ class ProductTranslation(models.Model):
     """A specific language translation for a `Product`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    product = models.ForeignKey('Product', related_name="translations")
+    product = models.ForeignKey('Product', related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_("Full Name"), max_length=255)
     description = models.TextField(_("Description of product"), help_text=_("This field can contain HTML and should be a few paragraphs explaining the background of the product, and anything that would help the potential customer make their purchase."), default='', blank=True)
@@ -1416,9 +1414,9 @@ class ProductAttribute(models.Model):
     If you want more structure than this, create your own subtype to add
     whatever you want to your Products.
     """
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES, null=True, blank=True)
-    option = models.ForeignKey(AttributeOption)
+    option = models.ForeignKey(AttributeOption, on_delete=models.CASCADE)
     value = models.CharField(_("Value"), max_length=255)
 
     @cached_property
@@ -1443,9 +1441,9 @@ class CategoryAttribute(models.Model):
     """
     Similar to ProductAttribute, except that this is for categories.
     """
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES, null=True, blank=True)
-    option = models.ForeignKey(AttributeOption)
+    option = models.ForeignKey(AttributeOption, on_delete=models.CASCADE)
     value = models.CharField(_("Value"), max_length=255)
 
     @cached_property
@@ -1474,7 +1472,7 @@ class Price(models.Model):
     The current price should be the one with the earliest expires date, and the highest quantity
     that's still below the user specified (IE: ordered) quantity, that matches a given product.
     """
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = CurrencyField(_("Price"), max_digits=14, decimal_places=6, )
     quantity = models.DecimalField(_("Discount Quantity"), max_digits=18,
         decimal_places=6, default='1.0',
@@ -1532,7 +1530,7 @@ class ProductImage(models.Model):
     A picture of an item.  Can have many pictures associated with an item.
     Thumbnails are automatically created.
     """
-    product = models.ForeignKey(Product, null=True, blank=True)
+    product = models.ForeignKey(Product, null=True, blank=True, on_delete=models.CASCADE)
     picture = ImageWithThumbnailField(verbose_name=_('Picture'),
         upload_to="__DYNAMIC__",
         name_field="_filename",
@@ -1575,7 +1573,7 @@ class ProductImageTranslation(models.Model):
     """A specific language translation for a `ProductImage`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    productimage = models.ForeignKey(ProductImage, related_name="translations")
+    productimage = models.ForeignKey(ProductImage, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     caption = models.CharField(_("Translated Caption"), max_length=255, )
     version = models.IntegerField(_('version'), default=1)

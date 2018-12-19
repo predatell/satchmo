@@ -31,7 +31,7 @@ class ProductRatingManager(models.Manager):
 
 class ProductRating(models.Model):
     """A rating attached to a comment"""
-    comment = models.OneToOneField(Comment, verbose_name="Rating", primary_key=True)
+    comment = models.OneToOneField(Comment, verbose_name="Rating", primary_key=True, on_delete=models.CASCADE)
     rating = models.IntegerField(_("Rating"))
 
     objects = ProductRatingManager()
