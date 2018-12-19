@@ -7,7 +7,10 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 from l10n.mixins import TranslatedObjectMixin
 import product
@@ -33,7 +36,7 @@ class BrandManager(models.Manager):
 @python_2_unicode_compatible
 class Brand(models.Model, TranslatedObjectMixin):
     """A product brand"""
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     slug = models.SlugField(_("Slug"), unique=True,
     help_text=_("Used for URLs"))
     products = models.ManyToManyField(Product, blank=True, verbose_name=_("Products"), through='BrandProduct')
@@ -75,8 +78,8 @@ class Brand(models.Model, TranslatedObjectMixin):
         
 
 class BrandProduct(models.Model):
-    brand = models.ForeignKey(Brand)
-    product = models.ForeignKey(Product)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name=_("Brand Product")
@@ -84,7 +87,7 @@ class BrandProduct(models.Model):
 
 
 class BrandTranslation(models.Model):
-    brand = models.ForeignKey(Brand, related_name="translations")
+    brand = models.ForeignKey(Brand, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_('title'), max_length=100, blank=False)
     short_description = models.CharField(_('Short Description'), blank=True, max_length=200)
@@ -119,7 +122,7 @@ class BrandCategoryManager(models.Manager):
 class BrandCategory(models.Model, TranslatedObjectMixin):
     """A category within a brand"""
     slug = models.SlugField(_("Slug"), help_text=_("Used for URLs"))
-    brand = models.ForeignKey(Brand, related_name="categories")
+    brand = models.ForeignKey(Brand, related_name="categories", on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, blank=True, verbose_name=_("Products"), through='BrandCategoryProduct')
     ordering = models.IntegerField(_("Ordering"))
     active = models.BooleanField(default=True)
@@ -155,8 +158,8 @@ class BrandCategory(models.Model, TranslatedObjectMixin):
 
 
 class BrandCategoryProduct(models.Model):
-    brandcategory = models.ForeignKey(BrandCategory)
-    product = models.ForeignKey(Product)
+    brandcategory = models.ForeignKey(BrandCategory, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = _('Brand Category Product')
@@ -164,7 +167,7 @@ class BrandCategoryProduct(models.Model):
 
 
 class BrandCategoryTranslation(models.Model):
-    brandcategory = models.ForeignKey(BrandCategory, related_name="translations")
+    brandcategory = models.ForeignKey(BrandCategory, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_('title'), max_length=100, blank=False)
     short_description = models.CharField(_('Short Description'), blank=True, max_length=200)

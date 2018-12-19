@@ -43,7 +43,7 @@ class Processor(object):
                     log.info("Couldn't find Country from string: %s", country)
                     country = None
         
-        elif self.user and self.user.is_authenticated():
+        elif self.user and self.user.is_authenticated:
             try:
                 contact = Contact.objects.get(user=self.user)
                 try:

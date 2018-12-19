@@ -13,7 +13,7 @@ register = template.Library()
 def _get_taxprocessor(request=None):
     if request:
         user = request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             user_id = user.id
         else:
             user = None

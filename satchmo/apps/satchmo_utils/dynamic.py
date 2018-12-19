@@ -1,5 +1,9 @@
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
+try:
+    from django.core.urlresolvers import reverse, NoReverseMatch
+except ImportError:
+    from django.urls import reverse, NoReverseMatch
+    
 from satchmo_utils import url_join
 import logging
 log = logging.getLogger('satchmo_utils')
@@ -32,16 +36,16 @@ def lookup_url(settings, name, include_server=False, ssl=False):
     if not url:
         try:
             possible = settings.KEY.value + "_" + name
-            url = urlresolvers.reverse(possible)
-        except urlresolvers.NoReverseMatch:
+            url = reverse(possible)
+        except NoReverseMatch:
             log.debug('No url found for %s', possible)
 
     if not url:
         try:
-            url = urlresolvers.reverse(name)
-        except urlresolvers.NoReverseMatch:
+            url = reverse(name)
+        except NoReverseMatch:
             log.error('Could not find any url for %s', name)
-            raise urlresolvers.NoReverseMatch('No reverse for %s or %s' % (possible, name))
+            raise NoReverseMatch('No reverse for %s or %s' % (possible, name))
 
     if include_server:
         if ssl:

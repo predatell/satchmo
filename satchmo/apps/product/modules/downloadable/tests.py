@@ -122,9 +122,10 @@ class DownloadableProductTest(TestCase):
             time_stamp=timezone.now()
         )
 
-        # setup client
-        self.domain = 'satchmoserver'
-        self.client = Client(SERVER_NAME=self.domain)
+        if django.VERSION < (1, 10):        
+            # setup client
+            self.domain = 'satchmoserver'
+            self.client = Client(SERVER_NAME=self.domain)
 
         # go through the verification step
         self.pd_url = urlresolvers.reverse(
@@ -133,7 +134,7 @@ class DownloadableProductTest(TestCase):
         pd_process_url = urlresolvers.reverse(
             'satchmo_download_process', kwargs= {'download_key': self.key}
         )
-
+        
         # first, hit the url.
         response = self.client.get(self.pd_url)
         if django.VERSION >= (1, 10):

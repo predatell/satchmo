@@ -23,7 +23,7 @@ class SagePayShipForm(CreditPayShipForm):
         if (not cf.initial) or cf.initial == "":
             try:
                 user = request.user
-                if user and user.is_authenticated() and user.contact:
+                if user and user.is_authenticated and user.contact:
                     cf.initial = self.tempContact.full_name
             except Contact.DoesNotExist:
                 pass

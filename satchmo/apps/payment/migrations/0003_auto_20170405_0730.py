@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='creditcarddetail',
             name='orderpayment',
-            field=models.OneToOneField(related_name='creditcard', to='shop.OrderPayment'),
+            field=models.OneToOneField(related_name='creditcard', to='shop.OrderPayment', on_delete=models.CASCADE),
         ),
     ]

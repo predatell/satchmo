@@ -17,31 +17,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='giftcertificateusage',
             name='orderpayment',
-            field=models.ForeignKey(verbose_name='Order Payment', to='shop.OrderPayment', null=True),
+            field=models.ForeignKey(verbose_name='Order Payment', to='shop.OrderPayment', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='giftcertificateusage',
             name='used_by',
-            field=models.ForeignKey(related_name='giftcertificates_used', verbose_name='Used by', blank=True, to='contact.Contact', null=True),
+            field=models.ForeignKey(related_name='giftcertificates_used', verbose_name='Used by', blank=True, to='contact.Contact', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='giftcertificate',
             name='order',
-            field=models.ForeignKey(related_name='giftcertificates', verbose_name='Order', blank=True, to='shop.Order', null=True),
+            field=models.ForeignKey(related_name='giftcertificates', verbose_name='Order', blank=True, to='shop.Order', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='giftcertificate',
             name='purchased_by',
-            field=models.ForeignKey(related_name='giftcertificates_purchased', verbose_name='Purchased by', blank=True, to='contact.Contact', null=True),
+            field=models.ForeignKey(related_name='giftcertificates_purchased', verbose_name='Purchased by', blank=True, to='contact.Contact', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='giftcertificate',
             name='site',
-            field=models.ForeignKey(verbose_name='Site', blank=True, to='sites.Site', null=True),
+            field=models.ForeignKey(verbose_name='Site', blank=True, to='sites.Site', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
     ]

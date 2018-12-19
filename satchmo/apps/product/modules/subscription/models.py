@@ -23,7 +23,7 @@ class SubscriptionProduct(models.Model):
     """
     This type of Product is for recurring billing (memberships, subscriptions, payment terms)
     """
-    product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True)
+    product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True, on_delete=models.CASCADE)
     recurring = models.BooleanField(_("Recurring Billing"), help_text=_("Customer will be charged the regular product price on a periodic basis."), default=False)
     recurring_times = models.IntegerField(_("Recurring Times"), help_text=_("Number of payments which will occur at the regular rate.  (optional)"), null=True, blank=True)
     expire_length = models.IntegerField(_("Duration"), help_text=_("Length of each billing cycle"), null=True, blank=True)
@@ -135,7 +135,7 @@ class Trial(models.Model):
     product.  However, gateway based processors like Authorize.net can support as many
     billing periods as you wish.
     """
-    subscription = models.ForeignKey(SubscriptionProduct)
+    subscription = models.ForeignKey(SubscriptionProduct, on_delete=models.CASCADE)
     price = CurrencyField(_("Price"), help_text=_("Set to 0 for a free trial.  Leave empty if product does not have a trial."), max_digits=10, decimal_places=2, null=True, )
     expire_length = models.IntegerField(_("Trial Duration"), help_text=_("Length of trial billing cycle.  Leave empty if product does not have a trial."), null=True, blank=True)
 

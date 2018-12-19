@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(help_text='Used for URLs', verbose_name='Slug')),
                 ('ordering', models.IntegerField(verbose_name='Ordering')),
                 ('active', models.BooleanField(default=True)),
-                ('brand', models.ForeignKey(related_name='categories', to='brand.Brand')),
+                ('brand', models.ForeignKey(related_name='categories', to='brand.Brand', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('ordering', 'slug'),

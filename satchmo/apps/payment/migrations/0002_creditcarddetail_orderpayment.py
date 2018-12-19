@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='creditcarddetail',
             name='orderpayment',
-            field=models.ForeignKey(related_name='creditcards', to='shop.OrderPayment', unique=True),
+            field=models.ForeignKey(related_name='creditcards', to='shop.OrderPayment', unique=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

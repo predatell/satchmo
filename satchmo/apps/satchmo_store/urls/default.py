@@ -13,7 +13,7 @@ admin.autodiscover()
 urlpatterns = getattr(settings, 'URLS', [])
 
 adminpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 if urlpatterns:

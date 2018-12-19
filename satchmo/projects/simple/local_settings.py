@@ -73,6 +73,10 @@ CACHES = {
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
+ALLOWED_HOSTS = [
+    "localhost",
+]
+
 #Configure logging
 LOGFILE = "satchmo.log"
 logging.basicConfig(level=logging.DEBUG,

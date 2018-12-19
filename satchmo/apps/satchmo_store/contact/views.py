@@ -2,12 +2,15 @@ from django import http
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core import urlresolvers
 from django.shortcuts import render
 from django.forms.models import model_to_dict
 from django.utils.translation import ugettext
 from django.views.generic import DetailView, FormView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
+try:
+    from django.core.urlresolvers import reverse, reverse_lazy
+except ImportError:
+    from django.urls import reverse, reverse_lazy
 
 from satchmo_store.contact import signals, CUSTOMER_ID
 from satchmo_store.contact.forms import ExtendedContactInfoForm, ContactInfoForm, area_choices_for_country, AddressBookForm, YesNoForm
@@ -70,7 +73,7 @@ class ContactUpdateView(ContactFromRequestMixin, SingleObjectMixin, FormView):
     template_name = "contact/update_form.html"
     model = Contact
     form_class = ExtendedContactInfoForm
-    success_url = urlresolvers.reverse_lazy('satchmo_account_info')
+    success_url = reverse_lazy('satchmo_account_info')
     context_object_name = "contact"
     
     def get_contact(self):
@@ -173,7 +176,7 @@ update = login_required(ContactUpdateView.as_view())
 #             request.session[CUSTOMER_ID] = custID
 #             redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
 #             if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
-#                 redirect_to = urlresolvers.reverse('satchmo_account_info')
+#                 redirect_to = reverse('satchmo_account_info')
 
 #             return http.HttpResponseRedirect(redirect_to)
 #         else:
@@ -222,7 +225,7 @@ class AddressCreateEditView(ContactFromRequestMixin, SingleObjectMixin, FormView
     model = AddressBook
     form_class = AddressBookForm
     pk_url_kwarg = 'id'
-    success_url = urlresolvers.reverse_lazy('satchmo_account_info')
+    success_url = reverse_lazy('satchmo_account_info')
     context_object_name = "entry"
     
     def get_object(self):
@@ -279,7 +282,7 @@ address_create_edit = login_required(AddressCreateEditView.as_view())
 #         initial_entry = get_object_or_404(AddressBook, pk=id)
 #         # Make sure we only edit entries associated with this contact
 #         if not initial_entry.contact == contact:
-#             return http.HttpResponseRedirect(urlresolvers.reverse('satchmo_account_info'))
+#             return http.HttpResponseRedirect(reverse('satchmo_account_info'))
 #         initial_data = model_to_dict(initial_entry, fields=[], exclude=['contact'])
 #         # This is a bit of a hack because we normally use jquery to populate the addressee
 #         initial_data['addressee_name'] = initial_data["addressee"]
@@ -291,7 +294,7 @@ address_create_edit = login_required(AddressCreateEditView.as_view())
 #             if next_url:
 #                 return http.HttpResponseRedirect(next_url)
 #             else:
-#                 return http.HttpResponseRedirect(urlresolvers.reverse('satchmo_account_info'))
+#                 return http.HttpResponseRedirect(reverse('satchmo_account_info'))
 #     else:
 #         form = AddressBookForm(initial=initial_data)
 #     if initial_entry:
@@ -303,7 +306,7 @@ address_create_edit = login_required(AddressCreateEditView.as_view())
 class AddressDeleteView(ContactFromRequestMixin, DeleteView):
     model = AddressBook
     template_name = 'contact/address_form_delete.html'
-    success_url = urlresolvers.reverse_lazy('satchmo_account_info')
+    success_url = reverse_lazy('satchmo_account_info')
     context_object_name = "entry"
     pk_url_kwarg = 'id'
 
@@ -350,11 +353,11 @@ address_delete = login_required(AddressDeleteView.as_view())
 #         initial_entry = get_object_or_404(AddressBook, pk=id)
 #         # Make sure we only edit entries associated with this contact
 #         if not initial_entry.contact == contact:
-#             return http.HttpResponseRedirect(urlresolvers.reverse('satchmo_account_info'))
+#             return http.HttpResponseRedirect(reverse('satchmo_account_info'))
 #     if request.method == 'POST' and initial_entry:
 #         if request.POST['delete_entry'] == 'Yes':
 #             initial_entry.delete()
-#         return http.HttpResponseRedirect(urlresolvers.reverse('satchmo_account_info'))
+#         return http.HttpResponseRedirect(reverse('satchmo_account_info'))
 #     else:
 #         form = YesNoForm()
 #     context = {'form':form,'entry':initial_entry}   

@@ -36,7 +36,7 @@ class PositiveRoundedDecimalField(RoundedDecimalField):
 
         return value
 
-class RoundedDecimalError:
+class RoundedDecimalError(Exception):
     """
      General Purpose Error Handling used to handle error exceptions
      created in caller.

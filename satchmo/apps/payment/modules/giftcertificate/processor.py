@@ -3,7 +3,7 @@ GiftCertificate processor
 """
 from django.utils.translation import ugettext as _
 from l10n.utils import moneyfmt
-from models import GiftCertificate
+from .models import GiftCertificate
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 
 class PaymentProcessor(BasePaymentProcessor):

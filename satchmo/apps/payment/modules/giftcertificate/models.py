@@ -39,12 +39,12 @@ class GiftCertificateManager(models.Manager):
 @python_2_unicode_compatible
 class GiftCertificate(models.Model):
     """A Gift Cert which holds value."""
-    site = models.ForeignKey(Site, null=True, blank=True, verbose_name=_('Site'))
-    order = models.ForeignKey(Order, null=True, blank=True, related_name="giftcertificates", verbose_name=_('Order'))
-    code = models.CharField(_('Certificate Code'), max_length=100,
-        blank=True, null=True)
-    purchased_by =  models.ForeignKey(Contact, verbose_name=_('Purchased by'),
-        blank=True, null=True, related_name='giftcertificates_purchased')
+    site = models.ForeignKey(Site, null=True, blank=True, verbose_name=_('Site'), on_delete=models.SET_NULL)
+    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL,
+                              related_name="giftcertificates", verbose_name=_('Order'))
+    code = models.CharField(_('Certificate Code'), max_length=100, blank=True, null=True)
+    purchased_by =  models.ForeignKey(Contact, verbose_name=_('Purchased by'), on_delete=models.SET_NULL,
+                                      blank=True, null=True, related_name='giftcertificates_purchased')
     date_added = models.DateField(_("Date added"), null=True, blank=True)
     valid = models.BooleanField(_('Valid'), default=True)
     message = models.CharField(_('Message'), blank=True, null=True, max_length=255)
@@ -113,12 +113,11 @@ class GiftCertificateUsage(models.Model):
     """Any usage of a Gift Cert is logged with one of these objects."""
     usage_date = models.DateField(_("Date of usage"), null=True, blank=True)
     notes = models.TextField(_('Notes'), blank=True, null=True)
-    balance_used = models.DecimalField(_("Amount Used"), decimal_places=2,
-        max_digits=8, )
-    orderpayment = models.ForeignKey('shop.OrderPayment', null=True, verbose_name=_('Order Payment'))
-    used_by = models.ForeignKey(Contact, verbose_name=_('Used by'),
-        blank=True, null=True, related_name='giftcertificates_used')
-    giftcertificate = models.ForeignKey(GiftCertificate, related_name='usages')
+    balance_used = models.DecimalField(_("Amount Used"), decimal_places=2, max_digits=8)
+    orderpayment = models.ForeignKey('shop.OrderPayment', null=True, verbose_name=_('Order Payment'), on_delete=models.SET_NULL)
+    used_by = models.ForeignKey(Contact, verbose_name=_('Used by'), on_delete=models.SET_NULL,
+                                blank=True, null=True, related_name='giftcertificates_used')
+    giftcertificate = models.ForeignKey(GiftCertificate, related_name='usages', on_delete=models.CASCADE)
 
     def __str__(self):
         return "GiftCertificateUsage: %s" % self.balance_used
@@ -134,7 +133,7 @@ class GiftCertificateProduct(models.Model):
     """
     The product model for a Gift Certificate
     """
-    product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True)
+    product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True, on_delete=models.CASCADE)
     is_shippable = False
     discountable = False
 

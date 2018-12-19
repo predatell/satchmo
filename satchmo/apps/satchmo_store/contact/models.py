@@ -79,8 +79,8 @@ class Organization(models.Model):
     An organization can be a company, government or any kind of group.
     """
     name = models.CharField(_("Name"), max_length=50, )
-    type = models.ForeignKey(ContactOrganization, verbose_name=_("Type"), null=True)
-    role = models.ForeignKey(ContactOrganizationRole, verbose_name=_("Role"), null=True)
+    type = models.ForeignKey(ContactOrganization, verbose_name=_("Type"), null=True, on_delete=models.SET_NULL)
+    role = models.ForeignKey(ContactOrganizationRole, verbose_name=_("Role"), null=True, on_delete=models.SET_NULL)
     create_date = models.DateField(_("Creation Date"))
     notes = models.TextField(_("Notes"), max_length=200, blank=True, null=True)
 
@@ -111,7 +111,7 @@ class ContactManager(models.Manager):
         """
 
         contact = None
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             try:
                 contact = Contact.objects.get(user=request.user.id)
                 request.session[CUSTOMER_ID] = contact.id
@@ -156,9 +156,9 @@ class Contact(models.Model):
     title = models.CharField(_("Title"), max_length=30, blank=True, null=True)
     first_name = models.CharField(_("First name"), max_length=30, )
     last_name = models.CharField(_("Last name"), max_length=30, )
-    user = models.OneToOneField(User, blank=True, null=True)
-    role = models.ForeignKey(ContactRole, verbose_name=_("Role"), null=True)
-    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), blank=True, null=True)
+    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL)
+    role = models.ForeignKey(ContactRole, verbose_name=_("Role"), null=True, on_delete=models.SET_NULL)
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), blank=True, null=True, on_delete=models.SET_NULL)
     dob = models.DateField(_("Date of birth"), blank=True, null=True)
     email = models.EmailField(_("Email"), blank=True, max_length=75)
     notes = models.TextField(_("Notes"), max_length=500, blank=True)
@@ -249,8 +249,8 @@ class Interaction(models.Model):
     A type of activity with the customer.  Useful to track emails, phone calls,
     or in-person interactions.
     """
-    contact = models.ForeignKey(Contact, verbose_name=_("Contact"))
-    type = models.ForeignKey(ContactInteractionType, verbose_name=_("Type"))
+    contact = models.ForeignKey(Contact, verbose_name=_("Contact"), on_delete=models.CASCADE)
+    type = models.ForeignKey(ContactInteractionType, verbose_name=_("Type"), on_delete=models.CASCADE)
     date_time = models.DateTimeField(_("Date and Time"), )
     description = models.TextField(_("Description"), max_length=200)
 
@@ -267,7 +267,7 @@ class PhoneNumber(models.Model):
     """
     Phone number associated with a contact.
     """
-    contact = models.ForeignKey(Contact)
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     type = models.CharField(_("Description"), choices=PHONE_CHOICES,
         max_length=20, blank=True)
     phone = models.CharField(_("Phone Number"), blank=True, max_length=30,
@@ -303,7 +303,7 @@ class AddressBook(models.Model):
     """
     Address information associated with a contact.
     """
-    contact = models.ForeignKey(Contact)
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     description = models.CharField(_("Description"), max_length=20, blank=True,
         help_text=_('Description of address - Home, Office, Warehouse, etc.',))
     addressee = models.CharField(_("Addressee"), max_length=80)
@@ -312,7 +312,7 @@ class AddressBook(models.Model):
     state = models.CharField(_("State"), max_length=50, blank=True)
     city = models.CharField(_("City"), max_length=50)
     postal_code = models.CharField(_("Zip Code"), max_length=30)
-    country = models.ForeignKey(Country, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, verbose_name=_("Country"), on_delete=models.PROTECT)
     is_default_shipping = models.BooleanField(_("Default Shipping Address"),
         default=False)
     is_default_billing = models.BooleanField(_("Default Billing Address"),

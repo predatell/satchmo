@@ -98,8 +98,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date_time', models.DateTimeField(verbose_name='Date and Time')),
                 ('description', models.TextField(max_length=200, verbose_name='Description')),
-                ('contact', models.ForeignKey(verbose_name='Contact', to='contact.Contact')),
-                ('type', models.ForeignKey(verbose_name='Type', to='contact.ContactInteractionType')),
+                ('contact', models.ForeignKey(verbose_name='Contact', to='contact.Contact', on_delete=models.CASCADE)),
+                ('type', models.ForeignKey(verbose_name='Type', to='contact.ContactInteractionType', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Interaction',
@@ -114,8 +114,8 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, verbose_name='Name')),
                 ('create_date', models.DateField(verbose_name='Creation Date')),
                 ('notes', models.TextField(max_length=200, null=True, verbose_name='Notes', blank=True)),
-                ('role', models.ForeignKey(verbose_name='Role', to='contact.ContactOrganizationRole', null=True)),
-                ('type', models.ForeignKey(verbose_name='Type', to='contact.ContactOrganization', null=True)),
+                ('role', models.ForeignKey(verbose_name='Role', to='contact.ContactOrganizationRole', null=True, on_delete=models.SET_NULL)),
+                ('type', models.ForeignKey(verbose_name='Type', to='contact.ContactOrganization', null=True, on_delete=models.SET_NULL)),
             ],
             options={
                 'verbose_name': 'Organization',
@@ -127,10 +127,10 @@ class Migration(migrations.Migration):
             name='PhoneNumber',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('type', models.CharField(blank=True, max_length=20, verbose_name='Description', choices=[(b'Work', 'Work'), (b'Home', 'Home'), (b'Fax', 'Fax'), (b'Mobile', 'Mobile')])),
+                ('type', models.CharField(blank=True, max_length=20, verbose_name='Description', choices=[('Work', 'Work'), ('Home', 'Home'), ('Fax', 'Fax'), ('Mobile', 'Mobile')])),
                 ('phone', models.CharField(max_length=30, verbose_name='Phone Number', blank=True)),
                 ('primary', models.BooleanField(default=False, verbose_name='Primary')),
-                ('contact', models.ForeignKey(to='contact.Contact')),
+                ('contact', models.ForeignKey(to='contact.Contact', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['-primary'],
@@ -142,31 +142,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contact',
             name='organization',
-            field=models.ForeignKey(verbose_name='Organization', blank=True, to='contact.Organization', null=True),
+            field=models.ForeignKey(verbose_name='Organization', blank=True, to='contact.Organization', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='contact',
             name='role',
-            field=models.ForeignKey(verbose_name='Role', to='contact.ContactRole', null=True),
+            field=models.ForeignKey(verbose_name='Role', to='contact.ContactRole', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='contact',
             name='user',
-            field=models.ForeignKey(null=True, blank=True, to=settings.AUTH_USER_MODEL, unique=True),
+            field=models.ForeignKey(null=True, blank=True, to=settings.AUTH_USER_MODEL, unique=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='addressbook',
             name='contact',
-            field=models.ForeignKey(to='contact.Contact'),
+            field=models.ForeignKey(to='contact.Contact', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='addressbook',
             name='country',
-            field=models.ForeignKey(verbose_name='Country', to='l10n.Country'),
+            field=models.ForeignKey(verbose_name='Country', to='l10n.Country', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

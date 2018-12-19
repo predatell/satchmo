@@ -1,6 +1,9 @@
 from django import forms
-from django.core import urlresolvers
 from django.utils.translation import ugettext, ugettext_lazy as _
+try:
+    from django.core.urlresolvers import reverse, NoReverseMatch
+except ImportError:
+    from django.urls import reverse, NoReverseMatch
 from payment.utils import capture_authorizations
 import logging
 
@@ -10,8 +13,8 @@ def form_terms_listener(sender, form=None, **kwargs):
     """Adds a 'do you accept the terms and conditions' checkbox to the form"""
 
     try:
-        url = urlresolvers.reverse('shop_terms')
-    except urlresolvers.NoReverseMatch:
+        url = reverse('shop_terms')
+    except NoReverseMatch:
         log.warn('To use the form_terms_listener, you must have a "shop_terms" url in your site urls')
         url = "#"
         

@@ -42,7 +42,7 @@ def get_filter_args(argstring, keywords=(), intargs=(), boolargs=(), stripquotes
 
                 key = key.strip()
                 if not key: continue
-                key = key.lower().encode('ascii')
+                key = key.lower()
 
                 if not keywords or key in keywords:
                     if key in intargs:

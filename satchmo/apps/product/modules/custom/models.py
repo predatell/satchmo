@@ -21,7 +21,8 @@ class CustomProduct(models.Model):
     """
     Product which must be custom-made or ordered.
     """
-    product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True)
+    product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True,
+                                   on_delete=models.CASCADE)
     downpayment = models.IntegerField(_("Percent Downpayment"), default=20)
     deferred_shipping = models.BooleanField(_('Deferred Shipping'),
         help_text=_('Do not charge shipping at checkout for this item.'),
@@ -128,7 +129,7 @@ class CustomTextField(models.Model):
     name = models.CharField(_('Custom field name'), max_length=40, )
     slug = models.SlugField(_("Slug"), help_text=_("Auto-generated from name if blank"),
         blank=True)
-    products = models.ForeignKey(CustomProduct, verbose_name=_('Custom Fields'),
+    products = models.ForeignKey(CustomProduct, verbose_name=_('Custom Fields'), on_delete=models.CASCADE,
         related_name='custom_text_fields')
     sort_order = models.IntegerField(_("Sort Order"),
         help_text=_("The display order for this group."), default=0)
@@ -156,7 +157,7 @@ class CustomTextFieldTranslation(models.Model):
     """A specific language translation for a `CustomTextField`.  This is intended for all descriptions which are not the
     default settings.LANGUAGE.
     """
-    customtextfield = models.ForeignKey(CustomTextField, related_name="translations")
+    customtextfield = models.ForeignKey(CustomTextField, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     name = models.CharField(_("Translated Custom Text Field Name"), max_length=255, )
     version = models.IntegerField(_('version'), default=1)

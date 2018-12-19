@@ -3,12 +3,17 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.sites.models import Site
-from django.core import serializers, urlresolvers
+from django.core import serializers
 from django.core.management.base import CommandError
 from django.core.management.color import no_style
 from django.db import transaction
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+
 from livesettings.functions import config_value
 from product.models import Product, Price, Option
 from satchmo_utils.unique_id import slugify
@@ -444,8 +449,7 @@ class VariationManagerForm(forms.Form):
                     slug = variation.slug
                     kw['initial'] = 'add'
                     self.existing[key] = True
-                    self.edit_urls[key] = urlresolvers.reverse('admin:product_product_change',
-                                                               args=(variation.id,))
+                    self.edit_urls[key] = reverse('admin:product_product_change', args=(variation.id,))
                 else:
                     basename = '%s (%s)' % (self.product.name, '/'.join(optnames))
                     slug = slugify('%s_%s' % (self.product.slug, '_'.join(optnames)))

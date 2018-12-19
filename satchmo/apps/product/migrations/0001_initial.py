@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(help_text=b'Optional', verbose_name='Description', blank=True)),
                 ('ordering', models.IntegerField(default=0, help_text='Override alphabetical order in category display', verbose_name='Ordering')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Active')),
-                ('parent', models.ForeignKey(related_name='child', blank=True, to='product.Category', null=True)),
+                ('parent', models.ForeignKey(related_name='child', blank=True, to='product.Category', null=True, on_delete=models.SET_NULL)),
                 ('related_categories', models.ManyToManyField(related_name='related_categories_rel_+', null=True, verbose_name='Related Categories', to='product.Category', blank=True)),
                 ('site', models.ManyToManyField(to='sites.Site', verbose_name='Site')),
             ],
@@ -56,8 +56,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('languagecode', models.CharField(blank=True, max_length=10, null=True, verbose_name='language', choices=[(b'en', b'English')])),
                 ('value', models.CharField(max_length=255, verbose_name='Value')),
-                ('category', models.ForeignKey(to='product.Category')),
-                ('option', models.ForeignKey(to='product.AttributeOption')),
+                ('category', models.ForeignKey(to='product.Category', on_delete=models.CASCADE)),
+                ('option', models.ForeignKey(to='product.AttributeOption', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('option__sort_order',),
@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
                 ('picture', satchmo_utils.satchmo_thumbnail.field.ImageWithThumbnailField(max_length=200, upload_to=satchmo_utils.satchmo_thumbnail.field.upload_dir)),
                 ('caption', models.CharField(max_length=100, null=True, verbose_name='Optional caption', blank=True)),
                 ('sort', models.IntegerField(default=0, verbose_name='Sort Order')),
-                ('category', models.ForeignKey(related_name='images', blank=True, to='product.Category', null=True)),
+                ('category', models.ForeignKey(related_name='images', blank=True, to='product.Category', null=True, on_delete=models.SET_NULL)),
             ],
             options={
                 'ordering': ['sort'],
@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                 ('caption', models.CharField(max_length=255, verbose_name='Translated Caption')),
                 ('version', models.IntegerField(default=1, verbose_name='version')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('categoryimage', models.ForeignKey(related_name='translations', to='product.CategoryImage')),
+                ('categoryimage', models.ForeignKey(related_name='translations', to='product.CategoryImage', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('categoryimage', 'caption', 'languagecode'),
@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(default=b'', verbose_name='Description of category', blank=True)),
                 ('version', models.IntegerField(default=1, verbose_name='version')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('category', models.ForeignKey(related_name='translations', to='product.Category')),
+                ('category', models.ForeignKey(related_name='translations', to='product.Category', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('category', 'name', 'languagecode'),
@@ -184,7 +184,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(default=b'', verbose_name='Description of OptionGroup', blank=True)),
                 ('version', models.IntegerField(default=1, verbose_name='version')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('optiongroup', models.ForeignKey(related_name='translations', to='product.OptionGroup')),
+                ('optiongroup', models.ForeignKey(related_name='translations', to='product.OptionGroup', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('optiongroup', 'name', 'languagecode'),
@@ -201,7 +201,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, verbose_name='Translated Option Name')),
                 ('version', models.IntegerField(default=1, verbose_name='version')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('option', models.ForeignKey(related_name='translations', to='product.Option')),
+                ('option', models.ForeignKey(related_name='translations', to='product.Option', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('option', 'name', 'languagecode'),
@@ -269,8 +269,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('languagecode', models.CharField(blank=True, max_length=10, null=True, verbose_name='language', choices=[(b'en', b'English')])),
                 ('value', models.CharField(max_length=255, verbose_name='Value')),
-                ('option', models.ForeignKey(to='product.AttributeOption')),
-                ('product', models.ForeignKey(to='product.Product')),
+                ('option', models.ForeignKey(to='product.AttributeOption', on_delete=models.CASCADE)),
+                ('product', models.ForeignKey(to='product.Product', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('option__sort_order',),
@@ -286,7 +286,7 @@ class Migration(migrations.Migration):
                 ('picture', satchmo_utils.satchmo_thumbnail.field.ImageWithThumbnailField(max_length=200, upload_to=satchmo_utils.satchmo_thumbnail.field.upload_dir)),
                 ('caption', models.CharField(max_length=100, null=True, verbose_name='Optional caption', blank=True)),
                 ('sort', models.IntegerField(default=0, verbose_name='Sort Order')),
-                ('product', models.ForeignKey(blank=True, to='product.Product', null=True)),
+                ('product', models.ForeignKey(blank=True, to='product.Product', null=True, on_delete=models.SET_NULL)),
             ],
             options={
                 'ordering': ['sort'],
@@ -303,7 +303,7 @@ class Migration(migrations.Migration):
                 ('caption', models.CharField(max_length=255, verbose_name='Translated Caption')),
                 ('version', models.IntegerField(default=1, verbose_name='version')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('productimage', models.ForeignKey(related_name='translations', to='product.ProductImage')),
+                ('productimage', models.ForeignKey(related_name='translations', to='product.ProductImage', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('productimage', 'caption', 'languagecode'),
@@ -340,7 +340,7 @@ class Migration(migrations.Migration):
                 ('short_description', models.TextField(default=b'', help_text='This should be a 1 or 2 line description for use in product listing screens', max_length=200, verbose_name='Short description of product', blank=True)),
                 ('version', models.IntegerField(default=1, verbose_name='version')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('product', models.ForeignKey(related_name='translations', to='product.Product')),
+                ('product', models.ForeignKey(related_name='translations', to='product.Product', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('product', 'name', 'languagecode'),
@@ -373,13 +373,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='taxClass',
-            field=models.ForeignKey(blank=True, to='product.TaxClass', help_text='If it is taxable, what kind of tax?', null=True, verbose_name='Tax Class'),
+            field=models.ForeignKey(blank=True, to='product.TaxClass', help_text='If it is taxable, what kind of tax?', null=True, verbose_name='Tax Class', on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='price',
             name='product',
-            field=models.ForeignKey(to='product.Product'),
+            field=models.ForeignKey(to='product.Product', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -397,7 +397,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='option',
             name='option_group',
-            field=models.ForeignKey(to='product.OptionGroup'),
+            field=models.ForeignKey(to='product.OptionGroup', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

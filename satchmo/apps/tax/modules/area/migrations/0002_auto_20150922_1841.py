@@ -16,19 +16,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='taxrate',
             name='taxClass',
-            field=models.ForeignKey(verbose_name='Tax Class', to='product.TaxClass'),
+            field=models.ForeignKey(verbose_name='Tax Class', to='product.TaxClass', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='taxrate',
             name='taxCountry',
-            field=models.ForeignKey(verbose_name='Tax Country', blank=True, to='l10n.Country', null=True),
+            field=models.ForeignKey(verbose_name='Tax Country', blank=True, to='l10n.Country', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='taxrate',
             name='taxZone',
-            field=models.ForeignKey(verbose_name='Tax Zone', blank=True, to='l10n.AdminArea', null=True),
+            field=models.ForeignKey(verbose_name='Tax Zone', blank=True, to='l10n.AdminArea', null=True, on_delete=models.SET_NULL),
             preserve_default=True,
         ),
     ]

@@ -8,7 +8,7 @@ from product.models import Product, Category
 from satchmo_store.shop.models import Config
 from django.utils.translation import ugettext_lazy as _
 
-@user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')
 def admin_product_feed(request, category=None, template="product_feeds/product_feed.csv", content_type="text/csv"):
     """Admin authenticated feed - same as product feed but for different types of feeds.
     """

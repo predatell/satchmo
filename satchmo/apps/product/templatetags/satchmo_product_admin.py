@@ -1,5 +1,5 @@
 from django import template
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template import Context, Template
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
