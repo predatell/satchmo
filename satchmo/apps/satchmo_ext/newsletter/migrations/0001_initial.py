@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.SlugField(max_length=100, verbose_name='Attribute Name')),
                 ('value', models.CharField(max_length=255, verbose_name='Value')),
-                ('subscription', models.ForeignKey(related_name='attributes', to='newsletter.Subscription')),
+                ('subscription', models.ForeignKey(related_name='attributes', to='newsletter.Subscription', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Subscription Attribute',

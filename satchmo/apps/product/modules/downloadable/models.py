@@ -4,12 +4,15 @@ import random
 from hashlib import sha1 as sha_constructor
 
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
 from django.db import models
 from django.db.models.fields.files import FileField
 from django.utils.encoding import smart_str, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 from livesettings.functions import config_value
 from product import signals
@@ -30,7 +33,8 @@ def _protected_dir(instance, filename):
     # imported/loaded it), that's bad, so let it bubble up.
     raw = config_value('PRODUCT', 'PROTECTED_DIR')
     updir = os.path.normpath(normalize_dir(raw))
-    return os.path.join(updir, instance.file.field.get_filename(filename))
+    file_name = os.path.normpath(instance.file.field.storage.get_valid_name(os.path.basename(filename)))
+    return os.path.join(updir, file_name)
 
 
 @python_2_unicode_compatible
@@ -38,7 +42,7 @@ class DownloadableProduct(models.Model):
     """
     This type of Product is a file to be downloaded
     """
-    product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True)
+    product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True, on_delete=models.CASCADE)
     file = FileField(_("File"), upload_to=_protected_dir)
     num_allowed_downloads = models.IntegerField(
         _("Num allowed downloads"),
@@ -78,8 +82,8 @@ class DownloadableProduct(models.Model):
 
 @python_2_unicode_compatible
 class DownloadLink(models.Model):
-    downloadable_product = models.ForeignKey(DownloadableProduct, verbose_name=_('Downloadable product'))
-    order = models.ForeignKey(Order, verbose_name=_('Order'))
+    downloadable_product = models.ForeignKey(DownloadableProduct, verbose_name=_('Downloadable product'), on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, verbose_name=_('Order'), on_delete=models.CASCADE)
     key = models.CharField(_('Key'), max_length=40)
     num_attempts = models.IntegerField(_('Number of attempts'), )
     time_stamp = models.DateTimeField(_('Time stamp'), )
@@ -103,11 +107,10 @@ class DownloadLink(models.Model):
         return (True, "")
 
     def get_absolute_url(self):
-        return('satchmo_store.shop.views.download.process', (), { 'download_key': self.key})
-    get_absolute_url = models.permalink(get_absolute_url)
+        return reverse('satchmo_store.shop.views.download.process', kwargs={ 'download_key': self.key})
 
     def get_full_url(self):
-        url = urlresolvers.reverse('satchmo_download_process', kwargs= {'download_key': self.key})
+        url = reverse('satchmo_download_process', kwargs= {'download_key': self.key})
         return('http://%s%s' % (Site.objects.get_current(), url))
 
     def save(self, **kwargs):

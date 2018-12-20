@@ -37,7 +37,7 @@ class Upsell(models.Model, CachedObjectMixin):
         help_text = _("The products for which you want to show this goal product as an Upsell."))
     
     goal = models.ForeignKey(Product, verbose_name=_('Goal Product'), 
-        related_name="upsellgoals")
+        related_name="upsellgoals", on_delete=models.CASCADE)
     
     create_date = models.DateField(_("Creation Date"))
 
@@ -127,7 +127,7 @@ class Upsell(models.Model, CachedObjectMixin):
         
 class UpsellTranslation(models.Model):
 
-    menu = models.ForeignKey(Upsell, related_name="translations")
+    menu = models.ForeignKey(Upsell, related_name="translations", on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, 
         choices=settings.LANGUAGES, default=settings.LANGUAGES[0][0])
     description = models.TextField(_('Description'), blank=True)

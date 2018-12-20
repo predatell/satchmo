@@ -11,12 +11,16 @@
 #   could be probably used for SubscriptionProducts. This module doesn't support it.
 #
 from decimal import Decimal
-from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
+try:
+    from django.core.urlresolvers import NoReverseMatch
+except ImportError:
+    from django.urls import NoReverseMatch
+    
 from livesettings.functions import config_get_group, config_value
 from payment.utils import get_processor_by_key
 from payment.views import payship
@@ -47,7 +51,7 @@ pay_ship_info = never_cache(pay_ship_info)
 def _resolve_local_url(payment_module, cfgval, ssl=False):
     try:
         return lookup_url(payment_module, cfgval.value, include_server=True, ssl=ssl)
-    except urlresolvers.NoReverseMatch:
+    except NoReverseMatch:
         return cfgval.value
 
 

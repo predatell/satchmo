@@ -202,7 +202,7 @@ class Carrier(models.Model):
         
         
 class CarrierTranslation(models.Model):
-    carrier = models.ForeignKey('Carrier', related_name='translations')
+    carrier = models.ForeignKey('Carrier', related_name='translations', on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES, )
     name = models.CharField(_('Carrier'), max_length=50, )
     description = models.CharField(_('Description'), max_length=200)
@@ -212,7 +212,7 @@ class CarrierTranslation(models.Model):
 
 @python_2_unicode_compatible
 class QuantityTier(models.Model):
-    carrier = models.ForeignKey('Carrier', related_name='tiers')
+    carrier = models.ForeignKey('Carrier', related_name='tiers', on_delete=models.CASCADE)
     quantity = models.DecimalField(_("Min Quantity"), max_digits=18,  decimal_places=6,
         help_text=_('Minimum qty in order for this to apply?'), )
     handling = models.DecimalField(_("Handling Price"), max_digits=10, 

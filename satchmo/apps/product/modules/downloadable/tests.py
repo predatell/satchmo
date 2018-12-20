@@ -1,13 +1,17 @@
 import django
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import Client
 from django.utils import timezone
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from l10n.models import Country
 from livesettings.functions import config_value
 from product.models import Product
@@ -128,10 +132,10 @@ class DownloadableProductTest(TestCase):
             self.client = Client(SERVER_NAME=self.domain)
 
         # go through the verification step
-        self.pd_url = urlresolvers.reverse(
+        self.pd_url = reverse(
             'satchmo_download_send', kwargs= {'download_key': self.key}
         )
-        pd_process_url = urlresolvers.reverse(
+        pd_process_url = reverse(
             'satchmo_download_process', kwargs= {'download_key': self.key}
         )
         

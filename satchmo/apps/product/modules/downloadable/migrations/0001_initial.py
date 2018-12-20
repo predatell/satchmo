@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DownloadableProduct',
             fields=[
-                ('product', models.OneToOneField(primary_key=True, serialize=False, to='product.Product', verbose_name='Product')),
+                ('product', models.OneToOneField(primary_key=True, serialize=False, to='product.Product', verbose_name='Product', on_delete=models.CASCADE)),
                 ('file', models.FileField(upload_to=product.modules.downloadable.models._protected_dir, verbose_name='File')),
                 ('num_allowed_downloads', models.IntegerField(default=0, help_text='Number of times link can be accessed. Enter 0 for unlimited.', verbose_name='Num allowed downloads')),
                 ('expire_minutes', models.IntegerField(default=0, help_text='Number of minutes the link should remain active. Enter 0 for unlimited.', verbose_name='Expire minutes')),
@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
                 ('num_attempts', models.IntegerField(verbose_name='Number of attempts')),
                 ('time_stamp', models.DateTimeField(verbose_name='Time stamp')),
                 ('active', models.BooleanField(default=True, verbose_name='Active')),
-                ('downloadable_product', models.ForeignKey(verbose_name='Downloadable product', to='downloadable.DownloadableProduct')),
-                ('order', models.ForeignKey(verbose_name='Order', to='shop.Order')),
+                ('downloadable_product', models.ForeignKey(verbose_name='Downloadable product', to='downloadable.DownloadableProduct', on_delete=models.CASCADE)),
+                ('order', models.ForeignKey(verbose_name='Order', to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Download Link',

@@ -43,7 +43,7 @@ class PricingTierManager(models.Manager):
 class PricingTier(models.Model):
     """A specific pricing tier, such as "trade customers"
     """
-    group = models.OneToOneField(Group, help_text=_('The user group that will receive the discount'))
+    group = models.OneToOneField(Group, help_text=_('The user group that will receive the discount'), on_delete=models.CASCADE)
     title = models.CharField(_('Title'), max_length=50)
     discount_percent = models.DecimalField(_("Discount Percent"), null=True, blank=True,
         max_digits=5, decimal_places=2,
@@ -81,8 +81,8 @@ class TieredPrice(models.Model):
     """
     A Price which applies only to special tiers.
     """
-    pricingtier = models.ForeignKey(PricingTier, related_name="tieredprices")
-    product = models.ForeignKey(Product, related_name="tieredprices")
+    pricingtier = models.ForeignKey(PricingTier, related_name="tieredprices", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="tieredprices", on_delete=models.CASCADE)
     price = CurrencyField(_("Price"), max_digits=14, decimal_places=6, )
     quantity = models.DecimalField(_("Discount Quantity"), max_digits=18, decimal_places=6,  default='1', help_text=_("Use this price only for this quantity or higher"))
     expires = models.DateField(_("Expires"), null=True, blank=True)
@@ -133,7 +133,7 @@ def tiered_price_listener(signal, adjustment=None, **kwargs):
     if discountable:
         product = adjustment.product
         user = threadlocals.get_current_user()
-        if user and not user.is_anonymous():
+        if user and not user.is_anonymous:
             try:
                 tiers = PricingTier.objects.by_user(user)
                 log.debug('got tiers: %s', tiers)

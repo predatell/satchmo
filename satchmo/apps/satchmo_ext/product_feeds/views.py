@@ -1,12 +1,17 @@
 from django.contrib.auth.decorators import user_passes_test
-from django.core import urlresolvers
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from payment.config import credit_choices
 from product.models import Product, Category
 from satchmo_store.shop.models import Config
-from django.utils.translation import ugettext_lazy as _
+
 
 @user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url='/accounts/login/')
 def admin_product_feed(request, category=None, template="product_feeds/product_feed.csv", content_type="text/csv"):
@@ -37,7 +42,7 @@ def product_feed(request, category=None, template="product_feeds/googlebase_atom
         params['category'] = category
         view = 'satchmo_atom_category_feed'
     
-    url = shop_config.base_url + urlresolvers.reverse(view, None, params)
+    url = shop_config.base_url + reverse(view, None, params)
     
     payment_choices = [c[1] for c in credit_choices(None, True)]
     

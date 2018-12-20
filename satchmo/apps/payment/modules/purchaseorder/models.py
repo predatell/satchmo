@@ -14,7 +14,7 @@ from satchmo_store.shop.models import Order
 @python_2_unicode_compatible
 class PurchaseOrder(models.Model):
     po_number = models.CharField(_('Customer PO Number'), max_length=20)
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     balance = models.DecimalField(_("Outstanding Balance"),
         max_digits=18, decimal_places=10, blank=True, null=True)
     paydate = models.DateField(_('Paid on'), blank=True, null=True)

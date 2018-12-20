@@ -1,11 +1,15 @@
 from decimal import Decimal
 from django.core import mail
-from django.core.urlresolvers import reverse as url
 from django.test import TestCase
 from django.test.client import Client
 from django.utils.encoding import smart_str
 from django.utils.translation import get_language
 from django.contrib.sites.models import Site
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+
 from keyedcache import cache_delete
 from l10n.models import Country
 from l10n.utils import moneyfmt
@@ -66,8 +70,8 @@ class ShopTest(TestCase):
         amount = smart_str('Memory - Internal RAM: 1.5 GB  ' + moneyfmt(Decimal('25.00')))
         self.assertContains(response, amount, count=1)
 
-        response = self.client.post(url('satchmo_checkout-step1'), get_step1_post_data(self.US))
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step2'),
+        response = self.client.post(reverse('satchmo_checkout-step1'), get_step1_post_data(self.US))
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step2'),
             status_code=302, target_status_code=200)
         data = {
             'credit_type': 'Visa',
@@ -76,15 +80,15 @@ class ShopTest(TestCase):
             'year_expires': '2020',
             'ccv': '552',
             'shipping': 'FlatRate'}
-        response = self.client.post(url('DUMMY_satchmo_checkout-step2'), data)
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step3'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step2'), data)
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step3'),
             status_code=302, target_status_code=200)
-        response = self.client.get(url('DUMMY_satchmo_checkout-step3'))
+        response = self.client.get(reverse('DUMMY_satchmo_checkout-step3'))
 
         amount = smart_str('satchmo computer - ' + moneyfmt(Decimal('168.00')))
         self.assertContains(response, amount, count=1, status_code=200)
-        response = self.client.post(url('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-success'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-success'),
             status_code=302, target_status_code=200)
         self.assertEqual(len(mail.outbox), 1)
 

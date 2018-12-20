@@ -18,7 +18,7 @@ class RawItem(models.Model):
     A raw good supplied by a supplier.  For instance, it could be a plain 
     shirt that you process to make your Item
     """
-    supplier = models.ForeignKey(Organization, verbose_name=_('Supplier'))
+    supplier = models.ForeignKey(Organization, verbose_name=_('Supplier'), on_delete=models.CASCADE)
     supplier_num = models.CharField(_("Supplier ID"), max_length=50)
     description = models.CharField(_("Description"), max_length=200)
     unit_cost = models.DecimalField(_("Unit Cost"), max_digits=6, decimal_places=2)
@@ -37,7 +37,7 @@ class SupplierOrder(models.Model):
     """
     An order the store owner places to a supplier for a raw good.
     """
-    supplier = models.ForeignKey(Organization, verbose_name=_('Supplier'))
+    supplier = models.ForeignKey(Organization, verbose_name=_('Supplier'), on_delete=models.CASCADE)
     date_created = models.DateField(_("Date Created"))
     order_sub_total = models.DecimalField(_("Subtotal"), max_digits=6, decimal_places=2)
     order_shipping = models.DecimalField(_("Shipping"), max_digits=6, decimal_places=2)
@@ -68,8 +68,8 @@ class SupplierOrderItem(models.Model):
     """
     Individual line items for an order
     """
-    order = models.ForeignKey(SupplierOrder)
-    line_item = models.ForeignKey(RawItem, verbose_name=_('Line Item'))
+    order = models.ForeignKey(SupplierOrder, on_delete=models.CASCADE)
+    line_item = models.ForeignKey(RawItem, verbose_name=_('Line Item'), on_delete=models.CASCADE)
     line_item_quantity = models.IntegerField(_("Line Item Quantity"), )
     line_item_total = models.DecimalField(_("Line Item Total"), max_digits=6,decimal_places=2)
     
@@ -90,7 +90,7 @@ class SupplierOrderStatus(models.Model):
     Status of a supplier's order.  There will be multiple statuses as it is
     placed and subsequently processed and received.
     """
-    order = models.ForeignKey(SupplierOrder)
+    order = models.ForeignKey(SupplierOrder, on_delete=models.CASCADE)
     status = models.CharField(_("Status"), max_length=20, choices=SUPPLIERORDER_STATUS, blank=True)
     notes = models.CharField(_("Notes"), max_length=100, blank=True)
     date = models.DateTimeField(_('Date'), blank=True)

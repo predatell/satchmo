@@ -34,8 +34,8 @@ class ProductWishManager(models.Manager):
 
 
 class ProductWish(models.Model):
-    contact = models.ForeignKey(Contact, verbose_name=_("Contact"), related_name="wishlist")
-    product = models.ForeignKey(Product, verbose_name=_("Product"), related_name="wishes")
+    contact = models.ForeignKey(Contact, verbose_name=_("Contact"), related_name="wishlist", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name=_("Product"), related_name="wishes", on_delete=models.CASCADE)
     _details = models.TextField(_('Details'), null=True, blank=True)
     create_date = models.DateTimeField(_("Creation Date"))
     

@@ -1,14 +1,18 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.core.urlresolvers import reverse as url
 from django.test import TestCase
 from django.test.client import Client
 from django.utils.encoding import smart_str
 from django.utils.translation import get_language
 from django.core.cache import cache
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from keyedcache import cache_delete
 from l10n.models import Country
 from l10n.utils import moneyfmt
@@ -268,8 +272,8 @@ class ShopTest(TestCase):
         shp.update(False)
 
         self.test_cart_adding()
-        response = self.client.post(url('satchmo_checkout-step1'), get_step1_post_data(self.US))
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step2'),
+        response = self.client.post(reverse('satchmo_checkout-step1'), get_step1_post_data(self.US))
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step2'),
             status_code=302, target_status_code=200)
         data = {
             'credit_type': 'Visa',
@@ -278,10 +282,10 @@ class ShopTest(TestCase):
             'year_expires': '2020',
             'ccv': '552',
             'shipping': 'FlatRate'}
-        response = self.client.post(url('DUMMY_satchmo_checkout-step2'), data)
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step3'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step2'), data)
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step3'),
             status_code=302, target_status_code=200)
-        response = self.client.get(url('DUMMY_satchmo_checkout-step3'))
+        response = self.client.get(reverse('DUMMY_satchmo_checkout-step3'))
         amount = smart_str('Shipping + ' + moneyfmt(Decimal('4.00')))
         self.assertContains(response, amount, count=1, status_code=200)
 
@@ -291,8 +295,8 @@ class ShopTest(TestCase):
         amount = smart_str('Total = ' + moneyfmt(Decimal('54.60')))
         self.assertContains(response, amount, count=1, status_code=200)
 
-        response = self.client.post(url('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-success'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-success'),
             status_code=302, target_status_code=200)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -327,8 +331,8 @@ class ShopTest(TestCase):
 
         # First checkout
         self.test_cart_adding()
-        response = self.client.post(url('satchmo_checkout-step1'), get_step1_post_data(self.US))
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step2'),
+        response = self.client.post(reverse('satchmo_checkout-step1'), get_step1_post_data(self.US))
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step2'),
             status_code=302, target_status_code=200)
         data = {
             'credit_type': 'Visa',
@@ -337,10 +341,10 @@ class ShopTest(TestCase):
             'year_expires': '2020',
             'ccv': '552',
             'shipping': 'FlatRate'}
-        response = self.client.post(url('DUMMY_satchmo_checkout-step2'), data)
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step3'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step2'), data)
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step3'),
             status_code=302, target_status_code=200)
-        response = self.client.get(url('DUMMY_satchmo_checkout-step3'))
+        response = self.client.get(reverse('DUMMY_satchmo_checkout-step3'))
         amount = smart_str('Shipping + ' + moneyfmt(Decimal('4.00')))
         self.assertContains(response, amount, count=1, status_code=200)
 
@@ -350,14 +354,14 @@ class ShopTest(TestCase):
         amount = smart_str('Total = ' + moneyfmt(Decimal('54.60')))
         self.assertContains(response, amount, count=1, status_code=200)
 
-        response = self.client.post(url('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-success'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-success'),
             status_code=302, target_status_code=200)
 
         # Second checkout
         self.test_cart_adding()
-        response = self.client.post(url('satchmo_checkout-step1'), get_step1_post_data(self.US))
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step2'),
+        response = self.client.post(reverse('satchmo_checkout-step1'), get_step1_post_data(self.US))
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step2'),
             status_code=302, target_status_code=200)
         data = {
             'credit_type': 'Visa',
@@ -366,10 +370,10 @@ class ShopTest(TestCase):
             'year_expires': '2020',
             'ccv': '552',
             'shipping': 'FlatRate'}
-        response = self.client.post(url('DUMMY_satchmo_checkout-step2'), data)
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-step3'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step2'), data)
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-step3'),
             status_code=302, target_status_code=200)
-        response = self.client.get(url('DUMMY_satchmo_checkout-step3'))
+        response = self.client.get(reverse('DUMMY_satchmo_checkout-step3'))
         amount = smart_str('Shipping + ' + moneyfmt(Decimal('4.00')))
         self.assertContains(response, amount, count=1, status_code=200)
 
@@ -379,8 +383,8 @@ class ShopTest(TestCase):
         amount = smart_str('Total = ' + moneyfmt(Decimal('54.60')))
         self.assertContains(response, amount, count=1, status_code=200)
 
-        response = self.client.post(url('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
-        self.assertRedirects(response, url('DUMMY_satchmo_checkout-success'),
+        response = self.client.post(reverse('DUMMY_satchmo_checkout-step3'), {'process' : 'True'})
+        self.assertRedirects(response, reverse('DUMMY_satchmo_checkout-success'),
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(mail.outbox), 2)
@@ -398,7 +402,7 @@ class ShopTest(TestCase):
             last_name="Tester")
         self.client.login(username='teddy', password='guz90tyc')
         self.test_cart_adding()
-        response = self.client.get(url('satchmo_checkout-step1'))
+        response = self.client.get(reverse('satchmo_checkout-step1'))
         self.assertContains(response, "Teddy", status_code=200)
 
     def test_registration_keeps_contact(self):
@@ -527,11 +531,11 @@ class AdminTest(TestCase):
         self.assertContains(response, "contact/contact/", status_code=200)
 
     #def test_product(self):
-        response = self.client.get(url('admin:product_product_change',args=(1,)))
+        response = self.client.get(reverse('admin:product_product_change',args=(1,)))
         self.assertContains(response, "Django Rocks shirt", status_code=200)
 
     #def test_configurableproduct(self):
-        response = self.client.get(url('admin:configurable_configurableproduct_change',args=(1,)))
+        response = self.client.get(reverse('admin:configurable_configurableproduct_change',args=(1,)))
         self.assertContains(response, "Small, Black", status_code=200)
 
     #def test_productimage_list(self):
@@ -750,7 +754,7 @@ class DiscountAmountTest(TestCase):
         self.assertEqual(sub_total, Decimal('11.00'))
         self.assertEqual(price, Decimal('7.00'))
         self.assertEqual(shipcost, Decimal('6.00'))
-        self.assertEqual(shiptotal, Decimal('2.67'))
+        self.assertEqual(shiptotal.quantize(Decimal('.01'), rounding=ROUND_HALF_UP), Decimal('2.67'))
         self.assertEqual(discount, Decimal('10.00'))
 
     def testApplySmallAmountShip(self):
@@ -1037,14 +1041,14 @@ class QuickOrderTest(TestCase):
 
     def testQuickOrderAdd(self):
         """Test adding multiple products at once to cart."""
-        response = self.client.get(url('satchmo_quick_order'))
+        response = self.client.get(reverse('satchmo_quick_order'))
         self.assertContains(response, "Django Rocks shirt (Large/Black)", status_code=200)
         self.assertContains(response, "Python Rocks shirt", status_code=200)
-        response = self.client.post(url('satchmo_quick_order'), {
+        response = self.client.post(reverse('satchmo_quick_order'), {
             "qty__dj-rocks-l-b" : "2",
             "qty__PY-Rocks" : "1",
         })
-        self.assertRedirects(response, url('satchmo_cart'),
+        self.assertRedirects(response, reverse('satchmo_cart'),
             status_code=302, target_status_code=200)
         response = self.client.get(prefix+'/cart/')
         self.assertContains(response, "Django Rocks shirt (Large/Black)" , status_code=200)

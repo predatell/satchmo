@@ -1,9 +1,13 @@
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse as url
 from django.test import TestCase
 from django.test.client import Client
 from django.utils.encoding import smart_str
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from keyedcache import cache_delete
 from l10n.models import Country
 from product.models import Product
@@ -47,7 +51,7 @@ class WishTest(TestCase):
         """
         Look at the main page
         """
-        response = self.client.get(url('satchmo_shop_home'))
+        response = self.client.get(reverse('satchmo_shop_home'))
 
         # Check that the rendered context contains 4 products
         self.assertContains(response, '<div class = "productImage">',
@@ -60,7 +64,7 @@ class WishTest(TestCase):
         product = Product.objects.get(slug='dj-rocks')
         response = self.client.get(product.get_absolute_url())
         self.assertContains(response, "Django Rocks shirt", count=2, status_code=200)
-        response = self.client.post(url('satchmo_smart_add'), { 
+        response = self.client.post(reverse('satchmo_smart_add'), { 
             "productname" : "dj-rocks",
             "1" : "M",
             "2" : "BL",
@@ -92,14 +96,15 @@ class WishTestLoggedIn(TestCase):
         product = Product.objects.get(slug='dj-rocks')
         response = self.client.get(product.get_absolute_url())
         self.assertContains(response, "Django Rocks shirt", count=2, status_code=200)
-        response = self.client.post(url('satchmo_smart_add'), { 
+        response = self.client.post(reverse('satchmo_smart_add'), { 
             "productname" : "dj-rocks",
             "1" : "M",
             "2" : "BL",
             "addwish" : "Add to wishlist"
         })
-        wishurl = url('satchmo_wishlist_view')
-        self.assertRedirects(response, domain + wishurl, status_code=302, target_status_code=200)
+        wishurl = reverse('satchmo_wishlist_view')
+        #self.assertRedirects(response, domain + wishurl, status_code=302, target_status_code=200)
+        self.assertRedirects(response, wishurl, status_code=302, target_status_code=200)
         response = self.client.get(wishurl)
         
         self.assertContains(response, "Django Rocks shirt (Medium/Blue)", count=1, status_code=200)
@@ -116,12 +121,12 @@ class WishTestLoggedIn(TestCase):
         wish = ProductWish(product = product, contact=self.contact)
         wish.save()
         
-        wishurl = url('satchmo_wishlist_view')
+        wishurl = reverse('satchmo_wishlist_view')
         response = self.client.get(wishurl)
         self.assertContains(response, "Robots Attack", count=1, status_code=200)
         self.assertContains(response, "Django Rocks shirt (Medium/Blue)", count=1, status_code=200)
         
-        wishurl = url('satchmo_wishlist_remove')
+        wishurl = reverse('satchmo_wishlist_remove')
         response = self.client.post(wishurl, {
             'id' : wish.id
         })
@@ -140,17 +145,18 @@ class WishTestLoggedIn(TestCase):
         wish = ProductWish(product = product, contact=self.contact)
         wish.save()
         
-        wishurl = url('satchmo_wishlist_view')
+        wishurl = reverse('satchmo_wishlist_view')
         response = self.client.get(wishurl)
         self.assertContains(response, "Robots Attack", count=1, status_code=200)
         self.assertContains(response, "Django Rocks shirt (Medium/Blue)", count=1, status_code=200)
         
-        moveurl = url('satchmo_wishlist_move_to_cart')
+        moveurl = reverse('satchmo_wishlist_move_to_cart')
         response = self.client.post(moveurl, {
             'id' : wish.id
         })
-        carturl = url('satchmo_cart')
-        self.assertRedirects(response, domain + carturl, status_code=302, target_status_code=200)
+        carturl = reverse('satchmo_cart')
+        #self.assertRedirects(response, domain + carturl, status_code=302, target_status_code=200)
+        self.assertRedirects(response, carturl, status_code=302, target_status_code=200)
 
         response = self.client.get(carturl)
         self.assertContains(response, "Robots Attack", count=1, status_code=200)

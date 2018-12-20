@@ -49,8 +49,8 @@ class Migration(migrations.Migration):
             name='BrandCategoryProduct',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('brandcategory', models.ForeignKey(to='brand.BrandCategory')),
-                ('product', models.ForeignKey(to='product.Product')),
+                ('brandcategory', models.ForeignKey(to='brand.BrandCategory', on_delete=models.CASCADE)),
+                ('product', models.ForeignKey(to='product.Product', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Brand Category Product',
@@ -62,12 +62,12 @@ class Migration(migrations.Migration):
             name='BrandCategoryTranslation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('languagecode', models.CharField(max_length=10, verbose_name='language', choices=[(b'en', b'English')])),
+                ('languagecode', models.CharField(max_length=10, verbose_name='language', choices=[('en', 'English')])),
                 ('name', models.CharField(max_length=100, verbose_name='title')),
                 ('short_description', models.CharField(max_length=200, verbose_name='Short Description', blank=True)),
                 ('description', models.TextField(verbose_name='Description', blank=True)),
                 ('picture', satchmo_utils.satchmo_thumbnail.field.ImageWithThumbnailField(max_length=200, null=True, upload_to=satchmo_utils.satchmo_thumbnail.field.upload_dir, blank=True)),
-                ('brandcategory', models.ForeignKey(related_name='translations', to='brand.BrandCategory')),
+                ('brandcategory', models.ForeignKey(related_name='translations', to='brand.BrandCategory', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('languagecode',),
@@ -79,8 +79,8 @@ class Migration(migrations.Migration):
             name='BrandProduct',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('brand', models.ForeignKey(to='brand.Brand')),
-                ('product', models.ForeignKey(to='product.Product')),
+                ('brand', models.ForeignKey(to='brand.Brand', on_delete=models.CASCADE)),
+                ('product', models.ForeignKey(to='product.Product', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Brand Product',
@@ -92,12 +92,12 @@ class Migration(migrations.Migration):
             name='BrandTranslation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('languagecode', models.CharField(max_length=10, verbose_name='language', choices=[(b'en', b'English')])),
+                ('languagecode', models.CharField(max_length=10, verbose_name='language', choices=[('en', 'English')])),
                 ('name', models.CharField(max_length=100, verbose_name='title')),
                 ('short_description', models.CharField(max_length=200, verbose_name='Short Description', blank=True)),
                 ('description', models.TextField(verbose_name='Full Description', blank=True)),
                 ('picture', satchmo_utils.satchmo_thumbnail.field.ImageWithThumbnailField(max_length=200, null=True, upload_to=satchmo_utils.satchmo_thumbnail.field.upload_dir, blank=True)),
-                ('brand', models.ForeignKey(related_name='translations', to='brand.Brand')),
+                ('brand', models.ForeignKey(related_name='translations', to='brand.Brand', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('languagecode',),
@@ -121,7 +121,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='brand',
             name='site',
-            field=models.ForeignKey(to='sites.Site'),
+            field=models.ForeignKey(to='sites.Site', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]
