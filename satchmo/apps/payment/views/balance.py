@@ -1,12 +1,15 @@
 from decimal import Decimal
 
 from django.contrib import messages
-from django.core import urlresolvers
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 from livesettings.functions import config_get_group
 from payment import active_gateways
@@ -42,7 +45,7 @@ class BalanceRemainingView(SingleObjectMixin, FormView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object:
-            return HttpResponseRedirect(urlresolvers.reverse('satchmo_checkout-step1'))
+            return HttpResponseRedirect(reverse('satchmo_checkout-step1'))
         return super(BalanceRemainingView, self).dispatch(request, *args, **kwargs)
             
     def form_valid(self, form):

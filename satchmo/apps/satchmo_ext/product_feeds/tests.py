@@ -1,6 +1,10 @@
 from django.conf import settings
-from django.core import urlresolvers
 from django.test import TestCase
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from product.models import Product
 import keyedcache
 
@@ -15,7 +19,7 @@ class GoogleBaseTest(TestCase):
         keyedcache.cache_delete
 
     def test_feed(self):
-        url = urlresolvers.reverse('satchmo_atom_feed')
+        url = reverse('satchmo_atom_feed')
         response = self.client.get(url)
         self.assertContains(response,
             "<title>Robots Attack! (Hard cover)</title>",

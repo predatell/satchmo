@@ -1,6 +1,10 @@
-from django.core import urlresolvers
 from django.test import TestCase
 from django.test.client import Client
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 import keyedcache
 from livesettings.functions import config_get
 from satchmo_ext.newsletter.utils import *
@@ -66,7 +70,7 @@ class NewsletterTestViews(TestCase):
         keyedcache.cache_delete()
     
     def  testNewIsSubscribed(self):
-        url = urlresolvers.reverse('newsletter_subscribe_ajah')
+        url = reverse('newsletter_subscribe_ajah')
         c = get_contact_or_fake('test test', 'testsubview@test.com')
         self.assertFalse(is_subscribed(c))
         
@@ -82,7 +86,7 @@ class NewsletterTestViews(TestCase):
         update_subscription(c, True)
         self.assertTrue(is_subscribed(c))
 
-        url = urlresolvers.reverse('newsletter_unsubscribe_ajah')
+        url = reverse('newsletter_unsubscribe_ajah')
         response = self.client.post(url, {
             'full_name' : 'Testy Testerson',
             'email': c.email,

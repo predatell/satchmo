@@ -898,9 +898,8 @@ class Order(models.Model):
 
     discounted_sub_total = property(_discounted_sub_total)
 
-    def _get_balance_remaining_url(self):
-        return ('satchmo_balance_remaining_order', None, {'order_id' : self.id})
-    get_balance_remaining_url = models.permalink(_get_balance_remaining_url)
+    def get_balance_remaining_url(self):
+        return reverse('satchmo_balance_remaining_order', kwargs={'order_id' : self.id})
 
     def _partially_paid(self):
         return self.balance_paid > Decimal("0.0000000000")

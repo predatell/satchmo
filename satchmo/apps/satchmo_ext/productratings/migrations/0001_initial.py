@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ProductRating',
             fields=[
-                ('comment', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='django_comments.Comment', verbose_name=b'Rating')),
+                ('comment', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='django_comments.Comment', verbose_name='Rating')),
                 ('rating', models.IntegerField(verbose_name='Rating')),
             ],
         ),

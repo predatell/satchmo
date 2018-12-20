@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             name='CarrierTranslation',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('languagecode', models.CharField(choices=[(b'en', b'English')], max_length=10, verbose_name='language')),
+                ('languagecode', models.CharField(choices=[('en', 'English')], max_length=10, verbose_name='language')),
                 ('name', models.CharField(max_length=50, verbose_name='Carrier')),
                 ('description', models.CharField(max_length=200, verbose_name='Description')),
                 ('method', models.CharField(help_text='i.e. US Mail', max_length=200, verbose_name='Method')),

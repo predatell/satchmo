@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=200, verbose_name='Description')),
                 ('unit_cost', models.DecimalField(verbose_name='Unit Cost', max_digits=6, decimal_places=2)),
                 ('inventory', models.DecimalField(verbose_name='Inventory', max_digits=18, decimal_places=6)),
-                ('supplier', models.ForeignKey(verbose_name='Supplier', to='contact.Organization')),
+                ('supplier', models.ForeignKey(verbose_name='Supplier', to='contact.Organization', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Raw Item',
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('order_tax', models.DecimalField(verbose_name='Tax', max_digits=6, decimal_places=2)),
                 ('order_notes', models.CharField(max_length=200, verbose_name='Notes', blank=True)),
                 ('order_total', models.DecimalField(verbose_name='Total', max_digits=6, decimal_places=2)),
-                ('supplier', models.ForeignKey(verbose_name='Supplier', to='contact.Organization')),
+                ('supplier', models.ForeignKey(verbose_name='Supplier', to='contact.Organization', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Supplier Order',
@@ -51,8 +51,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('line_item_quantity', models.IntegerField(verbose_name='Line Item Quantity')),
                 ('line_item_total', models.DecimalField(verbose_name='Line Item Total', max_digits=6, decimal_places=2)),
-                ('line_item', models.ForeignKey(verbose_name='Line Item', to='supplier.RawItem')),
-                ('order', models.ForeignKey(to='supplier.SupplierOrder')),
+                ('line_item', models.ForeignKey(verbose_name='Line Item', to='supplier.RawItem', on_delete=models.CASCADE)),
+                ('order', models.ForeignKey(to='supplier.SupplierOrder', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(blank=True, max_length=20, verbose_name='Status', choices=[('Sent in', 'Sent in'), ('Shipped', 'Shipped'), ('Received', 'Received')])),
                 ('notes', models.CharField(max_length=100, verbose_name='Notes', blank=True)),
                 ('date', models.DateTimeField(verbose_name='Date', blank=True)),
-                ('order', models.ForeignKey(to='supplier.SupplierOrder')),
+                ('order', models.ForeignKey(to='supplier.SupplierOrder', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Supplier Order Status',

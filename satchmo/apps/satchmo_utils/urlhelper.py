@@ -79,7 +79,10 @@ def replace_urlpatterns(urlpatterns, replacelist):
         replace_urlpattern(urlpatterns, replace)
 
 def reverse_admin_url(model, action, args=None, kwargs=None):
-    from django.core.urlresolvers import reverse
+    try:
+        from django.core.urlresolvers import reverse
+    except ImportError:
+        from django.urls import reverse
     try:
         model_name = model._meta.module_name
     except AttributeError:

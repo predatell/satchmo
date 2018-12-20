@@ -58,11 +58,11 @@ class Taxable(models.Model):
     in the product. You disable it per-jurisdiction by disabling it here. You
     cannot enable it here if it is disabled on the product itself.
     """
-    taxClass = models.ForeignKey(TaxClass, verbose_name=_('Tax Class'))
+    taxClass = models.ForeignKey(TaxClass, verbose_name=_('Tax Class'), on_delete=models.CASCADE)
     taxZone = models.ForeignKey(AdminArea, blank=True, null=True,
-        verbose_name=_('Tax Zone'))
+        verbose_name=_('Tax Zone'), on_delete=models.SET_NULL)
     taxCountry = models.ForeignKey(Country, blank=True, null=True,
-        verbose_name=_('Tax Country'))
+        verbose_name=_('Tax Country'), on_delete=models.SET_NULL)
     isTaxable = models.BooleanField(verbose_name=_('Taxable?'), default=True, )
     useIntrastate = models.BooleanField(verbose_name=_('Use Intrastate rate instead of Interstate?'),
                                         default=True)

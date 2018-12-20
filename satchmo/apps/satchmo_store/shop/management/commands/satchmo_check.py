@@ -2,7 +2,10 @@ from __future__ import print_function
 from decimal import Decimal
 from distutils.version import LooseVersion
 from django.core.management.base import BaseCommand
-from django.core import urlresolvers
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from importlib import import_module
 import django
 import imp
@@ -113,10 +116,10 @@ class Command(BaseCommand):
         except Exception as e:
             error_out("Can not use livesettings: %s" % e)
         else:
-            # The function urlresolvers.reverse has its own way of error reporting to screen and we have no access
+            # The function reverse has its own way of error reporting to screen and we have no access
             # to it so that we call it only if basic preconditions are fulfilled.
             try:
-                url = urlresolvers.reverse('satchmo_search')
+                url = reverse('satchmo_search')
                 # Catch SystemExit, because if an error occurs, `urlresolvers` usually calls sys.exit() and other error
                 # messages would be lost.
             except (Exception, SystemExit) as e:

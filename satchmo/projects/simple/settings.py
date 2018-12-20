@@ -50,7 +50,7 @@ ALLOWED_HOSTS = [
     "satchmoserver",
 ]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -63,6 +63,7 @@ MIDDLEWARE_CLASSES = (
     #"satchmo_ext.recentlist.middleware.RecentProductMiddleware",
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
+#MIDDLEWARE_CLASSES = MIDDLEWARE
 
 #this is used to add additional config variables to each request
 # NOTE: overridden in local_settings.py

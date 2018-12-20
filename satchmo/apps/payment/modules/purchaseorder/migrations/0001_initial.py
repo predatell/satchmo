@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('balance', models.DecimalField(null=True, verbose_name='Outstanding Balance', max_digits=18, decimal_places=10, blank=True)),
                 ('paydate', models.DateField(null=True, verbose_name='Paid on', blank=True)),
                 ('notes', models.TextField(null=True, verbose_name='Notes', blank=True)),
-                ('order', models.ForeignKey(to='shop.Order')),
+                ('order', models.ForeignKey(to='shop.Order', on_delete=models.CASCADE)),
             ],
             options={
             },

@@ -5,11 +5,14 @@ import datetime
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import timezone
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 import keyedcache
 import six
@@ -100,7 +103,7 @@ class CategoryTest(TestCase):
         self.assertRaises(ValidationError, self.womens_jewelry.save)
 
     def test_absolute_url(self):
-        exp_url = urlresolvers.reverse('satchmo_category', kwargs={
+        exp_url = reverse('satchmo_category', kwargs={
             'slug': self.womens_jewelry.slug
         })
         self.assertEqual(self.womens_jewelry.get_absolute_url(), exp_url)
@@ -393,7 +396,7 @@ class ProductExportTest(TestCase):
         """
         Test the content type of an exported text file.
         """
-        url = urlresolvers.reverse('satchmo_admin_product_export')
+        url = reverse('satchmo_admin_product_export')
 
         form_data = {
             'format': 'yaml',
@@ -418,7 +421,7 @@ class ProductExportTest(TestCase):
         """
         Test the content type of an exported zip file.
         """
-        url = urlresolvers.reverse('satchmo_admin_product_export')
+        url = reverse('satchmo_admin_product_export')
         form_data = {
             'format': 'yaml',
             'include_images': True,

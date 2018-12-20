@@ -19,9 +19,9 @@ class Migration(migrations.Migration):
                 ('isTaxable', models.BooleanField(default=True, verbose_name='Taxable?')),
                 ('useIntrastate', models.BooleanField(default=True, verbose_name='Use Intrastate rate instead of Interstate?')),
                 ('useFood', models.BooleanField(default=False, verbose_name='Use food/drug rate instead of general?')),
-                ('taxClass', models.ForeignKey(verbose_name='Tax Class', to='product.TaxClass')),
-                ('taxCountry', models.ForeignKey(verbose_name='Tax Country', blank=True, to='l10n.Country', null=True)),
-                ('taxZone', models.ForeignKey(verbose_name='Tax Zone', blank=True, to='l10n.AdminArea', null=True)),
+                ('taxClass', models.ForeignKey(verbose_name='Tax Class', to='product.TaxClass', on_delete=models.CASCADE)),
+                ('taxCountry', models.ForeignKey(verbose_name='Tax Country', blank=True, to='l10n.Country', null=True, on_delete=models.SET_NULL)),
+                ('taxZone', models.ForeignKey(verbose_name='Tax Zone', blank=True, to='l10n.AdminArea', null=True, on_delete=models.SET_NULL)),
             ],
             options={
                 'verbose_name': 'Taxable Class',

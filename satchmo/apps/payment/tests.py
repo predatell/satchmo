@@ -1,10 +1,13 @@
 from decimal import Decimal
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
-from django.core.urlresolvers import reverse as url
 from django.test import TestCase
 from django.test.client import Client
+try:
+    from django.core.urlresolvers import reverse, NoReverseMatch
+except ImportError:
+    from django.urls import reverse, NoReverseMatch
+
 from l10n.models import *
 from livesettings.functions import config_get, config_get_group
 from payment import utils
@@ -73,7 +76,7 @@ class TestModulesSettings(TestCase):
         try:
             t = lookup_url(self.dummy, 'test_doesnt_exist')
             self.fail('Should have failed with NoReverseMatch')
-        except urlresolvers.NoReverseMatch:
+        except NoReverseMatch:
             pass
 
     def testUrlPatterns(self):
@@ -152,25 +155,25 @@ class TestMinimumOrder(TestCase):
 
         #start with no min.
         min_order.update("0.00")
-        producturl = urlresolvers.reverse("satchmo_product", kwargs={'product_slug' : 'dj-rocks'})
+        producturl = reverse("satchmo_product", kwargs={'product_slug' : 'dj-rocks'})
         response = self.client.get(producturl)
         self.assertContains(response, "Django Rocks shirt", count=2, status_code=200)
-        cartadd = urlresolvers.reverse('satchmo_cart_add')
+        cartadd = reverse('satchmo_cart_add')
         response = self.client.post(cartadd, { "productname" : "dj-rocks",
                                                       "1" : "L",
                                                       "2" : "BL",
                                                       "quantity" : '2'})
-        carturl = urlresolvers.reverse('satchmo_cart')
+        carturl = reverse('satchmo_cart')
         self.assertRedirects(response, carturl,
             status_code=302, target_status_code=200)
         response = self.client.get(carturl)
         self.assertContains(response, "Django Rocks shirt (Large/Blue)", count=1, status_code=200)
-        response = self.client.get(url('satchmo_checkout-step1'))
+        response = self.client.get(reverse('satchmo_checkout-step1'))
         self.assertContains(response, "Billing Information", count=1, status_code=200)
 
         # now check for min order not met
         min_order.update("100.00")
-        response = self.client.get(url('satchmo_checkout-step1'))
+        response = self.client.get(reverse('satchmo_checkout-step1'))
         self.assertContains(response, "This store requires a minimum order", count=1, status_code=200)
 
         # add a bunch of shirts, to make the min order
@@ -180,7 +183,7 @@ class TestMinimumOrder(TestCase):
                                                       "quantity" : '10'})
         self.assertRedirects(response, carturl,
             status_code=302, target_status_code=200)
-        response = self.client.get(url('satchmo_checkout-step1'))
+        response = self.client.get(reverse('satchmo_checkout-step1'))
         self.assertContains(response, "Billing Information", count=1, status_code=200)
 
 

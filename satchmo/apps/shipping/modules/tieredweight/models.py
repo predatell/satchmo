@@ -119,7 +119,7 @@ class Carrier(models.Model):
     ordering = models.IntegerField(_('Ordering'), default=0)
     active = models.BooleanField(_('Active'), default=True)
     default_zone = models.ForeignKey('Zone', verbose_name=_('default_zone'), 
-        related_name='default', null=True, blank=True)
+        related_name='default', null=True, blank=True, on_delete=models.SET_NULL)
 
 
     def __str__(self):
@@ -143,7 +143,7 @@ class Carrier(models.Model):
 
 @python_2_unicode_compatible
 class Zone(models.Model):
-    carrier = models.ForeignKey(Carrier, verbose_name=_('carrier'), related_name='zones')
+    carrier = models.ForeignKey(Carrier, verbose_name=_('carrier'), related_name='zones', on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=50)
     countries = models.ManyToManyField(Country, verbose_name=_('countries'), blank=True)
     handling = models.DecimalField(_('handling'), max_digits=10, decimal_places=2,
@@ -245,7 +245,7 @@ class Zone(models.Model):
 
 @python_2_unicode_compatible
 class ZoneTranslation(models.Model):
-    zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='translations')
+    zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='translations', on_delete=models.CASCADE)
     lang_code = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
     description = models.CharField(_('description'), max_length=200)
     method = models.CharField(_('method'), help_text=_('i.e. Air, Land, Sea'), max_length=200)
@@ -262,7 +262,7 @@ class ZoneTranslation(models.Model):
 
 @python_2_unicode_compatible
 class WeightTier(models.Model):
-    zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='tiers')
+    zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='tiers', on_delete=models.CASCADE)
     min_weight = models.DecimalField(_('min weight'), max_digits=10, decimal_places=2, help_text=_("This tier will be used for weights up to this value. i.e.: this is the MAXIMUM weight this tier will be used for."))
     handling = models.DecimalField(_('handling adjustment'), max_digits=10, decimal_places=2,
         null=True, blank=True)

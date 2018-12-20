@@ -1,11 +1,15 @@
 from decimal import Decimal
 from django.conf import settings
-from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
+try:
+    from django.core.urlresolvers import NoReverseMatch
+except ImportError:
+    from django.urls import NoReverseMatch
+    
 from livesettings.functions import config_get_group, config_value
 from payment.config import gateway_live
 from payment.utils import get_processor_by_key
@@ -61,7 +65,7 @@ def confirm_info(request):
     try:
         address = lookup_url(payment_module,
             payment_module.RETURN_ADDRESS.value, include_server=True)
-    except urlresolvers.NoReverseMatch:
+    except NoReverseMatch:
         address = payment_module.RETURN_ADDRESS.value
 
     try:

@@ -1,9 +1,13 @@
 from decimal import Decimal
 from django.contrib.sites.models import Site
-from django.core import urlresolvers
 from django.test import TestCase
 from django.test.client import Client
 from django.utils import timezone
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from product.models import *
 from satchmo_store.contact.models import *
 from satchmo_store.shop.models import *
@@ -62,7 +66,7 @@ class TestRecurringBilling(TestCase):
 
         order_count = OrderItem.objects.count()
         self.c = Client()
-        url = urlresolvers.reverse('satchmo_cron_rebill')
+        url = reverse('satchmo_cron_rebill')
         self.response = self.c.get(url)
         self.assertEqual(self.response.status_code, 200)
         self.assertEqual(self.response.content, b'Authentication Key Required')

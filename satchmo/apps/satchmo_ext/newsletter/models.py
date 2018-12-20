@@ -107,7 +107,7 @@ class SubscriptionAttribute(models.Model):
     """
     Allows arbitrary name/value pairs (as strings) to be attached to a subscription.
     """
-    subscription = models.ForeignKey(Subscription, related_name="attributes")
+    subscription = models.ForeignKey(Subscription, related_name="attributes", on_delete=models.CASCADE)
     name = models.SlugField(_("Attribute Name"), max_length=100, )
     value = models.CharField(_("Value"), max_length=255)
 

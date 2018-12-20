@@ -1,8 +1,12 @@
 from django.conf import settings
-from django.core import urlresolvers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
+    
 from product.modules.downloadable.models import DownloadLink
 from satchmo_store.shop.signals import sendfile_url_for_file
 import mimetypes
@@ -49,7 +53,7 @@ def process(request, download_key):
         # The key is valid so let's set the session variable and redirect to the
         # download view
         request.session['download_key'] = download_key
-        url = urlresolvers.reverse('satchmo_download_send', kwargs= {'download_key': download_key})
+        url = reverse('satchmo_download_send', kwargs= {'download_key': download_key})
         context = {'download_product': dl_product, 'dl_url' : url}
         return render(request, 'shop/download.html', context)
 
@@ -60,11 +64,11 @@ def send_file(request, download_key):
     download in order to maintain security.
     """
     if not request.session.get('download_key', False):
-        url = urlresolvers.reverse('satchmo_download_process', kwargs = {'download_key': download_key})
+        url = reverse('satchmo_download_process', kwargs = {'download_key': download_key})
         return HttpResponseRedirect(url)
     valid, msg, dl_product = _validate_key(request.session['download_key'])
     if not valid:
-        url = urlresolvers.reverse('satchmo_download_process', kwargs = {'download_key': request.session['download_key']})
+        url = reverse('satchmo_download_process', kwargs = {'download_key': request.session['download_key']})
         return HttpResponseRedirect(url)
 
     # some temp vars

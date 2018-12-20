@@ -1,9 +1,12 @@
 from django.conf import settings
-from django.core import urlresolvers
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.safestring import mark_safe
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 try:
     from django.utils.simplejson.encoder import JSONEncoder
 except ImportError:
@@ -62,7 +65,7 @@ def wishlist_add(request):
         return bad_or_missing(request, _('The product you have requested does not exist.'))
         
     wish = ProductWish.objects.create_if_new(product, contact, details)
-    url = urlresolvers.reverse('satchmo_wishlist_view')
+    url = reverse('satchmo_wishlist_view')
     return HttpResponseRedirect(url)
 
 def wishlist_add_ajax(request, template="shop/json.html"):
@@ -120,7 +123,7 @@ def wishlist_move_to_cart(request):
                 }
             return wishlist_view(request, message=msg)
             
-        url = urlresolvers.reverse('satchmo_cart')
+        url = reverse('satchmo_cart')
         satchmo_cart_changed.send(cart, cart=cart, request=request)
         return HttpResponseRedirect(url)
     else:
