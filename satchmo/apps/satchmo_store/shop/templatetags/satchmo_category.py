@@ -82,7 +82,7 @@ def category_tree(id=None):
                 link = li.find("a")
                 link.attrib["class"] = "current"
                 break
-    return tostring(existing_tree, 'utf-8')
+    return tostring(existing_tree, 'utf-8').decode()
 
 class CategoryListNode(Node):
     """Template Node tag which pushes the category list into the context"""
