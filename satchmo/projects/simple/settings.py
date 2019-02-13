@@ -2,6 +2,7 @@
 # If you have an existing project, then ensure that you modify local_settings.py
 # and import it from your main settings file. (from local_settings import *)
 import os
+import django
 
 DIRNAME = os.path.dirname(__file__)
 
@@ -50,7 +51,7 @@ ALLOWED_HOSTS = [
     "satchmoserver",
 ]
 
-MIDDLEWARE = (
+MIDDLEWARES = (
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -63,7 +64,11 @@ MIDDLEWARE = (
     #"satchmo_ext.recentlist.middleware.RecentProductMiddleware",
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
-#MIDDLEWARE_CLASSES = MIDDLEWARE
+# use MIDDLEWARE_CLASSES for Django 1.* or use MIDDLEWARE for Dajngo 2.*
+if django.VERSION[0] > 1:
+    MIDDLEWARE = MIDDLEWARES
+else:
+    MIDDLEWARE_CLASSES = MIDDLEWARES
 
 #this is used to add additional config variables to each request
 # NOTE: overridden in local_settings.py

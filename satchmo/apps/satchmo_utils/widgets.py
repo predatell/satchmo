@@ -58,10 +58,10 @@ class BaseCurrencyWidget(forms.TextInput):
 
 class CurrencyWidget(BaseCurrencyWidget):
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, **kwargs):
         if value != '':
             value = _render_decimal(value, places=8)
-        rendered = super(CurrencyWidget, self).render(name, value, attrs)
+        rendered = super(CurrencyWidget, self).render(name, value, **kwargs)
         curr = get_l10n_default_currency_symbol()
         curr = curr.replace("_", "&nbsp;")
         return mark_safe('<span class="currency">%s</span>%s' % (curr, rendered))
@@ -71,9 +71,9 @@ class TruncatedCurrencyWidget(BaseCurrencyWidget):
     A Text Input widget that shows the currency amount - stripped to two digits by default.
     """
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, **kwargs):
         value = _render_decimal(value, places=2)
-        rendered = super(TruncatedCurrencyWidget, self).render(name, value, attrs)
+        rendered = super(TruncatedCurrencyWidget, self).render(name, value, **kwargs)
         curr = get_l10n_default_currency_symbol()
         curr = curr.replace("_", "&nbsp;")
         return mark_safe('<span class="currency">%s</span>%s' % (curr, rendered))
@@ -89,8 +89,8 @@ class StrippedDecimalWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(StrippedDecimalWidget, self).__init__(attrs=final_attrs)
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value,  **kwargs):
         value = _render_decimal(value, places=8, min_places=0)
-        return super(StrippedDecimalWidget, self).render(name, value, attrs)
+        return super(StrippedDecimalWidget, self).render(name, value, **kwargs)
 
 
