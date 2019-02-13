@@ -12,7 +12,7 @@ class AdminImageWithThumbnailWidget(AdminImageMixin, forms.FileInput):
     def __init__(self, attrs={}):
         super(AdminImageWithThumbnailWidget, self).__init__(attrs)
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, **kwargs):
         output = []
         if value and hasattr(value, "path"):
             # Generate 120px wide thumbnail for the admin interface
@@ -21,5 +21,5 @@ class AdminImageWithThumbnailWidget(AdminImageMixin, forms.FileInput):
                     quality=config_value('THUMBNAIL', 'IMAGE_QUALITY'))
             output.append('<img src="%s" /><br/>%s<br/> %s ' % \
                 (thumb.url, value.url, _('Change:')))
-        output.append(super(AdminImageWithThumbnailWidget, self).render(name, value, attrs))
+        output.append(super(AdminImageWithThumbnailWidget, self).render(name, value, **kwargs))
         return mark_safe(''.join(output))
