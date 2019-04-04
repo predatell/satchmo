@@ -15,12 +15,12 @@ def _render_decimal(value, places=2, min_places=2):
     # saved.
     bad_decimal = False
     try:
-        Decimal(value)
+        decimal_value = Decimal(value)
     except:
         bad_decimal = True
     if value is not None and not bad_decimal:
         roundfactor = "0." + "0"*(places-1) + "1"
-        if value < 0:
+        if decimal_value < 0:
             roundfactor = "-" + roundfactor
 
         value = round_decimal(val=value, places=places, roundfactor=roundfactor, normalize=True)
