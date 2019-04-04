@@ -16,7 +16,9 @@ email_re = re.compile(
             
 class EmailBackend(ModelBackend):
     """Authenticate using email only"""
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, *args, **kwargs):
+        username = kwargs.get("username")
+        password = kwargs.get("password")
         #If username is an email address, then try to pull it up
         if email_re.search(username):
             user = User.objects.filter(email__iexact=username)
