@@ -20,11 +20,11 @@ class EmailBackend(ModelBackend):
         username = kwargs.get("username")
         password = kwargs.get("password")
         #If username is an email address, then try to pull it up
-        if email_re.search(username):
-            user = User.objects.filter(email__iexact=username)
-            if user.count() > 0:
-                user = user[0]
+        if username and password and email_re.search(username):
+            try:
+                user = User.objects.filter(email__iexact=username)[0]
                 if user.check_password(password):
                     return user
+            except IndexError:
+                pass
         return None
-            
