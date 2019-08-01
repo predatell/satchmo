@@ -327,8 +327,11 @@ def display_featured(queryset=None, num_to_display=None, random_display=None):
     if random_display is None:
         random_display = config_value('PRODUCT','RANDOM_FEATURED')
 
-    if not random_display:
+    if random_display:
+        queryset = queryset.order_by('?')
+    
+    if num_to_display and num_to_display < queryset.count():
         return queryset[:num_to_display]
-    else:
-        return queryset.order_by('?')[:num_to_display]
+
+    return queryset
     
