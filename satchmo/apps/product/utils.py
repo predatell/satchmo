@@ -315,19 +315,20 @@ def optionids_from_post(configurableproduct, POST):
             chosen_options.append('%s-%s' % (opt_grp.id, POST[str(opt_grp.id)]))
     return sorted_tuple(chosen_options)
     
-def display_featured(num_to_display=None, random_display=None):
+def display_featured(queryset=None, num_to_display=None, random_display=None):
     """
     Used by the index generic view to choose how the featured products are displayed.
     Items can be displayed randomly or all in order
     """
+    if queryset is None:
+        queryset = Product.objects.featured_by_site()
     if num_to_display is None:
         num_to_display = config_value('PRODUCT','NUM_DISPLAY')
     if random_display is None:
         random_display = config_value('PRODUCT','RANDOM_FEATURED')
 
-    q = Product.objects.featured_by_site()
     if not random_display:
-        return q[:num_to_display]
+        return queryset[:num_to_display]
     else:
-        return q.order_by('?')[:num_to_display]
+        return queryset.order_by('?')[:num_to_display]
     

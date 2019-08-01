@@ -12,7 +12,11 @@ class HomeListView(ListView):
     context_object_name = "all_products_list"
 
     def get_queryset(self):
-        return display_featured()
+        return Product.objects.featured_by_site()
 
     def get_paginate_by(self, queryset):
         return config_value('PRODUCT','NUM_PAGINATED')
+    
+    def get_context_data(self, **kwargs):
+        kwargs['object_list'] = display_featured(queryset=self.object_list)
+        return super(HomeListView, self).get_context_data(**kwargs)
