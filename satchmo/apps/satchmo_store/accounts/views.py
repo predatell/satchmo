@@ -243,7 +243,7 @@ def activate(request, activation_key):
     from registration.models import RegistrationProfile
     activation_key = activation_key.lower()
     site = Site.objects.get_current()
-    account = RegistrationProfile.objects.activate_user(activation_key, site)
+    account = RegistrationProfile.objects.activate_user(activation_key, site)[0]
 
     if account:
         # ** hack for logging in the user **

@@ -230,7 +230,7 @@ class AddressCreateEditView(ContactFromRequestMixin, SingleObjectMixin, FormView
     
     def get_object(self):
         try:
-            super(AddressCreateEditView, self).get_object()
+            return super(AddressCreateEditView, self).get_object()
         except AttributeError:
             pass
 
@@ -312,7 +312,7 @@ class AddressDeleteView(ContactFromRequestMixin, DeleteView):
 
     def get_object(self):
         try:
-            super(AddressDeleteView, self).get_object()
+            return super(AddressDeleteView, self).get_object()
         except AttributeError:
             pass
 

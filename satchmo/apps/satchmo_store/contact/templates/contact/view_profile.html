@@ -30,7 +30,7 @@
 <h5>{% trans "Address Book Entries" %}</h5>
 <ul class="profile">
 {% for address in user_data.address_book_entries %}
-    <li>{{ address.description }} <a href="{% url 'satchmo_address_edit' address.pk%}">{% trans 'Edit' %}</a> | <a href="{% url 'satchmo_address_delete' address.pk%}">{% trans 'Delete' %}</a></li>
+    <li>{{ address.description }} <a href="{% url 'satchmo_address_edit' address.pk %}">{% trans 'Edit' %}</a> | <a href="{% url 'satchmo_address_delete' address.pk %}">{% trans 'Delete' %}</a></li>
     {% addressblock address %}
 {% endfor %}
 </ul>

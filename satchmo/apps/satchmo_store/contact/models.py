@@ -156,7 +156,7 @@ class Contact(models.Model):
     title = models.CharField(_("Title"), max_length=30, blank=True, null=True)
     first_name = models.CharField(_("First name"), max_length=30, )
     last_name = models.CharField(_("Last name"), max_length=30, )
-    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE)
     role = models.ForeignKey(ContactRole, verbose_name=_("Role"), null=True, on_delete=models.SET_NULL)
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), blank=True, null=True, on_delete=models.SET_NULL)
     dob = models.DateField(_("Date of birth"), blank=True, null=True)
