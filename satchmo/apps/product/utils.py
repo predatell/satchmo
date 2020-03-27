@@ -330,7 +330,7 @@ def display_featured(queryset=None, num_to_display=None, random_display=None):
     if random_display:
         queryset = queryset.order_by('?')
     
-    if num_to_display:
+    if num_to_display and num_to_display < queryset.count():
         return queryset[:num_to_display]
 
     return queryset
