@@ -1,13 +1,12 @@
 # coding=UTF-8
 from django.db import models
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from product.models import TaxClass
 from l10n.models import AdminArea, Country
-#from satchmo_store.shop.models import Order
-#from satchmo_store.shop.signals import order_success
-#from tax import Processor
+# from satchmo_store.shop.models import Order
+# from satchmo_store.shop.signals import order_success
+# from tax import Processor
 
 from datetime import date as _date
 
@@ -17,7 +16,6 @@ except:
     from django.utils._decimal import Decimal
 
 
-@python_2_unicode_compatible
 class Taxable(models.Model):
     """
     Map that says what items are taxable in a jurisdiction.
@@ -59,10 +57,8 @@ class Taxable(models.Model):
     cannot enable it here if it is disabled on the product itself.
     """
     taxClass = models.ForeignKey(TaxClass, verbose_name=_('Tax Class'), on_delete=models.CASCADE)
-    taxZone = models.ForeignKey(AdminArea, blank=True, null=True,
-        verbose_name=_('Tax Zone'), on_delete=models.SET_NULL)
-    taxCountry = models.ForeignKey(Country, blank=True, null=True,
-        verbose_name=_('Tax Country'), on_delete=models.SET_NULL)
+    taxZone = models.ForeignKey(AdminArea, blank=True, null=True, verbose_name=_('Tax Zone'), on_delete=models.SET_NULL)
+    taxCountry = models.ForeignKey(Country, blank=True, null=True, verbose_name=_('Tax Country'), on_delete=models.SET_NULL)
     isTaxable = models.BooleanField(verbose_name=_('Taxable?'), default=True, )
     useIntrastate = models.BooleanField(verbose_name=_('Use Intrastate rate instead of Interstate?'),
                                         default=True)
@@ -76,19 +72,18 @@ class Taxable(models.Model):
             return self.taxCountry.name
     country = property(_country)
 
-    #def _display_percentage(self):
-    #    return "%#2.2f%%" % (100*self.percentage)
-    #_display_percentage.short_description = _('Percentage')
-    #display_percentage = property(_display_percentage)
+    # def _display_percentage(self):
+    #     return "%#2.2f%%" % (100*self.percentage)
+    # _display_percentage.short_description = _('Percentage')
+    # display_percentage = property(_display_percentage)
 
     def __str__(self):
-        return "%s - %s = %s" % (self.taxClass,
-                             self.taxZone and self.taxZone or self.taxCountry,
-                             self.isTaxable)
+        return "%s - %s = %s" % (self.taxClass, self.taxZone and self.taxZone or self.taxCountry, self.isTaxable)
 
     class Meta:
         verbose_name = _("Taxable Class")
         verbose_name_plural = _("Taxable Classes")
+
 
 JURISDICTION_CHOICES = (
     (0, 'County'),
@@ -134,7 +129,6 @@ JURISDICTION_CHOICES = (
 )
 
 
-@python_2_unicode_compatible
 class TaxRate(models.Model):
     """
     Records for tax rates in the default SST format as defined at:
@@ -142,16 +136,11 @@ class TaxRate(models.Model):
     """
     state = models.IntegerField(verbose_name=_('FIPS State Code'), db_index=True)
     jurisdictionType = models.IntegerField(choices=JURISDICTION_CHOICES, verbose_name=_('Type'))
-    jurisdictionFipsCode = models.CharField(max_length=5,
-        verbose_name=_('FIPS Code'), db_index=True)
-    generalRateIntrastate = models.DecimalField(max_digits=8, decimal_places=7,
-        verbose_name=_('General Tax Rate - Intrastate'))
-    generalRateInterstate = models.DecimalField(max_digits=8, decimal_places=7,
-        verbose_name=_('General Tax Rate - Interstate'))
-    foodRateIntrastate = models.DecimalField(max_digits=8, decimal_places=7,
-        verbose_name=_('Food/Drug Tax Rate - Intrastate'))
-    foodRateInterstate = models.DecimalField(max_digits=8, decimal_places=7,
-        verbose_name=_('Food/Drug Tax Rate - Interstate'))
+    jurisdictionFipsCode = models.CharField(max_length=5, verbose_name=_('FIPS Code'), db_index=True)
+    generalRateIntrastate = models.DecimalField(max_digits=8, decimal_places=7, verbose_name=_('General Tax Rate - Intrastate'))
+    generalRateInterstate = models.DecimalField(max_digits=8, decimal_places=7, verbose_name=_('General Tax Rate - Interstate'))
+    foodRateIntrastate = models.DecimalField(max_digits=8, decimal_places=7, verbose_name=_('Food/Drug Tax Rate - Intrastate'))
+    foodRateInterstate = models.DecimalField(max_digits=8, decimal_places=7, verbose_name=_('Food/Drug Tax Rate - Interstate'))
     startDate = models.DateField(verbose_name=_('Effective Start Date'))
     endDate = models.DateField(verbose_name=_('Effective End Date'))
 
@@ -178,6 +167,7 @@ class TaxRate(models.Model):
             else:
                 return self.generalRateInterstate
 
+
 TAX_BOUNDRY_CHOICES = (
     ('Z', 'Zip-5 Record'),
     ('4', 'Zip+4 Record'),
@@ -191,63 +181,38 @@ ODD_EVEN_CHOICES = (
 )
 
 
-@python_2_unicode_compatible
 class TaxBoundry(models.Model):
     """
     Records for tax boundries in the default SST format as defined at:
     http://www.streamlinedsalestax.org/Technology/RatesandBoundariesClean082605.pdf
     """
-    recordType = models.CharField(max_length=1, choices=TAX_BOUNDRY_CHOICES,
-        verbose_name=_('Boundry Type'))
+    recordType = models.CharField(max_length=1, choices=TAX_BOUNDRY_CHOICES, verbose_name=_('Boundry Type'))
     startDate = models.DateField(verbose_name=_('Effective Start Date'))
     endDate = models.DateField(verbose_name=_('Effective End Date'))
-    lowAddress = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Low Address Range'))
-    highAddress = models.IntegerField(blank=True, null=True,
-        verbose_name=_('High Address Range'))
-    oddEven = models.CharField(max_length=1, blank=True, null=True, choices=ODD_EVEN_CHOICES,
-        verbose_name=_('Odd / Even Range Indicator'))
-    streetPreDirection = models.CharField(max_length=2, blank=True, null=True,
-        verbose_name=_('State Pre-Directional Abbr.'))
-    streetName = models.CharField(max_length=20, blank=True, null=True,
-        verbose_name=_('Street Name'))
-    streetSuffix = models.CharField(max_length=4, blank=True, null=True,
-        verbose_name=_('Street Suffix Abbr.'))
-    streetPostDirection = models.CharField(max_length=2, blank=True, null=True,
-        verbose_name=_('Street Post Directional'))
-    addressSecondaryAbbr = models.CharField(max_length=4, blank=True, null=True,
-        verbose_name=_('Address Secondary - Abbr.'))
-    addressSecondaryLow = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Address Secondary - Low'))
-    addressSecondaryHigh = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Address Secondary - High'))
-    addressSecondaryOddEven = models.CharField(max_length=1, blank=True, null=True,
-        choices=ODD_EVEN_CHOICES, verbose_name=_('Address Secondary - Odd/Even'))
-    cityName = models.CharField(max_length=28, blank=True, null=True,
-        verbose_name=_('City Name'))
-    zipCode = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Zip Code'))
-    plus4 = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Zip Code - Plus 4'))
-    zipCodeLow = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Zip Code - Low'), db_index=True)
-    zipExtensionLow = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Zip Code Extension - Low'), db_index=True)
-    zipCodeHigh = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Zip Code - High'), db_index=True)
-    zipExtensionHigh = models.IntegerField(blank=True, null=True,
-        verbose_name=_('Zip Code Extension - High'), db_index=True)
+    lowAddress = models.IntegerField(blank=True, null=True, verbose_name=_('Low Address Range'))
+    highAddress = models.IntegerField(blank=True, null=True, verbose_name=_('High Address Range'))
+    oddEven = models.CharField(max_length=1, blank=True, null=True, choices=ODD_EVEN_CHOICES, verbose_name=_('Odd / Even Range Indicator'))
+    streetPreDirection = models.CharField(max_length=2, blank=True, null=True, verbose_name=_('State Pre-Directional Abbr.'))
+    streetName = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Street Name'))
+    streetSuffix = models.CharField(max_length=4, blank=True, null=True, verbose_name=_('Street Suffix Abbr.'))
+    streetPostDirection = models.CharField(max_length=2, blank=True, null=True, verbose_name=_('Street Post Directional'))
+    addressSecondaryAbbr = models.CharField(max_length=4, blank=True, null=True, verbose_name=_('Address Secondary - Abbr.'))
+    addressSecondaryLow = models.IntegerField(blank=True, null=True, verbose_name=_('Address Secondary - Low'))
+    addressSecondaryHigh = models.IntegerField(blank=True, null=True, verbose_name=_('Address Secondary - High'))
+    addressSecondaryOddEven = models.CharField(max_length=1, blank=True, null=True, choices=ODD_EVEN_CHOICES, verbose_name=_('Address Secondary - Odd/Even'))
+    cityName = models.CharField(max_length=28, blank=True, null=True, verbose_name=_('City Name'))
+    zipCode = models.IntegerField(blank=True, null=True, verbose_name=_('Zip Code'))
+    plus4 = models.IntegerField(blank=True, null=True, verbose_name=_('Zip Code - Plus 4'))
+    zipCodeLow = models.IntegerField(blank=True, null=True, verbose_name=_('Zip Code - Low'), db_index=True)
+    zipExtensionLow = models.IntegerField(blank=True, null=True, verbose_name=_('Zip Code Extension - Low'), db_index=True)
+    zipCodeHigh = models.IntegerField(blank=True, null=True, verbose_name=_('Zip Code - High'), db_index=True)
+    zipExtensionHigh = models.IntegerField(blank=True, null=True, verbose_name=_('Zip Code Extension - High'), db_index=True)
     serCode = models.CharField(max_length=5, verbose_name=_('Composite SER Code'), blank=True, null=True)
-    fipsStateCode = models.CharField(max_length=2, blank=True, null=True,
-        verbose_name=_('FIPS State Code'))
-    fipsStateIndicator = models.CharField(max_length=2, blank=True, null=True,
-        verbose_name=_('FIPS State Indicator'))
-    fipsCountyCode = models.CharField(max_length=3, blank=True, null=True,
-        verbose_name=_('FIPS County Code'))
-    fipsPlaceCode = models.CharField(max_length=5, blank=True, null=True,
-        verbose_name=_('FIPS Place Code'))
-    fipsPlaceType = models.CharField(max_length=2, blank=True, null=True,
-        verbose_name=_('FIPS Place Type'), choices=JURISDICTION_CHOICES)
+    fipsStateCode = models.CharField(max_length=2, blank=True, null=True, verbose_name=_('FIPS State Code'))
+    fipsStateIndicator = models.CharField(max_length=2, blank=True, null=True, verbose_name=_('FIPS State Indicator'))
+    fipsCountyCode = models.CharField(max_length=3, blank=True, null=True, verbose_name=_('FIPS County Code'))
+    fipsPlaceCode = models.CharField(max_length=5, blank=True, null=True, verbose_name=_('FIPS Place Code'))
+    fipsPlaceType = models.CharField(max_length=2, blank=True, null=True, verbose_name=_('FIPS Place Type'), choices=JURISDICTION_CHOICES)
     special_1_code = models.CharField(max_length=5, verbose_name=_('FIPS Special 1 code'), blank=True, null=True)
     special_1_type = models.CharField(max_length=2, verbose_name=_('FIPS Special 1 type'), blank=True, null=True, choices=JURISDICTION_CHOICES)
     special_2_code = models.CharField(max_length=5, verbose_name=_('FIPS Special 2 code'), blank=True, null=True)
@@ -307,10 +272,10 @@ class TaxBoundry(models.Model):
     def rates(self, date=None):
         l = list()
         state = self.fipsStateCode
-        
+
         if not date:
             date = _date.today()
-            
+
         # Lookup all the applicable codes.
         for fips in (
             self.fipsStateIndicator, self.fipsCountyCode, self.fipsPlaceCode,
@@ -324,15 +289,15 @@ class TaxBoundry(models.Model):
         ):
             if not fips:
                 continue
-            
+
             rate = TaxRate.objects.get(
                 state=state,
                 jurisdictionFipsCode=fips,
                 startDate__lte=date,
                 endDate__gte=date,
             )
-            l.append( rate  )
-        
+            l.append(rate)
+
         return l
 
     def get_percentage(self, date=None):
@@ -343,8 +308,8 @@ class TaxBoundry(models.Model):
         for x in self.rates(date):
             pct += x.rate(intrastate=self.useIntrastate, food=self.useFood)
         return pct
-    percentage=property(get_percentage)
-    
+    percentage = property(get_percentage)
+
     def __str__(self):
         if self.recordType == 'Z':
             return 'TaxBoundry(Z): %i -- %i' % (
@@ -364,7 +329,7 @@ class TaxBoundry(models.Model):
         for it."""
         if not date:
             date = _date.today()
-        
+
         # Try for a ZIP+4 lookup first if we can.
         if ext:
             try:
@@ -380,7 +345,7 @@ class TaxBoundry(models.Model):
             except cls.DoesNotExist:
                 # Not all zip+4 have entires. That's OK.
                 pass
-        
+
         # Try for just the ZIP then.
         try:
             return cls.objects.get(
@@ -398,19 +363,19 @@ class TaxBoundry(models.Model):
         verbose_name_plural = _("Tax Boundries")
 
 
-#class TaxCollected(models.Model):
-#    order = models.ForeignKey(Order, verbose_name=_("Order"))
-#    taxRate = models.ForeignKey(TaxRate, verbose_name=_('Tax Rate'))
-#    useIntrastate = models.BooleanField(verbose_name=_('Use Intrastate rate instead of Interstate?'),
-#                                        default=True)
-#    useFood = models.BooleanField(verbose_name=_('Use food/drug rate instead of general?'),
-#                                  default=False)
+# class TaxCollected(models.Model):
+#     order = models.ForeignKey(Order, verbose_name=_("Order"))
+#     taxRate = models.ForeignKey(TaxRate, verbose_name=_('Tax Rate'))
+#     useIntrastate = models.BooleanField(verbose_name=_('Use Intrastate rate instead of Interstate?'),
+#                                         default=True)
+#     useFood = models.BooleanField(verbose_name=_('Use food/drug rate instead of general?'),
+#                                   default=False)
 #
-#def save_taxes_collected(order, **kwargs):
-#    processor = Processor(order=order)
-#    tb = processor.get_boundry()
+# def save_taxes_collected(order, **kwargs):
+#     processor = Processor(order=order)
+#     tb = processor.get_boundry()
 #
 
-#order_success.connect(save_taxes_colletecd)
+# order_success.connect(save_taxes_colletecd)
 
 from . import config

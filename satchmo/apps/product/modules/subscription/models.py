@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -12,13 +11,13 @@ from satchmo_utils import add_month
 from satchmo_utils.fields import CurrencyField
 import six
 
-SATCHMO_PRODUCT=True
+SATCHMO_PRODUCT = True
+
 
 def get_product_types():
     return ('SubscriptionProduct',)
 
 
-@python_2_unicode_compatible
 class SubscriptionProduct(models.Model):
     """
     This type of Product is for recurring billing (memberships, subscriptions, payment terms)
@@ -115,7 +114,7 @@ class SubscriptionProduct(models.Model):
         return expiredate
 
     def save(self, **kwargs):
-        if hasattr(self.product,'_sub_types'):
+        if hasattr(self.product, '_sub_types'):
             del self.product._sub_types
         super(SubscriptionProduct, self).save(**kwargs)
 
@@ -124,7 +123,6 @@ class SubscriptionProduct(models.Model):
         verbose_name_plural = _("Subscription Products")
 
 
-@python_2_unicode_compatible
 class Trial(models.Model):
     """
     Trial billing terms for subscription products.
@@ -144,7 +142,7 @@ class Trial(models.Model):
 
     def _occurrences(self):
         if self.expire_length:
-            return int(self.expire_length/self.subscription.expire_length)
+            return int(self.expire_length / self.subscription.expire_length)
         else:
             return 0
     occurrences = property(fget=_occurrences)
@@ -163,4 +161,3 @@ class Trial(models.Model):
         ordering = ['-id']
         verbose_name = _("Trial Terms")
         verbose_name_plural = _("Trial Terms")
-
