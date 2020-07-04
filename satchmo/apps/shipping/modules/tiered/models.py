@@ -2,16 +2,18 @@
 Tiered shipping models
 """
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
-from decimal import Decimal
-from django.conf import settings
-from django.db import models
-from django.utils.translation import get_language, ugettext_lazy as _
-from shipping.modules.base import BaseShipper
 import datetime
 import logging
 import operator
 from six.moves import reduce
+from six import python_2_unicode_compatible
+from decimal import Decimal
+
+from django.conf import settings
+from django.db import models
+from django.utils.translation import get_language, ugettext_lazy as _
+
+from shipping.modules.base import BaseShipper
 from livesettings.functions import config_value
 
 log = logging.getLogger('shipping.Tiered')
