@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.contrib.auth.models import Group, User
 from django.db import models
@@ -13,7 +14,6 @@ import datetime
 import logging
 
 log = logging.getLogger('tieredpricing.models')
-
 
 class PricingTierManager(models.Manager):
 
@@ -39,15 +39,16 @@ class PricingTierManager(models.Manager):
         return current
 
 
+@python_2_unicode_compatible
 class PricingTier(models.Model):
     """A specific pricing tier, such as "trade customers"
     """
     group = models.OneToOneField(Group, help_text=_('The user group that will receive the discount'), on_delete=models.CASCADE)
     title = models.CharField(_('Title'), max_length=50)
-    discount_percent = models.DecimalField(_("Discount Percent"), null=True, blank=True, max_digits=5, decimal_places=2,
-                                           help_text=_("This is the discount that will be applied to every product if no explicit "
-                                                       "Tiered Price exists for that product.  Leave as 0 if you don't want any "
-                                                       "automatic discount in that case."))
+    discount_percent = models.DecimalField(_("Discount Percent"), null=True, blank=True,
+        max_digits=5, decimal_places=2,
+        help_text=_("This is the discount that will be applied to every product if no explicit Tiered Price exists for that "
+                    "product.  Leave as 0 if you don't want any automatic discount in that case."))
 
     objects = PricingTierManager()
 
@@ -76,7 +77,6 @@ class TieredPriceManager(models.Manager):
                 return qty_discounts[0]
         raise TieredPrice.DoesNotExist
 
-
 class TieredPrice(models.Model):
     """
     A Price which applies only to special tiers.
@@ -84,7 +84,7 @@ class TieredPrice(models.Model):
     pricingtier = models.ForeignKey(PricingTier, related_name="tieredprices", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name="tieredprices", on_delete=models.CASCADE)
     price = CurrencyField(_("Price"), max_digits=14, decimal_places=6, )
-    quantity = models.DecimalField(_("Discount Quantity"), max_digits=18, decimal_places=6, default='1', help_text=_("Use this price only for this quantity or higher"))
+    quantity = models.DecimalField(_("Discount Quantity"), max_digits=18, decimal_places=6,  default='1', help_text=_("Use this price only for this quantity or higher"))
     expires = models.DateField(_("Expires"), null=True, blank=True)
 
     objects = TieredPriceManager()
@@ -92,7 +92,8 @@ class TieredPrice(models.Model):
     def _dynamic_price(self):
         """Get the current price as modified by all listeners."""
         adjust = PriceAdjustmentCalc(self)
-        signals.satchmo_price_query.send(self, adjustment=adjust, slug=self.product.slug, discountable=self.product.is_discountable)
+        signals.satchmo_price_query.send(self, adjustment=adjust,
+            slug=self.product.slug, discountable=self.product.is_discountable)
         return adjust.final_price()
 
     dynamic_price = property(fget=_dynamic_price)
@@ -107,7 +108,7 @@ class TieredPrice(models.Model):
         if self.id:
             prices = prices.exclude(id=self.id)
         if prices.count():
-            return  # Duplicate Price
+            return #Duplicate Price
 
         super(TieredPrice, self).save(**kwargs)
 
@@ -116,7 +117,6 @@ class TieredPrice(models.Model):
         verbose_name = _("Tiered Price")
         verbose_name_plural = _("Tiered Prices")
         unique_together = (("pricingtier", "product", "quantity", "expires"),)
-
 
 def tiered_price_listener(signal, adjustment=None, **kwargs):
     """Listens for satchmo_price_query signals, and returns a tiered price instead of the
@@ -150,7 +150,7 @@ def tiered_price_listener(signal, adjustment=None, **kwargs):
                     except TieredPrice.DoesNotExist:
                         pcnt = tier.discount_percent
                         if pcnt is not None and pcnt != 0:
-                            candidate = currentprice * (100 - pcnt) / 100
+                            candidate = currentprice * (100-pcnt)/100
 
                     if best is None or (candidate and candidate < best):
                         best = candidate
@@ -162,16 +162,14 @@ def tiered_price_listener(signal, adjustment=None, **kwargs):
                     delta = currentprice - best
                     adjustment += PriceAdjustment(
                         'tieredpricing',
-                        _('Tiered Pricing for %(tier)s' % {'tier': besttier.group.name}),
+                        _('Tiered Pricing for %(tier)s' % { 'tier': besttier.group.name}),
                         delta)
 
             except PricingTier.DoesNotExist:
                 pass
 
-
 # dispatch_uid prevents applying the same discount multiple times if the module is imported repeatedly.
 signals.satchmo_price_query.connect(tiered_price_listener, dispatch_uid='tieredpricing.models.tiered_price_listener')
-
 
 def pricingtier_group_change_listener(action=None, reverse=None, instance=None, **kwargs):
     """Listens for changes of m2m relation between auth.User/Group and resets related threadlocals cached object"""
@@ -181,11 +179,10 @@ def pricingtier_group_change_listener(action=None, reverse=None, instance=None, 
         else:
             modified_users_id = [u.id for u in instance.user_set.all()]
             # After required Django version will be 1.3+, the previous line can be replaced by:
-            # modified_users = kwargs['pk_set']
+            #modified_users = kwargs['pk_set']
         for user_id in modified_users_id:
             if user_id:
                 key = 'TIER_%i' % user_id
                 threadlocals.set_thread_variable(key, None)
-
 
 models.signals.m2m_changed.connect(pricingtier_group_change_listener, sender=User.groups.through)

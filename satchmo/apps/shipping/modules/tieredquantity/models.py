@@ -2,6 +2,7 @@
 Tiered shipping models
 """
 from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -85,6 +86,7 @@ class Shipper(BaseShipper):
         return True
 
 
+@python_2_unicode_compatible
 class Carrier(models.Model):
     key = models.SlugField(_('Key'))
     ordering = models.IntegerField(_('Ordering'), default=0)
@@ -208,6 +210,7 @@ class CarrierTranslation(models.Model):
     delivery = models.CharField(_('Delivery Days'), max_length=200)
 
 
+@python_2_unicode_compatible
 class QuantityTier(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='tiers', on_delete=models.CASCADE)
     quantity = models.DecimalField(_("Min Quantity"), max_digits=18,  decimal_places=6,

@@ -2,6 +2,7 @@
 TieredWeight shipping models
 """
 from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 import logging
 
 from datetime import date
@@ -38,6 +39,7 @@ class Shipper(BaseShipper):
         self._carrier = carrier
         super(BaseShipper, self).__init__()
 
+
     def calculate(self, cart, contact):
         """
         Perform shipping calculations
@@ -54,11 +56,13 @@ class Shipper(BaseShipper):
 
         super(Shipper, self).calculate(cart, contact)
 
+
     def __str__(self):
         """
         This is mainly helpful for debugging purposes
         """
         return "TieredWeight_Shipper: %s" % self.id
+
 
     def cost(self):
         """
@@ -67,12 +71,14 @@ class Shipper(BaseShipper):
         assert(self._calculated)
         return self._cost
 
+
     def description(self):
         """
         A basic description that will be displayed to the user when selecting their shipping options
         """
         assert(self._calculated)
         return self._zone.description
+
 
     def method(self):
         """
@@ -81,6 +87,7 @@ class Shipper(BaseShipper):
         assert(self._calculated)
         return self._zone.method
 
+
     def expectedDelivery(self):
         """
         Can be a plain string or complex calculation returning an actual date
@@ -88,9 +95,10 @@ class Shipper(BaseShipper):
         assert(self._calculated)
         return self._zone.delivery
 
+
     def valid(self, order=None):
         """
-        Check if shipping is valid for country and set zone accordingly. Fallback
+        Check if shipping is valid for country and set zone accordingly. Fallback 
         to default zone if set
         """
         assert(self._calculated)
@@ -104,19 +112,25 @@ class Shipper(BaseShipper):
             return True
 
 
+
+@python_2_unicode_compatible
 class Carrier(models.Model):
     name = models.CharField(_('carrier'), max_length=50)
     ordering = models.IntegerField(_('Ordering'), default=0)
     active = models.BooleanField(_('Active'), default=True)
-    default_zone = models.ForeignKey('Zone', verbose_name=_('default_zone'), related_name='default', null=True, blank=True, on_delete=models.SET_NULL)
+    default_zone = models.ForeignKey('Zone', verbose_name=_('default_zone'), 
+        related_name='default', null=True, blank=True, on_delete=models.SET_NULL)
+
 
     def __str__(self):
         return '%s' % self.name
 
+
     class Meta:
-        ordering = ['ordering']
+        ordering = ['ordering',]
         verbose_name = _('carrier')
         verbose_name_plural = _('carriers')
+
 
     def get_zone(self, country):
         try:
@@ -126,28 +140,32 @@ class Carrier(models.Model):
                 return self.default_zone
 
 
+
+@python_2_unicode_compatible
 class Zone(models.Model):
     carrier = models.ForeignKey(Carrier, verbose_name=_('carrier'), related_name='zones', on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=50)
     countries = models.ManyToManyField(Country, verbose_name=_('countries'), blank=True)
-    handling = models.DecimalField(_('handling'), max_digits=10, decimal_places=2, null=True, blank=True)
+    handling = models.DecimalField(_('handling'), max_digits=10, decimal_places=2,
+        null=True, blank=True)
 
     def __str__(self):
         return '%s' % self.name
 
     class Meta:
         unique_together = ('carrier', 'name')
-        ordering = ['carrier', 'name']
+        ordering = ['carrier', 'name',]
         verbose_name = _('zone')
         verbose_name_plural = _('zones')
+
 
     def _find_translation(self, language_code=None):
         if not language_code:
             language_code = get_language()
-
+    
         c = self.translations.filter(lang_code__exact=language_code)
         ct = c.count()
-
+    
         if not c or ct == 0:
             pos = language_code.find('-')
             if pos > -1:
@@ -157,21 +175,22 @@ class Zone(models.Model):
                 ct = c.count()
                 if ct > 0:
                     log.debug("%s: Found root language content for: [%s]", self, short_code)
-
+    
         if not c or ct == 0:
-            # log.debug("Trying to find default language content for: %s", self)
+            #log.debug("Trying to find default language content for: %s", self)
             c = self.translations.filter(lang_code__istartswith=settings.LANGUAGE_CODE)
             ct = c.count()
-
+    
         if not c or ct == 0:
-            # log.debug("Trying to find *any* language content for: %s", self)
+            #log.debug("Trying to find *any* language content for: %s", self)
             c = self.translations.all()
             ct = c.count()
-
+    
         if ct > 0:
             return c[0]
         else:
             return None
+
 
     def delivery(self):
         """
@@ -184,6 +203,7 @@ class Zone(models.Model):
             return ''
     delivery = property(delivery)
 
+
     def description(self):
         """
         Get the description, looking up by language code, falling back gracefully
@@ -195,6 +215,7 @@ class Zone(models.Model):
             return ''
     description = property(description)
 
+
     def method(self):
         """
         Get the description, looking up by language code, falling back gracefully
@@ -205,6 +226,7 @@ class Zone(models.Model):
         else:
             return ''
     method = property(method)
+
 
     def cost(self, weight):
         """
@@ -221,6 +243,7 @@ class Zone(models.Model):
             raise TieredWeightException
 
 
+@python_2_unicode_compatible
 class ZoneTranslation(models.Model):
     zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='translations', on_delete=models.CASCADE)
     lang_code = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES)
@@ -232,26 +255,29 @@ class ZoneTranslation(models.Model):
         return self.lang_code
 
     class Meta:
-        ordering = ['lang_code']
+        ordering = ['lang_code',]
         verbose_name = _('zone translation')
         verbose_name_plural = _('zone translations')
 
 
+@python_2_unicode_compatible
 class WeightTier(models.Model):
     zone = models.ForeignKey(Zone, verbose_name=_('zone'), related_name='tiers', on_delete=models.CASCADE)
     min_weight = models.DecimalField(_('min weight'), max_digits=10, decimal_places=2, help_text=_("This tier will be used for weights up to this value. i.e.: this is the MAXIMUM weight this tier will be used for."))
-    handling = models.DecimalField(_('handling adjustment'), max_digits=10, decimal_places=2, null=True, blank=True)
+    handling = models.DecimalField(_('handling adjustment'), max_digits=10, decimal_places=2,
+        null=True, blank=True)
     price = models.DecimalField(_('shipping price'), max_digits=10, decimal_places=2)
     expires = models.DateField(_('expires'), null=True, blank=True)
-
+    
     def __str__(self):
         return 'Weight: %s (Total cost: %s)' % (self.min_weight, self.cost)
 
     class Meta:
         unique_together = ('zone', 'min_weight', 'expires')
-        ordering = ['min_weight']
+        ordering = ['min_weight',]
         verbose_name = _('weight tier')
         verbose_name_plural = _('weight tiers')
+
 
     def cost(self):
         handling = Decimal('0.0')

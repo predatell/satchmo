@@ -1,36 +1,33 @@
 from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django import forms
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_str
-from product.models import Option, Product, ProductPriceLookup, OptionGroup, Price, make_option_unique_id
+from product.models import Option, Product, ProductPriceLookup, OptionGroup, Price ,make_option_unique_id
 from product.prices import get_product_quantity_price, get_product_quantity_adjustments
 from satchmo_utils import cross_list
 from satchmo_utils.unique_id import slugify
-from . import config  # livesettings options
+from . import config # livesettings options
 import datetime
 import logging
 import six
 
-SATCHMO_PRODUCT = True
-
+SATCHMO_PRODUCT=True
 
 def get_product_types():
-    return ('ConfigurableProduct', 'ProductVariation')
-
+    return ('ConfigurableProduct','ProductVariation')
 
 def sorted_tuple(lst):
     ret = []
     for x in lst:
-        if x not in ret:
+        if not x in ret:
             ret.append(x)
     ret.sort()
     return tuple(ret)
 
-
 log = logging.getLogger('product.modules.configurable')
-
 
 def get_all_options(obj, ids_only=False):
     """
@@ -42,7 +39,7 @@ def get_all_options(obj, ids_only=False):
     """
     sublist = []
     masterlist = []
-    # Create a list of all the options & create all combos of the options
+    #Create a list of all the options & create all combos of the options
     for opt in obj.option_group.select_related().all():
         for value in opt.option_set.all():
             if ids_only:
@@ -55,6 +52,7 @@ def get_all_options(obj, ids_only=False):
     return results
 
 
+@python_2_unicode_compatible
 class ConfigurableProduct(models.Model):
     """
     Product with selectable options.
@@ -63,7 +61,7 @@ class ConfigurableProduct(models.Model):
     """
     product = models.OneToOneField(Product, verbose_name=_("Product"), primary_key=True, on_delete=models.CASCADE)
     option_group = models.ManyToManyField(OptionGroup, blank=True, verbose_name=_("Option Group"))
-    create_subs = models.BooleanField(_("Create Variations"), default=False, help_text=_("Create ProductVariations for all this product's options.  To use this, you must first add an option, save, then return to this page and select this option."))
+    create_subs = models.BooleanField(_("Create Variations"), default=False, help_text =_("Create ProductVariations for all this product's options.  To use this, you must first add an option, save, then return to this page and select this option."))
 
     def __init__(self, *args, **kwargs):
         super(ConfigurableProduct, self).__init__(*args, **kwargs)
@@ -81,7 +79,7 @@ class ConfigurableProduct(models.Model):
         """
         sublist = []
         masterlist = []
-        # Create a list of all the options & create all combos of the options
+        #Create a list of all the options & create all combos of the options
         for opt in self.option_group.all():
             for value in opt.option_set.all():
                 sublist.append(value)
@@ -194,7 +192,7 @@ class ConfigurableProduct(models.Model):
         options = self._unique_ids_from_options(options)
         pv = None
         if hasattr(self, '_variation_cache'):
-            pv = self._variation_cache.get(options, None)
+            pv =  self._variation_cache.get(options, None)
         else:
             for member in self.productvariation_set.all():
                 if member.unique_option_ids == options:
@@ -223,7 +221,7 @@ class ConfigurableProduct(models.Model):
         selected_options = self._unique_ids_from_options(selected_options)
 
         options = serialize_options(self, selected_options)
-        if 'options' not in context:
+        if not 'options' in context:
             context['options'] = options
         else:
             curr = list(context['options'])
@@ -244,7 +242,7 @@ class ConfigurableProduct(models.Model):
         Right now this only works if you save the suboptions, then go back and choose to create the variations.
         """
         super(ConfigurableProduct, self).save(**kwargs)
-        if hasattr(self.product, '_sub_types'):
+        if hasattr(self.product,'_sub_types'):
             del self.product._sub_types
         # Doesn't work with admin - the manipulator doesn't add the option_group
         # until after save() is called.
@@ -279,6 +277,7 @@ class ProductVariationManager(models.Manager):
         return ProductVariation.objects.filter(parent=parent)
 
 
+@python_2_unicode_compatible
 class ProductVariation(models.Model):
     """
     This is the real Product that is ordered when a customer orders a
@@ -296,11 +295,11 @@ class ProductVariation(models.Model):
         if qty:
             prices = prices.filter(quantity__lte=qty)
         return prices
-
+        
     def _get_fullPrice(self):
         """ Get price based on parent ConfigurableProduct """
         # allow explicit setting of prices.
-        # qty_discounts = self.price_set.exclude(expires__isnull=False, expires__lt=datetime.date.today()).filter(quantity__lte=1)
+        #qty_discounts = self.price_set.exclude(expires__isnull=False, expires__lt=datetime.date.today()).filter(quantity__lte=1)
         try:
             qty_discounts = self._get_self_qty_price_list()
             if qty_discounts.count() > 0:
@@ -338,7 +337,7 @@ class ProductVariation(models.Model):
     full_name = property(_get_optionName)
 
     def _optionkey(self):
-        # todo: verify ordering
+        #todo: verify ordering
         optkeys = [smart_str(x) for x in self.options.values_list('value', flat=True).order_by('option_group__id')]
         return "::".join(optkeys)
     optionkey = property(fget=_optionkey)
@@ -404,7 +403,7 @@ class ProductVariation(models.Model):
             prices = self.parent.product.get_qty_price_list()
             price_delta = self.price_delta()
 
-            pricelist = [(qty, price + price_delta) for qty, price in prices]
+            pricelist = [(qty, price+price_delta) for qty, price in prices]
 
         return pricelist
 
@@ -412,8 +411,8 @@ class ProductVariation(models.Model):
         product = self.product
         parent = self.parent.product
         return (product.shipclass == 'YES' or
-                (product.shipclass == "DEFAULT" and
-                 parent.shipclass in ("DEFAULT", "YES"))
+                (product.shipclass == "DEFAULT"
+                 and parent.shipclass in ("DEFAULT", "YES"))
                 )
 
     is_shippable = property(fget=_is_shippable)
@@ -437,18 +436,18 @@ class ProductVariation(models.Model):
 
         pvs = ProductVariation.objects.filter(parent=self.parent)
         pvs = pvs.exclude(product=self.product)
-
+        
         for pv in pvs:
             if pv.unique_option_ids == self.unique_option_ids:
                 return
         # TODO: The following code snippet was introduced as an optimization in commit 2229
         # see ticket #1312 for details.
         # Unfortunately it is not working, see ticket #1318
-        # for option in self.options.all():
-        #     pvs = pvs.filter(options__option_group__id=option.option_group_id,
-        #         options__value=option.value)
-        # if pvs.count():
-        #     return # Don't allow duplicates
+        #for option in self.options.all():
+        #    pvs = pvs.filter(options__option_group__id=option.option_group_id, 
+        #        options__value=option.value)
+        #if pvs.count():
+        #    return # Don't allow duplicates
 
         if not self.product.name:
             # will force calculation of default name
@@ -493,3 +492,4 @@ class ProductVariation(models.Model):
 
     def __str__(self):
         return self.product.slug
+

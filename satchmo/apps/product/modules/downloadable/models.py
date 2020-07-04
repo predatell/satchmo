@@ -6,7 +6,7 @@ from hashlib import sha1 as sha_constructor
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.fields.files import FileField
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 try:
@@ -17,12 +17,12 @@ except ImportError:
 from livesettings.functions import config_value
 from product import signals
 from product.models import Product
+import product.modules.downloadable.config
 from satchmo_store.shop.models import Order
 from satchmo_utils import normalize_dir
 
 
-SATCHMO_PRODUCT = True
-
+SATCHMO_PRODUCT=True
 
 def get_product_types():
     return ('DownloadableProduct',)
@@ -37,6 +37,7 @@ def _protected_dir(instance, filename):
     return os.path.join(updir, file_name)
 
 
+@python_2_unicode_compatible
 class DownloadableProduct(models.Model):
     """
     This type of Product is a file to be downloaded
@@ -63,7 +64,7 @@ class DownloadableProduct(models.Model):
 
     def create_key(self):
         salt = sha_constructor(str(random.random())).hexdigest()[:5]
-        download_key = sha_constructor(salt + smart_str(self.product.name)).hexdigest()
+        download_key = sha_constructor(salt+smart_str(self.product.name)).hexdigest()
         return download_key
 
     def order_success(self, order, order_item):
@@ -74,11 +75,12 @@ class DownloadableProduct(models.Model):
         verbose_name_plural = _("Downloadable Products")
 
     def save(self, *args, **kwargs):
-        if hasattr(self.product, '_sub_types'):
+        if hasattr(self.product,'_sub_types'):
             del self.product._sub_types
         super(DownloadableProduct, self).save(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class DownloadLink(models.Model):
     downloadable_product = models.ForeignKey(DownloadableProduct, verbose_name=_('Downloadable product'), on_delete=models.CASCADE)
     order = models.ForeignKey(Order, verbose_name=_('Order'), on_delete=models.CASCADE)
@@ -105,10 +107,10 @@ class DownloadLink(models.Model):
         return (True, "")
 
     def get_absolute_url(self):
-        return reverse('satchmo_store.shop.views.download.process', kwargs={'download_key': self.key})
+        return reverse('satchmo_store.shop.views.download.process', kwargs={ 'download_key': self.key})
 
     def get_full_url(self):
-        url = reverse('satchmo_download_process', kwargs={'download_key': self.key})
+        url = reverse('satchmo_download_process', kwargs= {'download_key': self.key})
         return('http://%s%s' % (Site.objects.get_current(), url))
 
     def save(self, **kwargs):
@@ -124,7 +126,7 @@ class DownloadLink(models.Model):
 
     def _product_name(self):
         return "%s" % (self.downloadable_product.product.translated_name())
-    product_name = property(_product_name)
+    product_name=property(_product_name)
 
     class Meta:
         verbose_name = _("Download Link")

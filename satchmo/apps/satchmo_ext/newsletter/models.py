@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import datetime
 import logging
 
+from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -38,6 +39,7 @@ def get_contact_or_fake(full_name, email):
     return contact
 
 
+@python_2_unicode_compatible
 class Subscription(models.Model):
     """A newsletter subscription."""
 
@@ -57,9 +59,9 @@ class Subscription(models.Model):
 
     def __str__(self):
         if self.subscribed:
-            flag = "Y"
+            flag="Y"
         else:
-            flag = "N"
+            flag="N"
         return "[%s] %s" % (flag, self.email)
 
     def __repr__(self):
@@ -83,7 +85,7 @@ class Subscription(models.Model):
         self.update_date = datetime.date.today()
 
         super(Subscription, self).save(**kwargs)
-
+                
     def update_attribute(self, name, value):
         """Update or create a `SubscriptionAttribute` object with the passed `name` and `value`."""
         value = str(value)
@@ -92,7 +94,7 @@ class Subscription(models.Model):
             att.value = value
         except SubscriptionAttribute.DoesNotExist:
             att = SubscriptionAttribute(subscription=self, name=name, value=value)
-
+        
         att.save()
         return att
 
@@ -100,7 +102,7 @@ class Subscription(models.Model):
         """Update `SubscriptionAttribute` objects from a dictionary of name val mappings."""
         return [self.update_attribute(name, value) for name, value in attributes.items()]
 
-
+        
 class SubscriptionAttribute(models.Model):
     """
     Allows arbitrary name/value pairs (as strings) to be attached to a subscription.

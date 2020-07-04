@@ -1,7 +1,8 @@
 """
 Tiered shipping models
-"""
+""" 
 from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -15,11 +16,9 @@ from livesettings.functions import config_value
 
 log = logging.getLogger('shipping.Tiered')
 
-
 class TieredPriceException(Exception):
     def __init__(self, reason):
         self.reason = reason
-
 
 class Shipper(BaseShipper):
 
@@ -76,7 +75,7 @@ class Shipper(BaseShipper):
             if config_value('SHIPPING_TIERED', 'MIN_PRICE_FOR') == 'NOT_DISCOUNTABLE':
                 sub_total = order.sub_total
             else:
-                itemprices = [item.sub_total for item in order.orderitem_set.all() if item.product.is_shippable]
+                itemprices = [ item.sub_total for item in order.orderitem_set.all() if item.product.is_shippable]
                 if itemprices:
                     sub_total = reduce(operator.add, itemprices)
                 else:
@@ -84,19 +83,21 @@ class Shipper(BaseShipper):
 
             try:
                 price = self.carrier.price(sub_total)
-
+                
             except TieredPriceException:
                 return False
-
+                
         elif self.cart:
             try:
                 price = self.cost()
+            
             except TieredPriceException:
                 return False
-
+                        
         return True
 
 
+@python_2_unicode_compatible
 class Carrier(models.Model):
     key = models.SlugField(_('Key'))
     ordering = models.IntegerField(_('Ordering'), default=0)
@@ -105,27 +106,27 @@ class Carrier(models.Model):
     def _find_translation(self, language_code=None):
         if not language_code:
             language_code = get_language()
-
-        c = self.translations.filter(languagecode__exact=language_code)
+            
+        c = self.translations.filter(languagecode__exact = language_code)
         ct = c.count()
 
         if not c or ct == 0:
             pos = language_code.find('-')
-            if pos > -1:
+            if pos>-1:
                 short_code = language_code[:pos]
                 log.debug("Carrier: Trying to find root language content for: [%s]", short_code)
-                c = self.translations.filter(languagecode__exact=short_code)
+                c = self.translations.filter(languagecode__exact = short_code)
                 ct = c.count()
-                if ct > 0:
+                if ct>0:
                     log.debug("Carrier: Found root language content for: [%s]", short_code)
 
         if not c or ct == 0:
-            # log.debug("Trying to find default language content for: %s", self)
-            c = self.translations.filter(languagecode__istartswith=settings.LANGUAGE_CODE)
+            #log.debug("Trying to find default language content for: %s", self)
+            c = self.translations.filter(languagecode__istartswith = settings.LANGUAGE_CODE)
             ct = c.count()
 
         if not c or ct == 0:
-            # log.debug("Trying to find *any* language content for: %s", self)
+            #log.debug("Trying to find *any* language content for: %s", self)
             c = self.translations.all()
             ct = c.count()
 
@@ -147,7 +148,7 @@ class Carrier(models.Model):
             return ""
 
     delivery = property(delivery)
-
+ 
     def description(self):
         """Get the description, looking up by language code, falling back intelligently.
         """
@@ -159,7 +160,7 @@ class Carrier(models.Model):
             return ""
 
     description = property(description)
-
+    
     def method(self):
         """Get the description, looking up by language code, falling back intelligently.
         """
@@ -170,8 +171,8 @@ class Carrier(models.Model):
         else:
             return ""
 
-    method = property(method)
-
+    method = property(method)    
+ 
     def name(self):
         """Get the name, looking up by language code, falling back intelligently.
         """
@@ -183,11 +184,11 @@ class Carrier(models.Model):
             return ""
 
     name = property(name)
-
+    
     def price(self, total):
         """Get a price for this total."""
         if total == 0:
-            total = Decimal('0.00')  # total was "0E-8", which breaks mysql
+            total = Decimal('0.00')# total was "0E-8", which breaks mysql
 
         # first check for special discounts
         prices = self.tiers.filter(expires__isnull=False, min_total__lte=total).exclude(expires__lt=datetime.date.today())
@@ -202,14 +203,15 @@ class Carrier(models.Model):
         else:
             log.debug("No tiered price found for %s: total=%s", self, total)
             raise TieredPriceException('No price available')
-
+            
+            
     def __str__(self):
         return "Carrier: %s" % self.name
-
+        
     class Meta:
         ordering = ('ordering',)
-
-
+        
+        
 class CarrierTranslation(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='translations', on_delete=models.CASCADE)
     languagecode = models.CharField(_('language'), max_length=10, choices=settings.LANGUAGES, )
@@ -217,21 +219,24 @@ class CarrierTranslation(models.Model):
     description = models.CharField(_('Description'), max_length=200)
     method = models.CharField(_('Method'), help_text=_("i.e. US Mail"), max_length=200)
     delivery = models.CharField(_('Delivery Days'), max_length=200)
-
+    
     class Meta:
-        ordering = ('languagecode', 'name')
+        ordering=('languagecode','name')
 
 
+@python_2_unicode_compatible
 class ShippingTier(models.Model):
     carrier = models.ForeignKey('Carrier', related_name='tiers', on_delete=models.CASCADE)
-    min_total = models.DecimalField(_("Min Price"), help_text=_('The minimum price for this tier to apply'), max_digits=10, decimal_places=2, )
+    min_total = models.DecimalField(_("Min Price"), 
+        help_text=_('The minimum price for this tier to apply'), 
+        max_digits=10, decimal_places=2, )
     price = models.DecimalField(_("Shipping Price"), max_digits=10, decimal_places=2, )
     expires = models.DateField(_("Expires"), null=True, blank=True)
-
+    
     def __str__(self):
         return "ShippingTier: %s @ %s" % (self.price, self.min_total)
-
+    
     class Meta:
-        ordering = ('carrier', 'price')
+        ordering = ('carrier','price')
 
 from . import config
