@@ -1,18 +1,20 @@
 from __future__ import unicode_literals
+import six
+from six import python_2_unicode_compatible
+from decimal import Decimal
 
-from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 from product.models import Product, get_product_quantity_price, get_product_quantity_adjustments
-from decimal import Decimal
 from satchmo_utils import add_month
 from satchmo_utils.fields import CurrencyField
-import six
 
-SATCHMO_PRODUCT=True
+
+SATCHMO_PRODUCT = True
+
 
 def get_product_types():
     return ('SubscriptionProduct',)
@@ -115,7 +117,7 @@ class SubscriptionProduct(models.Model):
         return expiredate
 
     def save(self, **kwargs):
-        if hasattr(self.product,'_sub_types'):
+        if hasattr(self.product, '_sub_types'):
             del self.product._sub_types
         super(SubscriptionProduct, self).save(**kwargs)
 
@@ -144,7 +146,7 @@ class Trial(models.Model):
 
     def _occurrences(self):
         if self.expire_length:
-            return int(self.expire_length/self.subscription.expire_length)
+            return int(self.expire_length / self.subscription.expire_length)
         else:
             return 0
     occurrences = property(fget=_occurrences)
@@ -163,4 +165,3 @@ class Trial(models.Model):
         ordering = ['-id']
         verbose_name = _("Trial Terms")
         verbose_name_plural = _("Trial Terms")
-

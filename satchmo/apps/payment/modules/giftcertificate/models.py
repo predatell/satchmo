@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
-
-from datetime import datetime
 from decimal import Decimal
+from six import python_2_unicode_compatible
+import logging
+
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 
 from l10n.utils import moneyfmt
 from payment.modules.giftcertificate.utils import generate_certificate_code
@@ -14,12 +14,12 @@ from payment.utils import get_processor_by_key
 from product.models import Product
 from satchmo_store.contact.models import Contact
 from satchmo_store.shop.models import Order
-import logging
 
 
 GIFTCODE_KEY = 'GIFTCODE'
 log = logging.getLogger('giftcertificate.models')
 SATCHMO_PRODUCT = True
+
 
 def get_product_types():
     return ("GiftcertificateProduct",)
@@ -43,14 +43,13 @@ class GiftCertificate(models.Model):
     order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL,
                               related_name="giftcertificates", verbose_name=_('Order'))
     code = models.CharField(_('Certificate Code'), max_length=100, blank=True, null=True)
-    purchased_by =  models.ForeignKey(Contact, verbose_name=_('Purchased by'), on_delete=models.SET_NULL,
-                                      blank=True, null=True, related_name='giftcertificates_purchased')
+    purchased_by = models.ForeignKey(Contact, verbose_name=_('Purchased by'), on_delete=models.SET_NULL,
+                                     blank=True, null=True, related_name='giftcertificates_purchased')
     date_added = models.DateField(_("Date added"), null=True, blank=True)
     valid = models.BooleanField(_('Valid'), default=True)
     message = models.CharField(_('Message'), blank=True, null=True, max_length=255)
     recipient_email = models.EmailField(_("Email"), blank=True, max_length=75)
-    start_balance = models.DecimalField(_("Starting Balance"), decimal_places=2,
-        max_digits=8)
+    start_balance = models.DecimalField(_("Starting Balance"), decimal_places=2, max_digits=8)
 
     objects = GiftCertificateManager()
 
@@ -71,11 +70,11 @@ class GiftCertificate(models.Model):
         """
         amount = min(order.balance, self.balance)
         log.info('applying %s from giftcert #%i [%s] to order #%i [%s]',
-            moneyfmt(amount),
-            self.id,
-            moneyfmt(self.balance),
-            order.id,
-            moneyfmt(order.balance))
+                 moneyfmt(amount),
+                 self.id,
+                 moneyfmt(self.balance),
+                 order.id,
+                 moneyfmt(order.balance))
 
         processor = get_processor_by_key('PAYMENT_GIFTCERTIFICATE')
         orderpayment = processor.record_payment(order=order, amount=amount)
@@ -84,8 +83,7 @@ class GiftCertificate(models.Model):
 
     def use(self, amount, notes="", orderpayment=None):
         """Use some amount of the gift cert, returning the current balance."""
-        u = GiftCertificateUsage(notes=notes, balance_used = amount,
-            orderpayment=orderpayment, giftcertificate=self)
+        u = GiftCertificateUsage(notes=notes, balance_used=amount, orderpayment=orderpayment, giftcertificate=self)
         u.save()
         return self.balance
 
@@ -153,20 +151,20 @@ class GiftCertificateProduct(models.Model):
             elif detl.name == "message":
                 message = detl.value
 
-        price=order_item.line_item_price
+        price = order_item.line_item_price
         log.debug("Creating gc for %s", price)
         gc = GiftCertificate(
-            order = order,
-            start_balance= price,
-            purchased_by = order.contact,
+            order=order,
+            start_balance=price,
+            purchased_by=order.contact,
             valid=True,
             message=message,
             recipient_email=email
-            )
+        )
         gc.save()
 
     def save(self, **kwargs):
-        if hasattr(self.product,'_sub_types'):
+        if hasattr(self.product, '_sub_types'):
             del self.product._sub_types
         super(GiftCertificateProduct, self).save(**kwargs)
 
@@ -174,5 +172,6 @@ class GiftCertificateProduct(models.Model):
         verbose_name = _("Gift certificate product")
         verbose_name_plural = _("Gift certificate products")
 
+
 from . import config
-PAYMENT_PROCESSOR=True
+PAYMENT_PROCESSOR = True

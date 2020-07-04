@@ -1,16 +1,19 @@
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from l10n.utils import lookup_translation
 from product.models import Product, OptionGroup, get_product_quantity_price, get_product_quantity_adjustments
 from product.modules.configurable.models import get_all_options
 from satchmo_utils.fields import CurrencyField
 from satchmo_utils.unique_id import slugify
 
-SATCHMO_PRODUCT=True
+SATCHMO_PRODUCT = True
+
 
 def get_product_types():
     return ('CustomProduct',)
@@ -24,9 +27,8 @@ class CustomProduct(models.Model):
     product = models.OneToOneField(Product, verbose_name=_('Product'), primary_key=True,
                                    on_delete=models.CASCADE)
     downpayment = models.IntegerField(_("Percent Downpayment"), default=20)
-    deferred_shipping = models.BooleanField(_('Deferred Shipping'),
-        help_text=_('Do not charge shipping at checkout for this item.'),
-        default=False)
+    deferred_shipping = models.BooleanField(_('Deferred Shipping'), default=False,
+                                            help_text=_('Do not charge shipping at checkout for this item.'))
     option_group = models.ManyToManyField(
         OptionGroup,
         verbose_name=_('Option Group'),
@@ -52,7 +54,7 @@ class CustomProduct(models.Model):
         from product.utils import serialize_options
 
         options = serialize_options(self, selected_options)
-        if not 'options' in context:
+        if 'options' not in context:
             context['options'] = options
         else:
             curr = list(context['options'])
@@ -76,7 +78,7 @@ class CustomProduct(models.Model):
             else:
                 price = None
 
-        if not price and qty == Decimal('1'): # Prevent a recursive loop.
+        if not price and qty == Decimal('1'):  # Prevent a recursive loop.
             price = Decimal("0.00")
         elif not price:
             price = self.product._get_fullPrice()
@@ -95,8 +97,6 @@ class CustomProduct(models.Model):
 
     full_price = property(fget=get_full_price)
 
-
-
     def _get_subtype(self):
         return 'CustomProduct'
 
@@ -110,10 +110,9 @@ class CustomProduct(models.Model):
         return get_all_options(self, ids_only=True)
 
     def save(self, **kwargs):
-        if hasattr(self.product,'_sub_types'):
+        if hasattr(self.product, '_sub_types'):
             del self.product._sub_types
         super(CustomProduct, self).save(**kwargs)
-
 
     class Meta:
         verbose_name = _('Custom Product')
@@ -127,14 +126,10 @@ class CustomTextField(models.Model):
     """
 
     name = models.CharField(_('Custom field name'), max_length=40, )
-    slug = models.SlugField(_("Slug"), help_text=_("Auto-generated from name if blank"),
-        blank=True)
-    products = models.ForeignKey(CustomProduct, verbose_name=_('Custom Fields'), on_delete=models.CASCADE,
-        related_name='custom_text_fields')
-    sort_order = models.IntegerField(_("Sort Order"),
-        help_text=_("The display order for this group."), default=0)
-    price_change = CurrencyField(_("Price Change"), max_digits=14,
-        decimal_places=6, blank=True, null=True)
+    slug = models.SlugField(_("Slug"), help_text=_("Auto-generated from name if blank"), blank=True)
+    products = models.ForeignKey(CustomProduct, verbose_name=_('Custom Fields'), on_delete=models.CASCADE, related_name='custom_text_fields')
+    sort_order = models.IntegerField(_("Sort Order"), help_text=_("The display order for this group."), default=0)
+    price_change = CurrencyField(_("Price Change"), max_digits=14, decimal_places=6, blank=True, null=True)
 
     def save(self, **kwargs):
         if not self.slug:
@@ -166,7 +161,7 @@ class CustomTextFieldTranslation(models.Model):
     class Meta:
         verbose_name = _('CustomTextField Translation')
         verbose_name_plural = _('CustomTextField Translations')
-        ordering = ('customtextfield', 'name','languagecode')
+        ordering = ('customtextfield', 'name', 'languagecode')
         unique_together = ('customtextfield', 'languagecode', 'version')
 
     def __str__(self):

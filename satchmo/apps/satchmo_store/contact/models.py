@@ -2,14 +2,16 @@
 Stores customer, organization, and order information.
 """
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
+import datetime
+import logging
+from six import python_2_unicode_compatible
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext, ugettext_lazy as _
+
 from l10n.models import Country
 from satchmo_store.contact import CUSTOMER_ID
-import datetime
-import logging
 
 log = logging.getLogger('contact.models')
 
@@ -120,7 +122,7 @@ class ContactManager(models.Manager):
         else:
             # Don't create a Contact if the user isn't authenticated.
             create = False
-            
+
         if request.session.get(CUSTOMER_ID):
             try:
                 contactBySession = Contact.objects.get(id=request.session[CUSTOMER_ID])
@@ -228,9 +230,9 @@ class Contact(models.Model):
         """ Return all non primary shipping and billing addresses
         """
         return AddressBook.objects.filter(contact=self.pk).exclude(is_default_shipping=True).exclude(is_default_billing=True)
-        
-    address_book_entries=property(_get_address_book_entries)
-        
+
+    address_book_entries = property(_get_address_book_entries)
+
     class Meta:
         verbose_name = _("Contact")
         verbose_name_plural = _("Contacts")
@@ -242,6 +244,7 @@ PHONE_CHOICES = (
     ('Fax', _('Fax')),
     ('Mobile', _('Mobile')),
 )
+
 
 @python_2_unicode_compatible
 class Interaction(models.Model):
@@ -268,10 +271,8 @@ class PhoneNumber(models.Model):
     Phone number associated with a contact.
     """
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-    type = models.CharField(_("Description"), choices=PHONE_CHOICES,
-        max_length=20, blank=True)
-    phone = models.CharField(_("Phone Number"), blank=True, max_length=30,
-        )
+    type = models.CharField(_("Description"), choices=PHONE_CHOICES, max_length=20, blank=True)
+    phone = models.CharField(_("Phone Number"), blank=True, max_length=30)
     primary = models.BooleanField(_("Primary"), default=False)
 
     def __str__(self):
@@ -305,7 +306,7 @@ class AddressBook(models.Model):
     """
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     description = models.CharField(_("Description"), max_length=20, blank=True,
-        help_text=_('Description of address - Home, Office, Warehouse, etc.',))
+                                   help_text=_('Description of address - Home, Office, Warehouse, etc.',))
     addressee = models.CharField(_("Addressee"), max_length=80)
     street1 = models.CharField(_("Street"), max_length=80)
     street2 = models.CharField(_("Street"), max_length=80, blank=True)
@@ -313,13 +314,11 @@ class AddressBook(models.Model):
     city = models.CharField(_("City"), max_length=50)
     postal_code = models.CharField(_("Zip Code"), max_length=30)
     country = models.ForeignKey(Country, verbose_name=_("Country"), on_delete=models.PROTECT)
-    is_default_shipping = models.BooleanField(_("Default Shipping Address"),
-        default=False)
-    is_default_billing = models.BooleanField(_("Default Billing Address"),
-        default=False)
+    is_default_shipping = models.BooleanField(_("Default Shipping Address"), default=False)
+    is_default_billing = models.BooleanField(_("Default Billing Address"), default=False)
 
     def __str__(self):
-       return '%s - %s' % (self.contact.full_name, self.description)
+        return '%s - %s' % (self.contact.full_name, self.description)
 
     def save(self, **kwargs):
         """
@@ -348,5 +347,6 @@ class AddressBook(models.Model):
     class Meta:
         verbose_name = _("Address Book")
         verbose_name_plural = _("Address Books")
+
 
 from . import config
