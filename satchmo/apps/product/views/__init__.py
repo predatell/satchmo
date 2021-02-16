@@ -47,10 +47,13 @@ class CategoryView(DetailView):
 
     def get_queryset(self):
         return self.model.objects.by_site()
-        
+
+    def get_products(self):
+        return self.object.active_products()
+
     def get_context_data(self, **kwargs):
         context = super(CategoryView, self).get_context_data(**kwargs)
-        products = list(self.object.active_products())
+        products = list(self.get_products())
         context['child_categories'] = self.object.get_all_children()
         context['sale'] = find_best_auto_discount(products)
         context['products'] = products
@@ -58,7 +61,7 @@ class CategoryView(DetailView):
         return context
 
 category_view = CategoryView.as_view()
-        
+
 # def category_view(request, slug, parent_slugs='', template='product/category.html'):
 #     """Display the category, its child categories, and its products.
 

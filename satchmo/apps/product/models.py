@@ -471,8 +471,8 @@ class Discount(models.Model):
                            help_text=_("Enter absolute discount amount OR percentage."))
     percentage = models.DecimalField(_("Discount Percentage"), decimal_places=2, max_digits=5, blank=True, null=True,
                                      help_text=_("Enter absolute discount amount OR percentage.  Percents are given in whole numbers, and can be up to 100%."))
-    automatic = models.NullBooleanField(_("Is this an automatic discount?"), default=False, blank=True, null=True,
-                                        help_text=_("Use this field to advertise the discount on all products to which it applies.  Generally this is used for site-wide sales."))
+    automatic = models.BooleanField(_("Is this an automatic discount?"), default=False, blank=True, null=True,
+                                    help_text=_("Use this field to advertise the discount on all products to which it applies.  Generally this is used for site-wide sales."))
     allowedUses = models.IntegerField(_("Number of allowed uses"), blank=True, null=True,
                                       help_text=_('Set this to a number greater than 0 to have the discount expire after that many uses.'))
     numUses = models.IntegerField(_("Number of times already used"), blank=True, null=True)

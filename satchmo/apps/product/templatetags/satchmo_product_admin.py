@@ -40,7 +40,7 @@ def list_variations(configurableproduct):
     from product.modules.configurable.models import ProductVariation
 
     opts = configurableproduct.get_all_options()
-    output = "{% load admin_static admin_modify %}"
+    output = "{% load static admin_modify %}"
     output += "<table>"
     for p_opt in opts:
         opt_strs = []
