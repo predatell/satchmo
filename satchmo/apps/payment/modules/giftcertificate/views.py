@@ -45,7 +45,7 @@ def giftcert_pay_ship_process_form(request, contact, working_cart, payment_modul
             if gift_certificate.balance < newOrder.balance:
                 controller = confirm.ConfirmController(request, gc)
                 controller.confirm()
-                url = reverse('satchmo_balance_remaining')
+                url = newOrder.get_balance_remaining_url()
             else:
                 url = lookup_url(payment_module, 'satchmo_checkout-step3')
             return (True, http.HttpResponseRedirect(url))

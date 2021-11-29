@@ -77,7 +77,7 @@ def category_tree(id=None):
     # This search is less expensive than the multiple db calls
     if active_cat:
         active_cat_id = "category-%s" % active_cat.id
-        for li in existing_tree.getiterator("li"):
+        for li in existing_tree.iter("li"):
             if li.attrib["id"] == active_cat_id:
                 link = li.find("a")
                 link.attrib["class"] = "current"

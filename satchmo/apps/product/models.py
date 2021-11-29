@@ -864,7 +864,7 @@ class Product(models.Model):
                             help_text=_("Used for URLs, auto-generated from name if blank"))
     sku = models.CharField(_("SKU"), max_length=255, blank=True, null=True,
                            help_text=_("Defaults to slug if left blank"))
-    short_description = models.TextField(_("Short description of product"), help_text=_("This should be a 1 or 2 line description in the default site language for use in product listing screens"), max_length=200, default='', blank=True)
+    short_description = models.TextField(_("Short description of product"), help_text=_("This should be a 1 or 2 line description in the default site language for use in product listing screens"), default='', blank=True)
     description = models.TextField(_("Description of product"), help_text=_("This field can contain HTML and should be a few paragraphs in the default site language explaining the background of the product, and anything that would help the potential customer make their purchase."), default='', blank=True)
     category = models.ManyToManyField(Category, blank=True, verbose_name=_("Category"))
     items_in_stock = models.DecimalField(_("Number in stock"), max_digits=18, decimal_places=6, default='0')
