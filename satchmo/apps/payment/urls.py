@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from livesettings.functions import config_value_safe
 from satchmo_store.shop.satchmo_settings import get_satchmo_setting
@@ -11,17 +11,18 @@ log = logging.getLogger('payment.urls')
 ssl = get_satchmo_setting('SSL', default_value=False)
 
 urlpatterns = [
-    url(r'^$', contact.contact_info_view, {'SSL': ssl}, name='satchmo_checkout-step1'),
-    url(r'^success/$', checkout.success, {'SSL' : ssl}, name='satchmo_checkout-success'),
-    url(r'custom/charge/(?P<orderitem_id>\d+)/$', balance.ChargeRemainingUpdateView.as_view(), name='satchmo_charge_remaining'),
-    #url(r'custom/charge/$', balance.charge_remaining_post, name="satchmo_charge_remaining_post"),
-    url(r'^balance/(?P<order_id>\d+)/$', balance.BalanceRemainingOrderView.as_view(), {'SSL' : ssl}, name='satchmo_balance_remaining_order'),
-    url(r'^balance/$', balance.BalanceRemainingView.as_view(), {'SSL' : ssl}, name="satchmo_balance_remaining"),
-    url(r'^cron/$', cron.cron_rebill, name='satchmo_cron_rebill'),
-    url(r'^mustlogin/$', contact.authentication_required, {'SSL' : ssl}, name='satchmo_checkout_auth_required'),
+    re_path(r'^$', contact.contact_info_view, {'SSL': ssl}, name='satchmo_checkout-step1'),
+    re_path(r'^success/$', checkout.success, {'SSL': ssl}, name='satchmo_checkout-success'),
+    re_path(r'custom/charge/(?P<orderitem_id>\d+)/$', balance.ChargeRemainingUpdateView.as_view(), name='satchmo_charge_remaining'),
+    # re_path(r'custom/charge/$', balance.charge_remaining_post, name="satchmo_charge_remaining_post"),
+    re_path(r'^balance/(?P<order_id>\d+)/$', balance.BalanceRemainingOrderView.as_view(), {'SSL': ssl}, name='satchmo_balance_remaining_order'),
+    re_path(r'^balance/$', balance.BalanceRemainingView.as_view(), {'SSL': ssl}, name="satchmo_balance_remaining"),
+    re_path(r'^cron/$', cron.cron_rebill, name='satchmo_cron_rebill'),
+    re_path(r'^mustlogin/$', contact.authentication_required, {'SSL': ssl}, name='satchmo_checkout_auth_required'),
 ]
 
 # now add all enabled module payment settings
+
 
 def make_urlpatterns():
     patterns = []
@@ -38,7 +39,7 @@ def make_urlpatterns():
             modulename = 'PAYMENT_%s' % key
             name = app.__name__
             name = name[:name.rfind('.')]
-            #log.debug('payment module=%s, key=%s', modulename, key)
+            # log.debug('payment module=%s, key=%s', modulename, key)
             # BJK: commenting out Bursar settings here
             # try:
             #     cfg = config_get(modulename, 'INTERFACE_MODULE')
@@ -49,7 +50,8 @@ def make_urlpatterns():
             urlmodule = '.'.join(parts[:-1]) + '.urls'
             urlbase = config_value_safe(modulename, 'URL_BASE', key.lower())
             log.debug('Found payment processor: %s, adding urls at %s', key, urlbase)
-            patterns.append(url(urlbase, [urlmodule, '', '']))
+            patterns.append(re_path(urlbase, [urlmodule, '', '']))
     return patterns
+
 
 urlpatterns += make_urlpatterns()

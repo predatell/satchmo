@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 import logging
@@ -13,7 +13,7 @@ admin.autodiscover()
 urlpatterns = getattr(settings, 'URLS', [])
 
 adminpatterns = [
-    url(r'^admin/', admin.site.urls),
+    re_path(r'^admin/', admin.site.urls),
 ]
 
 if urlpatterns:
@@ -21,6 +21,5 @@ if urlpatterns:
 else:
     urlpatterns = adminpatterns
 # If we are in debug mode, then serve the images and other files in MEDIA_ROOT
-if settings.DEBUG and getattr(settings,'MEDIA_URL',False) and getattr(settings,'MEDIA_ROOT',False):
+if settings.DEBUG and getattr(settings, 'MEDIA_URL', False) and getattr(settings, 'MEDIA_ROOT', False):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

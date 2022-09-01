@@ -16,7 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q
 from django.utils.encoding import smart_str
-from django.utils.translation import get_language, ugettext, ugettext_lazy as _
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 from django.utils.functional import cached_property
 try:
     from django.core.urlresolvers import reverse
@@ -516,24 +516,24 @@ class Discount(models.Model):
         If this is a "FREECHEAP" discount, then error if the cheapest shipping hasn't been chosen.
         """
         if not self.active:
-            return (False, ugettext('This coupon is disabled.'))
+            return (False, gettext('This coupon is disabled.'))
         if self.startDate > datetime.date.today():
-            return (False, ugettext('This coupon is not active yet.'))
+            return (False, gettext('This coupon is not active yet.'))
         if self.endDate < datetime.date.today():
-            return (False, ugettext('This coupon has expired.'))
+            return (False, gettext('This coupon has expired.'))
         if self.numUses and self.allowedUses and self.allowedUses > 0 and self.numUses >= self.allowedUses:
-            return (False, ugettext('This discount has exceeded the number of allowed uses.'))
+            return (False, gettext('This discount has exceeded the number of allowed uses.'))
 
         if cart:
             minOrder = self.minOrder or 0
             if cart.total < minOrder:
-                return (False, ugettext('This discount only applies to orders of at least %s.' % moneyfmt(minOrder)))
+                return (False, gettext('This discount only applies to orders of at least %s.' % moneyfmt(minOrder)))
 
             if not (self.allValid or (len(self._valid_products(cart.cartitem_set)) > 0)):
-                return (False, ugettext('This discount cannot be applied to the products in your cart.'))
+                return (False, gettext('This discount cannot be applied to the products in your cart.'))
 
         # last minute check to make sure discount is valid
-        success = {'valid': True, 'message': ugettext('Valid.')}
+        success = {'valid': True, 'message': gettext('Valid.')}
         signals.discount_validate.send(
             sender=Discount,
             discount=self,

@@ -5,7 +5,7 @@ If that doesn't work, we add random numbers to the name
 """
 
 from django.contrib.auth.models import User
-from django.utils.encoding import smart_text 
+from django.utils.encoding import smart_str
 import six
 from six.moves.html_entities import name2codepoint
 from satchmo_utils import random_string
@@ -54,7 +54,7 @@ def generate_id(first_name='', last_name='', email=''):
 # From http://www.djangosnippets.org/snippets/369/
 def slugify(s, entities=True, decimal=True, hexadecimal=True,
    instance=None, slug_field='slug', filter_dict=None):
-    s = smart_text(s)
+    s = smart_str(s)
 
     #character entity reference
     if entities:

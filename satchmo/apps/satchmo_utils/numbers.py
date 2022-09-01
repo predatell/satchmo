@@ -1,6 +1,6 @@
 from decimal import Decimal, ROUND_DOWN, InvalidOperation, getcontext
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from livesettings.functions import config_value
 import logging
 

@@ -1,6 +1,6 @@
 from livesettings.functions import config_register_list
 from livesettings.values import ConfigurationGroup, IntegerValue, BooleanValue
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 THUMB_GROUP = ConfigurationGroup('THUMBNAIL', _('Thumbnail Settings'))
 
