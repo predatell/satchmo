@@ -1,6 +1,6 @@
 from payment.modules.giftcertificate.models import GiftCertificate, GiftCertificateUsage, GiftCertificateProduct
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 
 class GiftCertificateUsage_Inline(admin.StackedInline):

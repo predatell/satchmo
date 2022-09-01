@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.generic.base import TemplateView
 try:

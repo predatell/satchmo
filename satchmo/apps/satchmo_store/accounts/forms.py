@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 from satchmo_store.accounts.mail import send_welcome_email
 from livesettings.functions import config_value
 from satchmo_store.contact.forms import ContactInfoForm
@@ -72,7 +72,7 @@ class RegistrationForm(forms.Form):
         p2 = self.cleaned_data.get('password2')
         if not (p1 and p2 and p1 == p2):
             raise forms.ValidationError(
-                ugettext("The two passwords do not match."))
+                gettext("The two passwords do not match."))
 
         # note, here is where we'd put some kind of custom
         # validator to enforce "hard" passwords.
@@ -84,7 +84,7 @@ class RegistrationForm(forms.Form):
         username = self.cleaned_data.get('username',None)
         if username and User.objects.filter(username__iexact=username).count() > 0:
             raise forms.ValidationError(
-                ugettext("That username is already in use."))
+                gettext("That username is already in use."))
         return username
 
     def clean_email(self):
@@ -92,7 +92,7 @@ class RegistrationForm(forms.Form):
         email = self.cleaned_data.get('email', None)
         if email and User.objects.filter(email__iexact=email).count() > 0:
             raise forms.ValidationError(
-                ugettext("That email address is already in use."))
+                gettext("That email address is already in use."))
 
         return email
 

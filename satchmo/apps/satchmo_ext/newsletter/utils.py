@@ -1,7 +1,7 @@
 """Pluggable newsletter handling."""
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.functions import config_value
 from satchmo_store.accounts.signals import satchmo_registration
 from satchmo_store.contact.signals import satchmo_contact_view

@@ -6,7 +6,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 from shipping.modules.base import BaseShipper
 import datetime
 import logging

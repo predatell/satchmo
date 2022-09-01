@@ -1,7 +1,7 @@
 from django import template
 from django.urls import reverse
 from django.template import Context, Template
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from product import active_product_types
 from product.models import Product

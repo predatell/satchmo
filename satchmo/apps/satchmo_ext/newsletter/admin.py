@@ -1,6 +1,6 @@
 from satchmo_ext.newsletter.models import Subscription, SubscriptionAttribute
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
     
 class SubscriptionAttributeInline(admin.TabularInline):
     model = SubscriptionAttribute

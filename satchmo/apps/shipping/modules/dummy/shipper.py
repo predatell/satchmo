@@ -7,7 +7,7 @@ This dummy module can be used as a basis for creating your own
 
 # Note, make sure you use decimal math everywhere!
 from decimal import Decimal
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from shipping.modules.base import BaseShipper
 
 class Shipper(BaseShipper):

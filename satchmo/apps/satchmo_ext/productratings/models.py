@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 if 'django_comments' in settings.INSTALLED_APPS:
     from django_comments.models import Comment
     from django_comments.signals import comment_was_posted

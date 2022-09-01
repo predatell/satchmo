@@ -1,5 +1,5 @@
 from django import forms
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 try:
     from django.core.urlresolvers import reverse, NoReverseMatch
 except ImportError:
@@ -18,7 +18,7 @@ def form_terms_listener(sender, form=None, **kwargs):
         log.warn('To use the form_terms_listener, you must have a "shop_terms" url in your site urls')
         url = "#"
         
-    link = '<a target="_blank" href="%s">%s</a>' % (url,ugettext('terms and conditions'))
+    link = '<a target="_blank" href="%s">%s</a>' % (url,gettext('terms and conditions'))
     form.fields['terms'] = forms.BooleanField(
         label=_('Do you accept the %(terms_link)s?') % {'terms_link' : link}, 
         widget=forms.CheckboxInput(), required=True)

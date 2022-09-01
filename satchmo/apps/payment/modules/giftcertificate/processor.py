@@ -1,7 +1,7 @@
 """
 GiftCertificate processor
 """
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from l10n.utils import moneyfmt
 from .models import GiftCertificate
 from payment.modules.base import BasePaymentProcessor, ProcessorResult

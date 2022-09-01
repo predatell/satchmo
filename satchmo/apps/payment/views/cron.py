@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 from decimal import Decimal
 from django.http import HttpResponse
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.utils import timezone
 from livesettings.functions import config_get_group, config_value
 from satchmo_store.shop.models import Order, OrderItem, OrderPayment
@@ -79,7 +79,7 @@ def cron_rebill(request=None):
 
                         if result.success:
                             #success handler
-                            item.order.add_status(status='New', notes = ugettext("Subscription Renewal Order successfully submitted"))
+                            item.order.add_status(status='New', notes = gettext("Subscription Renewal Order successfully submitted"))
                             new_order_item.completed = True
                             new_order_item.save()
                             orderpayment = OrderPayment(order=item.order, amount=item.order.balance, payment=six.text_type(payment_module.KEY.value))

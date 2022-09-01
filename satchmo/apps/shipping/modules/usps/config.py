@@ -1,5 +1,5 @@
 from decimal import Decimal
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.values import StringValue,ConfigurationGroup,BooleanValue,DecimalValue,MultipleStringValue
 from livesettings.functions import config_register_list,config_get
 

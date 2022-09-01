@@ -2,7 +2,7 @@
 
 from django import http
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from livesettings.functions import config_get_group
 from payment.views import payship, confirm
 import logging

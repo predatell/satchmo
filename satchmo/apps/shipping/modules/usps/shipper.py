@@ -16,7 +16,7 @@ unique needs.
 from decimal import Decimal
 from django.core.cache import cache
 from django.template import loader
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from l10n.models import Country
 from livesettings.functions import config_get_group, config_value
 from shipping.modules.base import BaseShipper

@@ -11,7 +11,7 @@ def payment_label(group):
     if not group.startswith('PAYMENT_'):
         group = "PAYMENT_" + group.upper()
     config = config_get_group(group)
-    label = translation.ugettext(config.LABEL.value)
+    label = translation.gettext(config.LABEL.value)
     return label.capitalize()
 
 @register.inclusion_tag('payment/_order_payment_summary.html')

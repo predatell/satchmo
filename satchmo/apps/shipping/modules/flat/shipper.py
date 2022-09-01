@@ -2,9 +2,9 @@
 Each shipping option uses the data in an Order object to calculate the shipping cost and return the value
 """
 from decimal import Decimal
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import gettext, gettext_lazy
 from livesettings.functions import config_value
-_ = ugettext_lazy
+_ = gettext_lazy
 from shipping.modules.base import BaseShipper
 
 class Shipper(BaseShipper):
@@ -36,13 +36,13 @@ class Shipper(BaseShipper):
         """
         Describes the actual delivery service (Mail, FedEx, DHL, UPS, etc)
         """
-        return ugettext(config_value('SHIPPING', 'FLAT_SERVICE'))
+        return gettext(config_value('SHIPPING', 'FLAT_SERVICE'))
 
     def expectedDelivery(self):
         """
         Can be a plain string or complex calcuation returning an actual date
         """
-        return ugettext(config_value('SHIPPING', 'FLAT_DAYS'))
+        return gettext(config_value('SHIPPING', 'FLAT_DAYS'))
 
     def valid(self, order=None):
         """

@@ -1,5 +1,5 @@
 from decimal import Decimal
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 from satchmo_utils.numbers import trunc_decimal
 

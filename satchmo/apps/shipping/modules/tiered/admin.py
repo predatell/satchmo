@@ -1,6 +1,6 @@
 from shipping.modules.tiered.models import Carrier, ShippingTier, CarrierTranslation
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 class ShippingTier_Inline(admin.TabularInline):
     model = ShippingTier

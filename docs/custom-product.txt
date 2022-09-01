@@ -24,7 +24,7 @@ a new or existing app and extend.
 A basic ``models.py`` file with a custom product model looks like this::
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from product.models import Product
 
     SATCHMO_PRODUCT=True
@@ -145,7 +145,7 @@ models which inherit from :class:`product.models.Product`.
 So, your ``models.py`` file should look like this::
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from product.models import Product
 
     class MyNewProduct(Product):

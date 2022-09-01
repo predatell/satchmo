@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 try:

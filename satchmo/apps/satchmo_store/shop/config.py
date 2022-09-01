@@ -5,7 +5,7 @@ import sys
 from six.moves import urllib
 from decimal import Decimal
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.functions import config_register
 from livesettings.values import BooleanValue, StringValue, ConfigurationGroup, PositiveIntegerValue, DecimalValue
 

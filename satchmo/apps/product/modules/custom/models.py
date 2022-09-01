@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from l10n.utils import lookup_translation
 from product.models import Product, OptionGroup, get_product_quantity_price, get_product_quantity_adjustments

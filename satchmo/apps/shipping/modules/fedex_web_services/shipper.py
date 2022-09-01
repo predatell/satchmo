@@ -5,7 +5,7 @@ Satchmo shipping module using python-fedex
 
 # Note, make sure you use decimal math everywhere!
 from decimal import Decimal
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from shipping.modules.base import BaseShipper
 from fedex.base_service import FedexBaseServiceException
 from fedex.services.rate_service import FedexRateServiceRequest

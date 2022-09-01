@@ -1,6 +1,6 @@
 from satchmo_store.contact.supplier.models import RawItem, SupplierOrder, SupplierOrderItem, SupplierOrderStatus
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 
 class SupplierOrderItem_Inline(admin.TabularInline):

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.values import StringValue,ConfigurationGroup,BooleanValue
 from livesettings.functions import config_register
 from satchmo_utils import is_string_like, load_module

@@ -1,6 +1,6 @@
 from livesettings.values import StringValue,ConfigurationGroup,BooleanValue,DecimalValue,ModuleValue
 from livesettings.functions import config_register_list
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # this is so that the translation utility will pick up the string
 gettext = lambda s: s

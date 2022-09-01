@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from satchmo_store.shop.models import Config, Cart, CartItem, CartItemDetails, Order, OrderItem, OrderItemDetail, OrderStatus, OrderPayment, OrderPaymentFailure, OrderAuthorization, OrderVariable, OrderTaxDetail
 from satchmo_store.shop.forms import OrderPaymentBaseAdminForm

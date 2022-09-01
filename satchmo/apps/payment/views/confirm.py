@@ -3,7 +3,7 @@
 #####################################################################
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 try:

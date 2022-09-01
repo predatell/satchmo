@@ -1,6 +1,6 @@
 from satchmo_ext.wishlist.models import ProductWish
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 
 class ProductWishOptions(admin.ModelAdmin):

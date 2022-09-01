@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django import forms
 from django.template import loader
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from l10n.utils import moneyfmt
 from livesettings.functions import config_value, config_value_safe

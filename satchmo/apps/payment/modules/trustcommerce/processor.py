@@ -4,7 +4,7 @@ You can get it from your TrustCommerce account d/l links or from -
 http://www.trustcommerce.com/tclink.html
 """
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 import six
 import tclink

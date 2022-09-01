@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render
 from django.forms.models import model_to_dict
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 from django.views.generic import DetailView, FormView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 try:
@@ -17,7 +17,7 @@ from satchmo_store.contact.forms import ExtendedContactInfoForm, ContactInfoForm
 from satchmo_store.contact.models import Contact, AddressBook
 from satchmo_store.shop.models import Config
 import logging
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 log = logging.getLogger('satchmo_store.contact.views')
 
@@ -387,7 +387,7 @@ def ajax_get_state(request, **kwargs):
         except:
             raise AjaxGetStateException("Invalid country specified")
 
-        areas = area_choices_for_country(country_obj, ugettext)
+        areas = area_choices_for_country(country_obj, gettext)
 
         return render(request, 'contact/_state_choices.html', { 'areas': areas })
     except AjaxGetStateException as e:

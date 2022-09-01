@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.values import StringValue,ConfigurationGroup, BooleanValue, MultipleStringValue
 from livesettings.functions import config_register, config_value
 from satchmo_store.shop import get_satchmo_setting

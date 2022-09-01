@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 from django.utils import timezone
 try:
     from django.forms.widgets import SelectDateWidget
@@ -171,7 +171,7 @@ class ContactInfoForm(ProxyContactForm):
                 return email
             if len(users_with_email) > 1 or users_with_email[0].id != self._contact.id:
                 raise forms.ValidationError(
-                    ugettext("That email address is already in use."))
+                    gettext("That email address is already in use."))
         return email
 
     def clean_postal_code(self):

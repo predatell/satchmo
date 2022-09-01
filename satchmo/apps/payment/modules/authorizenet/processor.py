@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.template import loader
 from django.utils.http import urlencode
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 from product.models import Discount

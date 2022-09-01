@@ -1,5 +1,5 @@
 from decimal import Decimal
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from satchmo_store.shop.models import OrderAuthorization, OrderPayment, OrderPaymentFailure, OrderPendingPayment, OrderStatus
 import logging

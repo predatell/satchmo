@@ -5,7 +5,7 @@ import logging
 
 from django.contrib.sites.models import Site
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from l10n.utils import moneyfmt

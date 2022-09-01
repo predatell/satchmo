@@ -14,7 +14,7 @@ unique needs.
 
 from decimal import Decimal
 from django.template import loader
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils import timezone
 from livesettings.functions import config_get_group, config_value
 from keyedcache import cache_key, cache_get, cache_set, NotCachedError

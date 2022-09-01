@@ -2,7 +2,7 @@ from shipping.modules.productshipping.models import Carrier, CarrierTranslation,
 from product.models import Product
 from product.admin import ProductOptions
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 class CarrierTranslation_Inline(admin.TabularInline):
     model = CarrierTranslation

@@ -3,7 +3,7 @@ from decimal import Decimal
 from django import http
 from django.contrib.messages import constants, get_messages
 from django.shortcuts import get_object_or_404, render
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView
 
 from l10n.utils import moneyfmt

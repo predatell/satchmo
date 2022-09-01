@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.fields.files import FileField
 from django.utils.encoding import smart_str, python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 try:
     from django.core.urlresolvers import reverse

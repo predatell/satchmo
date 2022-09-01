@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.values import BooleanValue,DecimalValue
 from livesettings.functions import config_register,config_get_group
 from tax.config import TAX_MODULE

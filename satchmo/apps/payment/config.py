@@ -1,11 +1,11 @@
-from django.utils.translation import ugettext_lazy, ugettext
+from django.utils.translation import gettext_lazy, gettext
 from livesettings.values import StringValue,ConfigurationGroup,BooleanValue,DecimalValue,PositiveIntegerValue
 from livesettings.functions import config_register,config_register_list,config_get_group,config_choice_values,config_value
 from payment import signals, active_gateways
 from satchmo_utils import is_string_like
 import logging
 
-_ = ugettext_lazy
+_ = gettext_lazy
 
 log = logging.getLogger('payment.config')
 
@@ -101,12 +101,12 @@ def credit_choices(settings=None, include_module_if_no_choices=False):
         for key, label in vals:
             if not key in keys:
                 keys.append(key)
-                pair = (key, ugettext(label))
+                pair = (key, gettext(label))
                 choices.append(pair)
         if include_module_if_no_choices and not vals:
             key = config_value(group, 'KEY')
             label = config_value(group, 'LABEL')
-            pair = (key, ugettext(label))
+            pair = (key, gettext(label))
             choices.append(pair)
     return choices
 

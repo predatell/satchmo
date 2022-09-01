@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 import product
 from product import signals as product_signals
 from product.modules.downloadable.models import DownloadLink
@@ -41,7 +41,7 @@ def create_download_link(product=None, order=None, subtype=None, **kwargs):
 
 def ship_downloadable_order(order=None, **kwargs):
     if order.is_downloadable and not order.status == 'Shipped':
-        order.add_status('Shipped', ugettext("Order immediately available for download"))
+        order.add_status('Shipped', gettext("Order immediately available for download"))
 
     product_signals.subtype_order_success.connect(create_download_link, sender=None)
     contact_signals.satchmo_contact_location_changed.connect(recalc_total_on_contact_change, sender=None)

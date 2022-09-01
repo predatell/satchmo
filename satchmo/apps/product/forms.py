@@ -8,7 +8,7 @@ from django.core.management.base import CommandError
 from django.core.management.color import no_style
 from django.db import transaction
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 try:
     from django.core.urlresolvers import reverse
 except ImportError:

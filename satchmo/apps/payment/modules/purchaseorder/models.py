@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.db import models
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
 
 from l10n.utils import moneyfmt
@@ -34,7 +34,7 @@ class PurchaseOrder(models.Model):
     def order_link(self):
         return mark_safe('<a href="/admin/shop/order/%i/">%s #%i (%s)</a>' % (
             self.order.id,
-            ugettext('Order'), 
+            gettext('Order'), 
             self.order.id, 
             moneyfmt(self.order.total)))
             

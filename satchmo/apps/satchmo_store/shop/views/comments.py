@@ -1,6 +1,6 @@
 """Satchmo product rating views"""
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.sites.models import Site

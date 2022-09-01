@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 try:
@@ -920,7 +920,7 @@ class Order(models.Model):
 
     def invoice(self):
         url = reverse('satchmo_print_shipping', kwargs={'doc': 'invoice', 'id': self.id})
-        return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
+        return mark_safe('<a href="%s">%s</a>' % (url, gettext('View')))
     invoice.allow_tags = True
 
     def _item_discount(self):
@@ -930,7 +930,7 @@ class Order(models.Model):
 
     def packingslip(self):
         url = reverse('satchmo_print_shipping', kwargs={'doc': 'packingslip', 'id': self.id})
-        return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
+        return mark_safe('<a href="%s">%s</a>' % (url, gettext('View')))
     packingslip.allow_tags = True
 
     def recalculate_total(self, save=True):
@@ -1048,7 +1048,7 @@ class Order(models.Model):
 
     def shippinglabel(self):
         url = reverse('satchmo_print_shipping', None, None, {'doc': 'shippinglabel', 'id': self.id})
-        return mark_safe('<a href="%s">%s</a>' % (url, ugettext('View')))
+        return mark_safe('<a href="%s">%s</a>' % (url, gettext('View')))
     shippinglabel.allow_tags = True
 
     def _order_total(self):

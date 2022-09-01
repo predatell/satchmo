@@ -1,7 +1,7 @@
 from django.template import loader
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 from satchmo_utils.numbers import trunc_decimal
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from six.moves import urllib
 
 try:

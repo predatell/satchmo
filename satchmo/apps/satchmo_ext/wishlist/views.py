@@ -14,7 +14,7 @@ except ImportError:
         from simplejson.encoder import JSONEncoder        
     except ImportError:
         from json import JSONEncoder
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from satchmo_store.contact.models import Contact
 from satchmo_store.shop.signals import order_success
 from product.models import Product

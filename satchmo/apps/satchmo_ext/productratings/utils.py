@@ -6,7 +6,7 @@ except ImportError:
     from django_comments.models import Comment
 from django.contrib.sites.models import Site
 from django.db.models import Avg
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from .models import ProductRating
 import logging
 import operator

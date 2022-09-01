@@ -18,7 +18,7 @@ pip install suds
 All values based on July 2011 Fedex Developer Guide
 """
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.values import StringValue,ConfigurationGroup,BooleanValue,MultipleStringValue
 from livesettings.functions import config_register_list,config_get
 SHIP_MODULES = config_get('SHIPPING', 'MODULES')

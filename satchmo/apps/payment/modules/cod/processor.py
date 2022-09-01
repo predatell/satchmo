@@ -1,7 +1,7 @@
 """
 Handle a cash-on-delivery payment.
 """
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 
 class PaymentProcessor(BasePaymentProcessor):

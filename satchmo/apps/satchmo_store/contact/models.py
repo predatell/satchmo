@@ -8,7 +8,7 @@ from six import python_2_unicode_compatible
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from l10n.models import Country
 from satchmo_store.contact import CUSTOMER_ID
@@ -22,7 +22,7 @@ class ContactRole(models.Model):
     name = models.CharField(_('Name'), max_length=40)
 
     def __str__(self):
-        return ugettext(self.name)
+        return gettext(self.name)
 
 
 @python_2_unicode_compatible
@@ -31,7 +31,7 @@ class ContactOrganization(models.Model):
     name = models.CharField(_('Name'), max_length=40)
 
     def __str__(self):
-        return ugettext(self.name)
+        return gettext(self.name)
 
     class Meta:
         verbose_name = _('Contact organization type')
@@ -43,7 +43,7 @@ class ContactOrganizationRole(models.Model):
     name = models.CharField(_('Name'), max_length=40)
 
     def __str__(self):
-        return ugettext(self.name)
+        return gettext(self.name)
 
 
 @python_2_unicode_compatible
@@ -52,7 +52,7 @@ class ContactInteractionType(models.Model):
     name = models.CharField(_('Name'), max_length=40)
 
     def __str__(self):
-        return ugettext(self.name)
+        return gettext(self.name)
 
 
 class OrganizationManager(models.Manager):

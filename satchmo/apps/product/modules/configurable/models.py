@@ -7,7 +7,7 @@ from decimal import Decimal
 
 from django import forms
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.encoding import smart_str
 from product.models import Option, Product, ProductPriceLookup, OptionGroup, Price, make_option_unique_id
 from product.prices import get_product_quantity_price, get_product_quantity_adjustments

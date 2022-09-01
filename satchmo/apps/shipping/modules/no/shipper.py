@@ -2,7 +2,7 @@
 Each shipping option uses the data in an Order object to calculate the shipping cost and return the value
 """
 from decimal import Decimal
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from shipping.modules.base import BaseShipper
 
 class Shipper(BaseShipper):
@@ -30,7 +30,7 @@ class Shipper(BaseShipper):
         """
         Describes the actual delivery service (Mail, FedEx, DHL, UPS, etc)
         """
-        return ugettext('No Shipping')
+        return gettext('No Shipping')
 
     def expectedDelivery(self):
         """

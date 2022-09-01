@@ -1,6 +1,6 @@
 """Adds Configuration-module specific configuration options"""
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from livesettings.values import BooleanValue
 from livesettings.functions import config_register
 from product.config import PRODUCT_GROUP

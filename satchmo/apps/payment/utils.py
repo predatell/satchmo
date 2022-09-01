@@ -4,7 +4,7 @@ from satchmo_store.shop.models import Order, OrderItem, OrderItemDetail, OrderCa
 from satchmo_store.shop.signals import satchmo_post_copy_item_to_order
 from shipping.utils import update_shipping
 from satchmo_store.mail import send_store_mail
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 import logging
 
 log = logging.getLogger('payment.utils')

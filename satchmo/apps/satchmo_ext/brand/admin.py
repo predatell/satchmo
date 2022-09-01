@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from product.admin import ProductOptions
 from satchmo_ext.brand.models import Brand, BrandTranslation, BrandCategory, BrandCategoryTranslation, BrandProduct, BrandCategoryProduct
 from product.models import Product

@@ -1,7 +1,7 @@
 """ Just tracks subscriptions, nothing more. """
 
 from satchmo_ext.newsletter.models import Subscription
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 import logging
 
 log = logging.getLogger('simple newsletter')

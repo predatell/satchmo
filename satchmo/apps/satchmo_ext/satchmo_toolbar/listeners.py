@@ -2,7 +2,7 @@ import datetime
 import logging
 import operator
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from six.moves import reduce
 

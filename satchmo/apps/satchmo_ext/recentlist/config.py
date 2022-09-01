@@ -1,6 +1,6 @@
 from livesettings.values import IntegerValue
 from livesettings.functions import config_register
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from product.config import PRODUCT_GROUP
 config_register(
 IntegerValue(PRODUCT_GROUP,

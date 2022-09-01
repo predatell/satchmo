@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 from satchmo_ext.newsletter.forms import NewsletterForm
 
 def add_subscription(request, template="newsletter/subscribe_form.html", 
@@ -36,7 +36,7 @@ def _update(request, state, template, result_template, form=NewsletterForm):
                 result = workform.save(state)
             success = True
         else:
-            result = ugettext('Error, not valid.')
+            result = gettext('Error, not valid.')
 
     else:
         workform = form()

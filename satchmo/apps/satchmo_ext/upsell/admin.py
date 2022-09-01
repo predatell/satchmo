@@ -1,6 +1,6 @@
 from satchmo_ext.upsell.models import Upsell, UpsellTranslation
 from django.contrib import admin
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 
 class UpsellTranslation_Inline(admin.TabularInline):

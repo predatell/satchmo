@@ -113,7 +113,7 @@ def make_messages():
                     open(os.path.join(dirpath, thefile), "wb").write(templatize(src))
                 if verbose:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-                cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
+                cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=gettext_noop --keyword=gettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
                     domain, os.path.join(dirpath, thefile))
                 (stdin, stdout, stderr) = os.popen3(cmd, 't')
                 msgs = stdout.read()

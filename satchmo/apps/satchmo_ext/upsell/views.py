@@ -1,5 +1,5 @@
 from decimal import Decimal, InvalidOperation
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from satchmo_store.shop.exceptions import CartAddProhibited
 import logging
 

@@ -8,7 +8,7 @@ your store.  You only need to override the specific urls that have changed, the 
 will fall back to the defaults for any not specified in your dictionary.
 """
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
 from satchmo_utils.numbers import trunc_decimal
 from django.utils.http import urlencode

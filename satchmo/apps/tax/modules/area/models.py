@@ -1,7 +1,7 @@
 from six import python_2_unicode_compatible
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from product.models import TaxClass
 from l10n.models import AdminArea, Country
