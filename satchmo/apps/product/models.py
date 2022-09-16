@@ -144,7 +144,7 @@ class Category(models.Model):
     description = models.TextField(_("Description"), blank=True, help_text="Optional")
     ordering = models.IntegerField(_("Ordering"), default=0, help_text=_("Override alphabetical order in category display"))
     is_active = models.BooleanField(_("Active"), default=True, blank=True)
-    related_categories = models.ManyToManyField('self', blank=True, verbose_name=_('Related Categories'), related_name='related_categories')
+    related_categories = models.ManyToManyField('self', blank=True, verbose_name=_('Related Categories'))
     objects = CategoryManager()
 
     @cached_property
@@ -881,8 +881,8 @@ class Product(models.Model):
     width_units = models.CharField(_("Width units"), max_length=3, null=True, blank=True)
     height = models.DecimalField(_("Height"), max_digits=6, decimal_places=2, null=True, blank=True)
     height_units = models.CharField(_("Height units"), max_length=3, null=True, blank=True)
-    related_items = models.ManyToManyField('self', blank=True, verbose_name=_('Related Items'), related_name='related_products')
-    also_purchased = models.ManyToManyField('self', blank=True, verbose_name=_('Previously Purchased'), related_name='also_products')
+    related_items = models.ManyToManyField('self', blank=True, verbose_name=_('Related Items'))
+    also_purchased = models.ManyToManyField('self', blank=True, verbose_name=_('Previously Purchased'))
     total_sold = models.DecimalField(_("Total sold"), max_digits=18, decimal_places=6, default='0')
     taxable = models.BooleanField(_("Taxable"), default=get_taxable)
     taxClass = models.ForeignKey('TaxClass', verbose_name=_('Tax Class'), blank=True, null=True, help_text=_("If it is taxable, what kind of tax?"), on_delete=models.SET_NULL)

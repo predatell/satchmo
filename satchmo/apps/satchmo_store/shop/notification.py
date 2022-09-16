@@ -20,8 +20,8 @@ def notify_on_ship_listener(sender, oldstatus="", newstatus="", order=None, **kw
         if order.is_shippable:
             send_ship_notice(order)
 
-@send_store_mail_template_decorator('shop/email/order_complete')
-def send_order_confirmation(order, template='', template_html=''):
+# @send_store_mail_template_decorator('shop/email/order_complete')
+def send_order_confirmation(order, template='shop/email/order_complete.txt', template_html='shop/email/order_complete.html'):
     """Send an order confirmation mail to the customer.
     """
 
@@ -37,8 +37,8 @@ def send_order_confirmation(order, template='', template_html=''):
                     template_html=template_html, format_subject=True,
                     sender=order_confirmation_sender)
 
-@send_store_mail_template_decorator('shop/email/order_placed_notice')
-def send_order_notice(order, template='', template_html=''):
+# @send_store_mail_template_decorator('shop/email/order_placed_notice')
+def send_order_notice(order, template='shop/email/order_placed_notice.txt', template_html='shop/email/order_placed_notice.html'):
     """Send an order confirmation mail to the owner.
     """
 

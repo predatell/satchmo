@@ -9,7 +9,7 @@ from decimal import Decimal, ROUND_CEILING
 from django.contrib.sites.models import Site
 from django.conf import settings
 from django.db import models
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
 from django.utils import timezone
@@ -270,8 +270,8 @@ class CartManager(models.Manager):
                     log.debug('Removing invalid cart from session')
                     del request.session['cart']
 
-        if isinstance(cart, NullCart) and not isinstance(cart, OrderCart) and contact is not None:
-            carts = Cart.objects.filter(customer=contact)
+        if (not cart or isinstance(cart, NullCart)) and not isinstance(cart, OrderCart) and contact is not None:
+            carts = Cart.objects.filter(customer=contact).order_by("-date_time_created")
             if carts.count() > 0:
                 cart = carts[0]
                 request.session['cart'] = cart.id
@@ -501,7 +501,7 @@ class CartItem(models.Model):
         ordering = ('id',)
 
     def __str__(self):
-        money_format = force_text(moneyfmt(self.line_total))
+        money_format = force_str(moneyfmt(self.line_total))
         return '%s - %s %s' % (self.quantity, self.product.name, money_format)
 
     def _get_line_unitprice(self, include_discount=True):
@@ -1246,7 +1246,7 @@ class OrderItemDetail(models.Model):
     """
     item = models.ForeignKey(OrderItem, verbose_name=_("Order Item"), on_delete=models.CASCADE)
     name = models.CharField(_('Name'), max_length=100)
-    value = models.CharField(_('Value'), max_length=255)
+    value = models.TextField(_('Value'))
     price_change = CurrencyField(_("Price Change"), max_digits=18, decimal_places=10, blank=True, null=True)
     sort_order = models.IntegerField(_("Sort Order"), help_text=_("The display order for this group."))
 
