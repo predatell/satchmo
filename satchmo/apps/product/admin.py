@@ -13,7 +13,6 @@ from product.models import Category, CategoryTranslation, CategoryImage, Categor
 from product.utils import import_validator, validate_attribute_value
 from satchmo_utils.satchmo_thumbnail.field import ImageWithThumbnailField
 from satchmo_utils.satchmo_thumbnail.widgets import AdminImageWithThumbnailWidget
-from django.http import HttpResponseRedirect
 import re
 
 def clean_attribute_value(cleaned_data, obj):
@@ -150,11 +149,9 @@ class CategoryOptions(admin.ModelAdmin):
 
     def mark_active(self, request, queryset):
         queryset.update(is_active=True)
-        return HttpResponseRedirect('')
 
     def mark_inactive(self, request, queryset):
         queryset.update(is_active=False)
-        return HttpResponseRedirect('')
 
     def which_site(self, obj):
         return ', '.join(site.name for site in obj.site.all().order_by())
@@ -194,7 +191,6 @@ class ProductOptions(admin.ModelAdmin):
         else:
             message_bit = _("%s products were" % rows_updated)
         self.message_user(request, _("%s successfully marked as active") % message_bit)
-        return HttpResponseRedirect('')
     make_active.short_description = _("Mark selected products as active")
 
     def make_inactive(self, request, queryset):
@@ -204,7 +200,6 @@ class ProductOptions(admin.ModelAdmin):
         else:
             message_bit = _("%s products were" % rows_updated)
         self.message_user(request, _("%s successfully marked as inactive") % message_bit)
-        return HttpResponseRedirect('')
     make_inactive.short_description = _("Mark selected products as inactive")
 
     def make_featured(self, request, queryset):
@@ -214,7 +209,6 @@ class ProductOptions(admin.ModelAdmin):
         else:
             message_bit = _("%s products were" % rows_updated)
         self.message_user(request, _("%s successfully marked as featured") % message_bit)
-        return HttpResponseRedirect('')
     make_featured.short_description = _("Mark selected products as featured")
 
     def make_unfeatured(self, request, queryset):
@@ -224,7 +218,6 @@ class ProductOptions(admin.ModelAdmin):
         else:
             message_bit = _("%s products were" % rows_updated)
         self.message_user(request, _("%s successfully marked as not featured") % message_bit)
-        return HttpResponseRedirect('')
     make_unfeatured.short_description = _("Mark selected products as not featured")
 
     def formatted_price(self, obj):

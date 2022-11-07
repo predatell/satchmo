@@ -3,10 +3,10 @@
 <tr>
     <td>&nbsp;</td>
     <td colspan="2">
-        {% ifnotequal custom.downpayment 100 %}
+        {% if custom.downpayment != 100 %}
             {% trans 'Base Price: ' %}{{ custom.full_price|currency }}<br/>
             <i>{% trans 'price at right is your deposit, you will receive a bill for the remainder when your item is ready.' %}</i><br/>
-        {% endifnotequal %}
+        {% endif %}
         {% for detail in cartitem.details.all %}
             {% if not forloop.first %}<br />{% endif %}
             {{ detail.name }}: {{ detail.value }} {% if detail.price_change %} {{ detail.price_change|currency}} {% endif %}
