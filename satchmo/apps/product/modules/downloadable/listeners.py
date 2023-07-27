@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from django.utils.translation import gettext
 import product
 from product import signals as product_signals
@@ -22,8 +22,8 @@ def add_download_urls(sender=None, patterns=None, section=None, **kwargs):
         return
 
     urlpatterns = [
-        url(r'^download/process/(?P<download_key>\w+)/$', views.process, name='satchmo_download_process'),
-        url(r'^download/send/(?P<download_key>\w+)/$', views.send_file, name='satchmo_download_send'),
+        re_path(r'^download/process/(?P<download_key>\w+)/$', views.process, name='satchmo_download_process'),
+        re_path(r'^download/send/(?P<download_key>\w+)/$', views.send_file, name='satchmo_download_send'),
     ]
 
     if patterns:
