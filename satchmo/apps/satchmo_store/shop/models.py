@@ -347,7 +347,7 @@ class Cart(models.Model):
     def __len__(self):
         return self.cartitem_set.count()
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         This is used by django to evaluate whether or not to
         include an object when dumping data. Therefore, we will dump
