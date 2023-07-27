@@ -35,11 +35,11 @@
             <li> {% trans "Previous" %} </li>
         {% endif %}
         {% for page_number in paginator.num_pages|template_range %}
-            {% ifequal page_number page_obj.number %}
+            {% if page_number == page_obj.number %}
                 <li class="currentpage">{{page_number}}</li>
             {% else %}
                 <li> <a href="{{shop_base}}/?page={{page_number}}">{{page_number}}</a> </li>
-            {% endifequal %}
+            {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
             <li> <a href="{{shop_base}}/?page={{page_obj.next_page_number}}">{% trans "Next" %}</a></li>

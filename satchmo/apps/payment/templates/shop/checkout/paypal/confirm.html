@@ -97,7 +97,7 @@
 <input type="hidden" name="address1" value="{{address.street1}}" />
 <input type="hidden" name="address2" value="{{address.street2}}" />
 <input type="hidden" name="city" value="{{address.city}}" />
-{# only U.S. abbreviations may be used here #}{% ifequal address.country.iso2_code|lower 'us' %}{% ifequal address.state|length 2 %}<input type="hidden" name="state" value="{{address.state}}" />{% endifequal %}{% endifequal %}
+{# only U.S. abbreviations may be used here #}{% if address.country.iso2_code|lower == 'us' %}{% if address.state|length == 2 %}<input type="hidden" name="state" value="{{address.state}}" />{% endif %}{% endif %}
 <input type="hidden" name="country" value="{{address.country.iso2_code}}" />
 <input type="hidden" name="zip" value="{{address.postal_code}}" />
 <input type="hidden" name="email" value="{{order.contact.email}}" />

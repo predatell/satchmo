@@ -21,7 +21,7 @@
 {% if order.shipping_method %}
 <h4>{% trans "Shipping Method" %}</h4>
 {{ order.shipping_description }}<br/>
-{% ifnotequal order.shipping_method order.shipping_description %}{{ order.shipping_method }}<br/>{% endifnotequal %}
+{% if order.shipping_method != order.shipping_description %}{{ order.shipping_method }}<br/>{% endif %}
 {{ order.shipping_sub_total|currency }}<br/>
 {% endif %}
 

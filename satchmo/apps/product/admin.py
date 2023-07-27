@@ -13,7 +13,6 @@ from product.models import Category, CategoryTranslation, CategoryImage, Categor
 from product.utils import import_validator, validate_attribute_value
 from satchmo_utils.satchmo_thumbnail.field import ImageWithThumbnailField
 from satchmo_utils.satchmo_thumbnail.widgets import AdminImageWithThumbnailWidget
-from django.http import HttpResponseRedirect
 import re
 
 def clean_attribute_value(cleaned_data, obj):

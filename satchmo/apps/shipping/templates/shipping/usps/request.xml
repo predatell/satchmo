@@ -1,5 +1,5 @@
 <RateV4Request USERID="{{ config.userid }}" PASSWORD="{{ config.password }}">
-{% ifequal config.ship_type "FIRST CLASS" %}
+{% if config.ship_type == "FIRST CLASS" %}
 {% for type in first_class_types %}
 <Package ID="products{{ forloop.counter }}">
 {% include 'shipping/usps/request_nodes.xml' %}
@@ -9,5 +9,5 @@
 <Package ID="products">
 {% include 'shipping/usps/request_nodes.xml' %}
 </Package>
-{% endifequal %}
+{% endif %}
 </RateV4Request>

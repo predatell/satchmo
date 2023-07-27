@@ -16,7 +16,7 @@
 
  {% for trial in product.subscriptionproduct.get_trial_terms %}
     {% if forloop.first %} <p> {% blocktrans %}This product has trial subscription pricing {% endblocktrans %}</p><ul> {% endif %}
-    <li>{% if trial.price %}{{trial.price|currency}}{% else %}{% trans 'Free' %} {% endif %}{% blocktrans %}for trial period of {% endblocktrans %}{{trial.expire_length}} {% ifequal product.subscriptionproduct.expire_unit "DAY" %}{% trans "days" %}{% else %}{% trans "months" %}{% endifequal %}</li>
+    <li>{% if trial.price %}{{trial.price|currency}}{% else %}{% trans 'Free' %} {% endif %}{% blocktrans %}for trial period of {% endblocktrans %}{{trial.expire_length}} {% if product.subscriptionproduct.expire_unit == "DAY" %}{% trans "days" %}{% else %}{% trans "months" %}{% endif %}</li>
     {% if forloop.last %} </ul> {% endif %}
  {% endfor %}
 

@@ -93,11 +93,11 @@
         {% endif %}
 	<para>{{order.bill_city}}, {{order.bill_state}}</para>
 	<para>{{order.bill_postal_code}}</para>
-        {% ifnotequal order.bill_country shopDetails.country.iso2_code %}
+        {% if order.bill_country != shopDetails.country.iso2_code %}
         <para>{{order.bill_country_name}}</para>
         {% else %}
 	<spacer length="0.8cm" width="1mm"/>
-	{% endifnotequal %}
+	{% endif %}
 	<para>{% trans "Phone" %}: {{order.contact.primary_phone.phone}}</para>
 	<para>{% trans "Email" %}: {{order.contact.email}}</para>
 
@@ -110,11 +110,11 @@
         {% endif %}
 	<para>{{order.ship_city}}, {{order.ship_state}}</para>
 	<para>{{order.ship_postal_code}}</para>
-        {% ifnotequal order.ship_country shopDetails.country.iso2_code %}
+        {% if order.ship_country != shopDetails.country.iso2_code %}
         <para>{{ order.ship_country_name }}</para>
         {% else %}
 	<spacer length="0.8cm" width="1mm"/>
-        {% endifnotequal %}
+        {% endif %}
     <nextFrame/>
     
 	<setNextTemplate name="others"/>
