@@ -3,10 +3,11 @@ import os
 import random
 from hashlib import sha1 as sha_constructor
 
+from six import python_2_unicode_compatible
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.fields.files import FileField
-from django.utils.encoding import smart_str, python_2_unicode_compatible
+from django.utils.encoding import smart_str
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 try:

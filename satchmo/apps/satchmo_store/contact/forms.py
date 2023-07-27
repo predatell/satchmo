@@ -403,7 +403,7 @@ class ContactInfoForm(ProxyContactForm):
                 pass
                 
         # Make sure not to overwrite a custom ship to name
-        if copy_address and getattr(ship_address, "addressee", "") == getattr(bill_address, "addressee", ""):
+        if copy_address:  # and getattr(ship_address, "addressee", "") == getattr(bill_address, "addressee", ""):
             # make sure we don't have any other default shipping address
             if ship_address and ship_address.id != bill_address.id:
                 ship_address.delete()
@@ -411,7 +411,7 @@ class ContactInfoForm(ProxyContactForm):
 
         bill_address.save()
         # If we have different ship to and bill to names, preserve them
-        if not copy_address or getattr(ship_address, "addressee", "") != getattr(bill_address, "addressee", ""):
+        if not copy_address:  # or getattr(ship_address, "addressee", "") != getattr(bill_address, "addressee", ""):
             if not ship_address or ship_address.id == bill_address.id:
                 ship_address = AddressBook()
 
