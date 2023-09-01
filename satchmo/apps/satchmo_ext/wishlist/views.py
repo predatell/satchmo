@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.safestring import mark_safe
 try:
@@ -107,7 +107,7 @@ def wishlist_add_ajax(request, template="shop/json.html"):
     encoded = mark_safe(encoded)
     log.debug('WISHLIST AJAX: %s', data)
 
-    return render_to_response(template, {'json' : encoded})
+    return render(template, {'json' : encoded})
 
 
 def wishlist_move_to_cart(request):
@@ -148,7 +148,7 @@ def wishlist_remove_ajax(request, template="shop/json.html"):
     encoded = JSONEncoder().encode(data)
     encoded = mark_safe(encoded)
     
-    return render_to_response(template, {'json' : encoded})
+    return render(template, {'json' : encoded})
     
 def _wish_from_post(request):
     wid = request.POST.get('id', None)
