@@ -151,6 +151,9 @@ class GiftCertificateProduct(models.Model):
             elif detl.name == "message":
                 message = detl.value
 
+        if not email:
+            email = order.contact.email
+
         price = order_item.line_item_price
         log.debug("Creating gc for %s", price)
         gc = GiftCertificate(

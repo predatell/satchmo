@@ -367,6 +367,10 @@ class Cart(models.Model):
         return "Shopping Cart (%s)" % self.date_time_created
 
     def add_item(self, chosen_item, number_added, details=[]):
+        if self.is_empty:
+            self.date_time_created = timezone.now()
+            self.save()
+
         alreadyInCart = False
         # Custom Products will not be added, they will each get their own line item
         if 'CustomProduct' in chosen_item.get_subtypes():
@@ -600,10 +604,17 @@ class CartItemDetails(models.Model):
         verbose_name_plural = _("Cart Item Details")
 
 
+# ORDER_CHOICES = (
+#     ('Online', _('Online')),
+#     ('In Person', _('In Person')),
+#     ('Show', _('Show')),
+# )
+
 ORDER_CHOICES = (
     ('Online', _('Online')),
-    ('In Person', _('In Person')),
-    ('Show', _('Show')),
+    ('LD', _('Stripe')),
+    ('Formstack', _('Formstack')),
+    ('In Person', _('In Center Purchase')),
 )
 
 ORDER_STATUS = (

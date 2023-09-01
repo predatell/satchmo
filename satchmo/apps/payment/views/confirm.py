@@ -132,8 +132,8 @@ class ConfirmController(object):
 
     def _onSuccess(self, controller):
         """Handles a success in payment.  If the order is paid-off, sends success, else return page to pay remaining."""
+        controller.cart.empty()
         if controller.order.paid_in_full:
-            controller.cart.empty()
             for item in controller.order.orderitem_set.all():
                 if item.product.is_subscription:
                     item.completed = True

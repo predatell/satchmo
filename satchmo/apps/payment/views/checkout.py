@@ -33,14 +33,15 @@ class SuccessDetailView(DetailView):
     model = Order
     template_name = "shop/checkout/success.html"
     context_object_name = "order"
-    
+
     def get_object(self, queryset=None):
         try:
-            return self.model.objects.from_request(self.request)
+            order = self.model.objects.from_request(self.request)
+            del self.request.session['orderID']
+            return order
         except:
             raise Http404("Your order has already been processed.")
-        del self.request.session['orderID']
-            
+
     def get_context_data(self, **kwargs):
         context = super(SuccessDetailView, self).get_context_data(**kwargs)
         gc_email_sent = False
@@ -49,14 +50,14 @@ class SuccessDetailView(DetailView):
             gc_email_sent = gift_certificate_processor(self.object)
         context['gc_email_sent'] = gc_email_sent
         return context
-                
+
 success = never_cache(SuccessDetailView.as_view())
 
 
 class FailureTemplateView(TemplateView):
     template_name = "shop/checkout/failure.html"
-    
+
 failure = FailureTemplateView.as_view()
-    
+
 # def failure(request):
 #     return render(request, 'shop/checkout/failure.html')
