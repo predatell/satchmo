@@ -26,7 +26,7 @@ import logging
 from django.views.decorators.csrf import csrf_exempt
 
 
-log = logging.getLogger()
+log = logging.getLogger('payment.modules.paypal.views')
 
 def pay_ship_info(request):
     return payship.base_pay_ship_info(request,
@@ -147,7 +147,7 @@ def ipn(request):
     try:
         data = request.POST
         log.debug("PayPal IPN data: " + repr(data))
-        if not confirm_ipn_data(request.raw_post_data, PP_URL):
+        if not confirm_ipn_data(request.body, PP_URL):
             return HttpResponse()
 
         if not 'payment_status' in data or not data['payment_status'] == "Completed":
@@ -196,14 +196,15 @@ def ipn(request):
 def confirm_ipn_data(query_string, PP_URL):
     # data is the form data that was submitted to the IPN URL.
 
-    params = 'cmd=_notify-validate&' + query_string
+    params = b'cmd=_notify-validate&' + query_string
 
     req = urllib.request.Request(PP_URL)
     req.add_header("Content-type", "application/x-www-form-urlencoded")
+    req.add_header("user-agent", "Python-IPN-Verification-Script")
     fo = urllib.request.urlopen(req, params)
 
     ret = fo.read()
-    if ret == "VERIFIED":
+    if ret.decode() == "VERIFIED":
         log.info("PayPal IPN data verification was successful.")
     else:
         log.info("PayPal IPN data verification failed.")

@@ -1,10 +1,16 @@
 import urllib
 import stripe
+import datetime
 
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
+from satchmo_store.contact.models import Contact
 from payment.modules.base import BasePaymentProcessor, ProcessorResult
+from payment.modules.stripe.forms import StripePaymentForm
+
+FORM = StripePaymentForm
 
 
 class PaymentProcessor(BasePaymentProcessor):
@@ -66,21 +72,10 @@ class PaymentProcessor(BasePaymentProcessor):
                 amount = order.balance
 
             standard = self.get_standard_charge_data(order, amount)
-            # customer = self.get_or_create_customer(order)
-
-
-            #print(customer)
-            #if getattr(customer, "pk", False):
-            #    standard['amount'] = amount
-            #    customer._meta.model.sync_from_stripe_data(customer, api_key=customer.default_api_key)
-            #    print(customer.id)
-            #    charge = customer.charge(**standard)
-            #else:
-            #    standard['customer'] = customer.id
-            #    charge = self.stripe.Charge.create(**standard)
-
-            payment_method = self.create_payment_method(order, include_billing_details=True)
-            standard["payment_method"] = payment_method
+            customer_id = self.get_or_create_customer(order)
+            standard["customer"] = customer_id
+            # payment_method = self.create_payment_method(order, include_billing_details=True)
+            # standard["payment_method"] = payment_method
             standard["confirm"] = True
             payment_intent = self.stripe.PaymentIntent.create(**standard)
             payment = self.record_payment(order=self.order, amount=amount, transaction_id=payment_intent.id)
@@ -108,7 +103,6 @@ class PaymentProcessor(BasePaymentProcessor):
         if len(items) > 0:
             product = items[0]
 
-        print(product)
         if product:
             price = product.get("default_price")
             if not price or price.get("unit_amount") != price_data.get("unit_amount") or not price.get("recurring") or \
@@ -130,7 +124,6 @@ class PaymentProcessor(BasePaymentProcessor):
             }]
         }
         subscription = stripe.Subscription.create(**data)
-        print(subscription)
         payment = self.record_payment(order=self.order, amount=amount, transaction_id=subscription.id)
         return ProcessorResult(self.key, True, "Subscription #%s is created" % subscription.id, payment=payment)
 
@@ -140,7 +133,6 @@ class PaymentProcessor(BasePaymentProcessor):
         results = []
         success = True
         customer_id = self.get_or_create_customer(recurring_orderitems[0].order)
-        print(customer_id)
         for order_item in recurring_orderitems:
             result = self.process_recurring_subscription(order_item, customer_id, testing=testing)
 
@@ -216,48 +208,52 @@ class PaymentProcessor(BasePaymentProcessor):
 
         customer_id = None
         email = order.contact.email
-
+        default_payment_card = None
+        default_payment_method = order.get_variable("default_payment_method")
         try:
             customer = self.dj_models.Customer.objects.get(email=email, id__isnull=False)
-            print(customer)
             customer_id = customer.id
+            if default_payment_method:
+                default_payment_card = customer.default_payment_method.card
         except (self.dj_models.Customer.DoesNotExist, AttributeError):
-            query = "email:'%s'" % order.contact.email
-            search_result = self.stripe.Customer.search(query=query, stripe_version=self.search_stripe_version)
-            print(search_result)
+            query = "email:'%s'" % email
+            search_result = self.stripe.Customer.search(query=query, stripe_version=self.search_stripe_version, expand=['data.invoice_settings.default_payment_method'])
             items = search_result.get("data")
             if len(items) > 0:
                 customer_id = items[0].get("id")
+                if default_payment_method:
+                    try:
+                        default_payment_card = items[0].get("invoice_settings").get("default_payment_method").get("card")
+                    except AttributeError:
+                        pass
 
-        payment_method = self.create_payment_method(order)
-        print(payment_method)
+        payment_method_id = None
+        if not default_payment_card:
+            payment_method = self.create_payment_method(order)
+            payment_method_id = payment_method.id
 
         data = {
             'name': "%s %s" % (order.bill_first_name, order.bill_last_name),
-            # 'email': order.contact.email,
             'phone': order.contact.primary_phone.phone,
             'address': self.prepare_billing_address(order),
             'shipping': {
                 'name': order.ship_addressee,
                 'address': self.prepare_shipping_address(order),
             },
-
-            # 'source': self.generate_card_token(order.credit_card, order),
-
         }
 
         if customer_id:
-            self.stripe.PaymentMethod.attach(payment_method.id, customer=customer_id)
-            data['invoice_settings'] = {'default_payment_method': payment_method.id}
+            if not default_payment_card:
+                self.stripe.PaymentMethod.attach(payment_method_id, customer=customer_id)
+                data['invoice_settings'] = {'default_payment_method': payment_method_id}
             self.stripe.Customer.modify(customer_id, **data)
         else:
             data['email'] = email
-            data['payment_method'] = payment_method.id
+            data['payment_method'] = payment_method_id
             customer = self.stripe.Customer.create(**data)
             customer_id = customer.id
 
         self.customer_id = customer_id
-        print(customer_id)
         return self.customer_id
 
     def create_payment_method(self, order, include_billing_details=False):
@@ -279,6 +275,38 @@ class PaymentProcessor(BasePaymentProcessor):
             }
         payment_method = self.stripe.PaymentMethod.create(**data)
         return payment_method
+
+    def get_default_payment_method(self, request):
+        contact = Contact.objects.from_request(request)
+        if contact:
+            email = contact.email
+            default_payment_method = None
+            card = None
+            try:
+                customer = self.dj_models.Customer.objects.get(email=email, id__isnull=False)
+                card = customer.default_payment_method.card
+            except (self.dj_models.Customer.DoesNotExist, AttributeError):
+                query = "email:'%s'" % email
+                search_result = self.stripe.Customer.search(query=query, stripe_version=self.search_stripe_version, expand=['data.invoice_settings.default_payment_method'])
+                items = search_result.get("data")
+                if len(items) > 0:
+                    try:
+                        card = items[0].get("invoice_settings").get("default_payment_method").get("card")
+                    except AttributeError:
+                        pass
+            if card and self.validate_card(card):
+                default_payment_method = "%s: ... %s" % (card.get("brand", "").title(), card.get("last4", ""))
+            return default_payment_method
+
+    def validate_card(self, card):
+        if card:
+            exp_month = card.get('exp_month', None)
+            exp_year = card.get('exp_year', None)
+            if exp_month and exp_year:
+                today = timezone.now().date()
+                exp_date = datetime.date(exp_year, exp_month + 1, 1)
+                if exp_date > today:
+                    return True
 
 
 if __name__ == "__main__":
@@ -323,11 +351,8 @@ if __name__ == "__main__":
     sampleOrder.credit_card.expirationDate = "10/11"
     sampleOrder.credit_card.ccv = "144"
 
-    stripe_settings = config_get_group('PAYMENT_NMI')
+    stripe_settings = config_get_group('PAYMENT_STRIPE')
     if not stripe_settings.LIVE.value:
         processor = PaymentProcessor(stripe_settings)
         processor.prepare_data(sampleOrder)
         results = processor.process(testing=True)
-        print(results)
-
-

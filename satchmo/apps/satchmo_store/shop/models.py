@@ -140,7 +140,7 @@ class Config(models.Model):
         else:
             return self.shipping_countries.filter(active=True)
 
-    def _base_url(self, secure=False):
+    def _base_url(self, secure=True):
         prefix = "http"
         if secure:
             prefix += "s"
@@ -614,6 +614,7 @@ ORDER_CHOICES = (
     ('Online', _('Online')),
     ('LD', _('Stripe')),
     ('Formstack', _('Formstack')),
+    ('Shopify', _('Shopify')),
     ('In Person', _('In Center Purchase')),
 )
 

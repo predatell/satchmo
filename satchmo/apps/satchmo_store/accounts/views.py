@@ -51,7 +51,7 @@ def emaillogin(request, template_name='registration/login.html',
         form = todo
 
     request.session.set_test_cookie()
-    if Site._meta.installed:
+    if Site._meta.app_config:
         current_site = Site.objects.get_current()
     else:
         current_site = RequestSite(request)

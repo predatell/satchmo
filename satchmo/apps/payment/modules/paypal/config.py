@@ -27,6 +27,18 @@ StringValue(PAYMENT_GROUP,
     default="https://www.sandbox.paypal.com/cgi-bin/webscr"),
 
 StringValue(PAYMENT_GROUP,
+    'IPN_URL',
+    description=_('IPN URL'),
+    help_text=_('The Paypal URL for real IPN notifications.'),
+    default="https://ipnpb.paypal.com/cgi-bin/webscr"),
+
+StringValue(PAYMENT_GROUP,
+    'IPN_TEST_URL',
+    description=_('IPN test URL'),
+    help_text=_('The Paypal URL for test IPN notifications.'),
+    default="https://ipnpb.sandbox.paypal.com/cgi-bin/webscr"),
+
+StringValue(PAYMENT_GROUP,
     'BUSINESS',
     description=_('Paypal account email'),
     help_text=_('The email address for your paypal account'),

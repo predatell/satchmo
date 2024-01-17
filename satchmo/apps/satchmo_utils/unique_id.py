@@ -29,7 +29,7 @@ def _id_generator(first_name, last_name, email):
     id = _alnum(email.split('@')[0])
     if len(id) >= _ID_MIN_LENGTH:
         yield id[:_ID_MAX_LENGTH]
-    id = _alnum(unicodedata.normalize('NFKD', first_name + last_name).encode('ascii', 'ignore'))
+    id = _alnum(unicodedata.normalize('NFKD', first_name.strip() + last_name.strip())
     if len(id) >= _ID_MIN_LENGTH:
         yield id[:_ID_MAX_LENGTH]
     id = _alnum(email, glue='_')

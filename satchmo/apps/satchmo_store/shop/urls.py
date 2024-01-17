@@ -26,7 +26,7 @@ urlpatterns += [
     re_path(r'^history/$', orders.order_history, name='satchmo_order_history'),
     re_path(r'^quickorder/$', cart.add_multiple, name='satchmo_quick_order'),
     re_path(r'^tracking/(?P<order_id>\d+)/$', orders.order_tracking, name='satchmo_order_tracking'),
-    re_path(r'^search/$', search.search_view, name='satchmo_search'),
+    re_path(r'^search/$', search.SearchView.as_view(), name='satchmo_search'),
     re_path(r'^l10n/', include('l10n.urls')),
 ]
 
