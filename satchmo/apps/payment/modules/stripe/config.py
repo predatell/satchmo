@@ -80,4 +80,10 @@ config_register_list(
         default=False,
         help_text=_('Enable ARB processing for setting up subscriptions.')),
 
+    BooleanValue(PAYMENT_GROUP,
+        'STORED_PAYMENT_METHOD',
+        description=_('Enable default payment method?'),
+        default=True,
+        help_text=_('Enable default payment method using stored credit cards.')),
+
 )

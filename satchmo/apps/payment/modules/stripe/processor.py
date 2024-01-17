@@ -277,6 +277,8 @@ class PaymentProcessor(BasePaymentProcessor):
         return payment_method
 
     def get_default_payment_method(self, request):
+        if not self.settings.STORED_PAYMENT_METHOD.value:
+            return
         contact = Contact.objects.from_request(request)
         if contact:
             email = contact.email
