@@ -14,12 +14,7 @@ FORM = StripePaymentForm
 
 
 class PaymentProcessor(BasePaymentProcessor):
-    """
-    Authorize.NET payment processing module
-    You must have an account with authorize.net in order to use this module.
-
-    Additionally, you must have ARB enabled in your account to use recurring billing.
-    """
+    dj_models = False
 
     def __init__(self, settings):
         super(PaymentProcessor, self).__init__('stripe', settings)
@@ -32,11 +27,12 @@ class PaymentProcessor(BasePaymentProcessor):
             security_key = settings.TEST_TRANKEY.value
         self.stripe.api_key = security_key
 
-        try:
-            from djstripe import models
-            self.dj_models = models
-        except ImportError:
-            self.dj_models = False
+        if settings.LIVE.value:
+            try:
+                from djstripe import models
+                self.dj_models = models
+            except ImportError:
+                pass
 
         self.customer_id = None
         self.card_token = None

@@ -130,8 +130,9 @@ def wishlist_move_to_cart(request):
         return wishlist_view(request)    
     
 def wishlist_remove(request):
-    contact = Contact.objects.from_request(request)
-    if not contact:
+    try:
+        contact = Contact.objects.from_request(request)
+    except Contact.DoesNotExist:
         return _wishlist_requires_login(request)
             
     success, msg = _wishlist_remove(request)
